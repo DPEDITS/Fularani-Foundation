@@ -166,3 +166,4 @@ Developer profile images are fetched directly from their GitHub profiles.
 |----------|--------|---------|
 | Developer 1 | [@DPEDITS](https://github.com/DPEDITS) | ![](https://github.com/DPEDITS.png?size=100) |
 | Developer 2 | [@Abhijeet-Dashy](https://github.com/Abhijeet-Dashy) | ![](https://github.com/Abhijeet-Dashy.png?size=100) |
+| Developer 3 | [@abhijeetdutta-1908](https://github.com/abhijeetdutta-1908) | ![](https://github.com/abhijeetdutta-1908.png?size=100) |
