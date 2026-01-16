@@ -76,10 +76,10 @@ Make sure the following are installed on your system:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/fularanifoundation.org.git
+git clone https://github.com/DPEDITS/Fularani-Foundation.git
 
 # Navigate into the project directory
-cd fularanifoundation.org
+cd Fularani-Foundation
 
 # Install dependencies
 npm install
@@ -156,3 +156,13 @@ You are free to use, modify, and distribute this project with proper attribution
 Built with ❤️ using Next.js
 
 ---
+
+## 👨‍💻 Developers
+
+The following contributors have worked on the development of this project.
+Developer profile images are fetched directly from their GitHub profiles.
+
+| Developer | GitHub | Profile |
+|----------|--------|---------|
+| Developer 1 | [@DPEDITS](https://github.com/DPEDITS) | ![](https://github.com/DPEDITS.png?size=100) |
+| Developer 2 | [@Abhijeet-Dashy](https://github.com/Abhijeet-Dashy) | ![](https://github.com/Abhijeet-Dashy.png?size=100) |
