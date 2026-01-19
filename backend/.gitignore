@@ -1,0 +1,17 @@
+node_modules
+.env
+dist
+.DS_Store
+.vscode
+npm-debug.log
+yarn-error.log
+logs
+*.log
+pids
+*.pid
+*.seed
+*.pid.lock
+coverage
+lib-cov
+.nyc_output
+.grunt
