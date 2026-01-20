@@ -1,9 +1,15 @@
-import React from 'react'
+import Navbar from "../components/Navbar";
 
-const HomePage = () => {
+const Home = () => {
   return (
-    <div>HomePage</div>
-  )
-}
+    <>
+      <Navbar />
+      <main className="pt-1000 text-center text-4xl font-bold">
+      <h1 className="text-red-500 text-4xl">TEST</h1>
 
-export default HomePage
+      </main>
+    </>
+  );
+};
+
+export default Home;
