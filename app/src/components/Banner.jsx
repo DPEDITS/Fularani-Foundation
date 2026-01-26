@@ -6,11 +6,14 @@ import headerImg from "../assets/fularani.svg"; // replace with foundation image
 export const Banner = () => {
     const [loopNum, setLoopNum] = useState(0);
     const [isDeleting, setIsDeleting] = useState(false);
-    const toRotate = [
-        "Fighting Thalassemia",
-        "Education for Every Child",
-        "Period Pride & Women’s Health",
-    ];
+const toRotate = [
+      "MISSION THALASSEMIA",
+      "MISSION GREEN",
+      "MISSION MOBILITY",
+      "EDUCATION FOR ALL",
+      "MISSION PERIOD PRIDE",
+];
+
     const [text, setText] = useState("");
     const [delta, setDelta] = useState(200);
     const period = 100;
@@ -61,16 +64,14 @@ export const Banner = () => {
                             towards a healthier, educated, and empowered society.
                         </p>
 
-                        <button
-                            onClick={() => {
-                                const section = document.querySelector("#connect");
-                                if (section) {
-                                    section.scrollIntoView({ behavior: "smooth" });
-                                }
-                            }}
-                        >
-                            Donate <ArrowRightCircle size={25} />
-                        </button>
+<button
+  onClick={() => {
+    window.location.href = "/donor-login";
+  }}
+  className="flex items-center gap-2"
+>
+  Donate <ArrowRightCircle size={25} />
+</button>
                     </div>
 
                     <div className="col-span-1 xl:col-span-1 flex justify-center md:justify-end">
