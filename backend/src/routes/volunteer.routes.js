@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import { registerUser } from '../controllers/user.controller.js';
+import { registerVolunteer } from '../controllers/volunteer.controller.js';
 import multer from 'multer';
 import { upload } from '../middlewares/multer.middleware.js';
 
@@ -12,7 +12,7 @@ router.route("/register").post(
             maxCount: 1
         }
     ]),
-    registerUser
+    registerVolunteer
 )
 
 
