@@ -74,7 +74,7 @@ const volunteerSchema = new Schema(
       required: true,
     },
     availabilityHours: {
-      type: Number,
+      type: String,
       required: true,
     },
     preferredAreas: {

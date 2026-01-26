@@ -46,15 +46,28 @@ const registerVolunteer = asyncHandler(async (req, res) => {
   if (avatarLocalPath) {
     avatar = await uploadOnCloudinary(avatarLocalPath);
   }
+  if (!avatar) {
+    throw new ApiError(400, "Avatar is required");
+  }
 
+  let parsedDateOfBirth = dateOfBirth;
+  const ddmmyyyyRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+  if (typeof dateOfBirth === "string") {
+    const match = dateOfBirth.match(ddmmyyyyRegex);
+    if (match) {
+      const [_, day, month, year] = match;
+      parsedDateOfBirth = new Date(year, month - 1, day);
+    }
+  }
+  //?.url || ""
   const user = await Volunteer.create({
     username: username.toLowerCase(),
     email,
     password,
-    avatar: avatar?.url || "",
+    avatar: avatar?.url,
     gender,
     phone,
-    dateOfBirth,
+    dateOfBirth: parsedDateOfBirth,
     address,
     idType,
     skills,
