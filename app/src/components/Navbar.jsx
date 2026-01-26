@@ -32,13 +32,12 @@ const Navbar = () => {
             <MobileLink href="/gallery" label="Gallery" />
             <MobileLink href="/missions" label="Missions" />
             <MobileLink href="/contact" label="Contact" />
-            <MobileLink href="/login" label="Join Us" />
 
             <a
               href="/login"
               className="block w-full text-center mt-4 px-5 py-3 rounded-full border border-white/20 text-white font-medium hover:bg-white hover:text-black transition"
             >
-              Donate
+              Join Us
             </a>
           </div>
         )}
@@ -54,7 +53,6 @@ const NavLinks = () => (
     <NavItem href="/gallery" label="Gallery" />
     <NavItem href="/missions" label="Missions" />
     <NavItem href="/contact" label="Contact" />
-    <NavItem href="/login" label="Join Us" />
   </>
 );
 
@@ -69,7 +67,7 @@ const DonateButton = () => (
     href="/login"
     className="ml-4 px-5 py-2 rounded-full border border-white/20 text-white text-sm font-medium hover:bg-white hover:text-black transition"
   >
-    Donate
+    Join Us
   </a>
 );
 
