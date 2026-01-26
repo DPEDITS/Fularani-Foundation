@@ -2,20 +2,29 @@ import mongoose, { Schema } from "mongoose";
 
 const donorSchema = new Schema(
   {
-    fullName: {
-      type: String,
-      required: true,
-      trim: true,
-      index: true,
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+        index: true
     },
     email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true
     },
-    passwordHash: {
+    avatar: {
+      type: String, // cloudinary url
+    },
+    password : {
+        type : String,
+        required : [true, "Password is required"]
+    },
+    refreshToken: {
       type: String,
     },
     phone: {
@@ -29,6 +38,7 @@ const donorSchema = new Schema(
     totalDonatedAmount: {
       type: Number,
       default: 0,
+      required : [true, "Total donated amount is required"]
     },
     donationCount: {
       type: Number,
@@ -36,6 +46,7 @@ const donorSchema = new Schema(
     },
     panNumber: {
       type: String,
+      required : [true, "Pan number is required"]
     },
     wants80GReceipt: {
       type: Boolean,

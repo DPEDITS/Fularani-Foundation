@@ -50,7 +50,7 @@ const contentSchema = new Schema(
     },
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Volunteer",
     },
   },
   { timestamps: true },

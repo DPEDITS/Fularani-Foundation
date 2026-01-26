@@ -11,45 +11,54 @@ const volunteerSchema = new Schema(
       sparse: true, // Allow null values to not conflict
     },
     email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true
     },
     emailVerified: {
       type: Boolean,
       default: false,
     },
-    fullName: {
-      type: String,
-      required: true,
-      trim: true,
-      index: true,
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+        index: true
     },
     avatar: {
       type: String, // cloudinary url
     },
-    password: {
-      type: String,
+    password : {
+        type : String,
+        required : [true, "Password is required"]
     },
     refreshToken: {
       type: String,
     },
     gender: {
       type: String,
+      enum: ["male", "female", "other"],
+      required: true,
     },
     phone: {
       type: String,
+      required: true,
     },
     dateOfBirth: {
       type: Date,
+      required: true,
     },
     address: {
       type: String,
+      required: true,
     },
     idType: {
       type: String,
+      required: true,
     },
     idNumberEncrypted: {
       type: String,
@@ -62,9 +71,11 @@ const volunteerSchema = new Schema(
     },
     skills: {
       type: [String],
+      required: true,
     },
     availabilityHours: {
       type: Number,
+      required: true,
     },
     preferredAreas: {
       type: [String],

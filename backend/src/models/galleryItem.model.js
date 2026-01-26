@@ -15,7 +15,7 @@ const galleryItemSchema = new Schema(
     },
     uploadedBy: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Volunteer",
     },
     uploadedAt: {
       type: Date,
