@@ -60,9 +60,6 @@ const donorSchema = new Schema(
       type: Boolean,
       default: true,
     },
-    lastLoginAt: {
-      type: Date,
-    },
   },
   { timestamps: true },
 );
