@@ -11,7 +11,7 @@ const Navbar = () => {
       <nav className="fixed top-6 left-1/2 z-50 -translate-x-1/2 hidden md:block">
         <div className="flex items-center gap-8 px-10 py-4 rounded-full bg-black/90 backdrop-blur-md border border-white/10 shadow-lg">
           <NavLinks />
-          <DonateButton />
+          <JoinUsButton />
         </div>
       </nav>
 
@@ -33,12 +33,25 @@ const Navbar = () => {
             <MobileLink href="/missions" label="Missions" />
             <MobileLink href="/contact" label="Contact" />
 
-            <a
-              href="/login"
-              className="block w-full text-center mt-4 px-5 py-3 rounded-full border border-white/20 text-white font-medium hover:bg-white hover:text-black transition"
-            >
-              Join Us
-            </a>
+<a
+  href="/login"
+  className="
+    relative overflow-hidden block w-full text-center mt-4 px-5 py-3 rounded-full
+    border border-white/20 text-white font-medium
+    transition-colors duration-300
+    before:absolute before:inset-0
+    before:bg-pink-500
+    before:translate-x-[-100%]
+    before:transition-transform before:duration-[300ms]
+    hover:before:translate-x-0
+    hover:text-black
+  "
+>
+  <span className="relative z-10">Join Us</span>
+</a>
+
+
+
           </div>
         )}
       </nav>
@@ -57,19 +70,32 @@ const NavLinks = () => (
 );
 
 const NavItem = ({ href, label }) => (
-  <a href={href} className="text-white text-sm font-medium hover:text-gray-300">
+  <a href={href} className="text-white text-sm font-medium hover:text-red-300">
     {label}
   </a>
 );
 
-const DonateButton = () => (
+const JoinUsButton = () => (
   <a
     href="/login"
-    className="ml-4 px-5 py-2 rounded-full border border-white/20 text-white text-sm font-medium hover:bg-white hover:text-black transition"
+    className="
+      relative overflow-hidden ml-4 px-5 py-2 rounded-full
+      border border-white/20 text-white text-sm font-medium
+      transition-colors duration-300
+      before:absolute before:inset-0
+      before:bg-pink-500
+      before:translate-x-[-100%]
+      before:transition-transform before:duration-[300ms]
+      hover:before:translate-x-0
+      hover:text-black
+    "
   >
-    Join Us
+    <span className="relative z-10">Join Us</span>
   </a>
 );
+
+
+
 
 const MobileLink = ({ href, label }) => (
   <a
