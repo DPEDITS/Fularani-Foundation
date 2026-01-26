@@ -1,19 +1,19 @@
 import {Router} from 'express';
-import { registerUser } from '../controllers/user.controller.js';
+import { registerDonor } from '../controllers/donor.controller.js';
 import multer from 'multer';
 import { upload } from '../middlewares/multer.middleware.js';
 
-const router = Router();
+const donorRouter = Router();
 
-router.route("/register").post(
+donorRouter.route("/register").post(
     upload.fields([
         {
             name: "avatar",
             maxCount: 1
         }
     ]),
-    registerUser
+    registerDonor
 )
 
 
-export default router; 
+export default donorRouter; 

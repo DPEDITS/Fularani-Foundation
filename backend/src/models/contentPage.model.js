@@ -19,7 +19,7 @@ const contentPageSchema = new Schema(
     },
     lastEditedBy: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Volunteer",
     },
   },
   { timestamps: true },
