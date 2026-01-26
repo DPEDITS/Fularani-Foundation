@@ -25,7 +25,7 @@ const DonorRegister = () => {
     const isConfirmValid = form.confirmPassword === form.password && form.confirmPassword.length > 0;
 
     return (
-        <main className="min-h-screen md:h-screen flex items-start justify-center px-4 md:px-8 lg:px-12 pt-24 pb-1 overflow-auto md:overflow-hidden">
+        <main className="min-h-screen md:h-screen flex items-start justify-center px-4 md:px-8 lg:px-12 pt-26 pb-1 overflow-auto md:overflow-hidden">
             <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid md:grid-cols-2 min-h-[600px] md:max-h-[85vh]">
 
                 {/* LEFT SIDE: Brand & Visuals */}
