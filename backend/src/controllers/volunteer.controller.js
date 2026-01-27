@@ -46,10 +46,10 @@ const registerVolunteer = asyncHandler(async (req, res) => {
   if (avatarLocalPath) {
     avatar = await uploadOnCloudinary(avatarLocalPath);
   }
-  if (!avatar) {
-    throw new ApiError(400, "Avatar is required");
-  }
-
+  // if (!avatar) {
+  //   throw new ApiError(400, "Avatar is required");
+  // }
+  // fix the avatar optional issue later
   let parsedDateOfBirth = dateOfBirth;
   const ddmmyyyyRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
   if (typeof dateOfBirth === "string") {
@@ -64,7 +64,7 @@ const registerVolunteer = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
     email,
     password,
-    avatar: avatar?.url,
+    avatar: avatar?.url || "",
     gender,
     phone,
     dateOfBirth: parsedDateOfBirth,
