@@ -24,7 +24,7 @@ const DonorLogin = () => {
             <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid md:grid-cols-2 min-h-[600px] md:max-h-[85vh]">
 
                 {/* LEFT SIDE: Brand & Visuals */}
-                <div className="relative bg-gradient-to-br from-red-600 to-rose-600 p-10 md:p-12 flex flex-col justify-between text-white overflow-hidden">
+                <div className="relative bg-gradient-to-br from-pink-400 to-rose-600 p-10 md:p-12 flex flex-col justify-between text-white overflow-hidden">
                     {/* Decorative Background Elements */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                     <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
