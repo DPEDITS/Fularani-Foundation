@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import Gallery from './pages/Gallery';
 import DonorLogin from './pages/DonorLogin';
 import DonorRegister from './pages/DonorRegister';
+import Contact from './pages/Contact';
 const App = () => {
   return (
     <div>
@@ -17,6 +18,7 @@ const App = () => {
         <Route path='/gallery' element={<Gallery />} />
         <Route path='/donor-login' element={<DonorLogin />} />
         <Route path='/donor-register' element={<DonorRegister />} />
+        <Route path='/contact' element={<Contact />} />
       </Routes>
     </div>
   );
