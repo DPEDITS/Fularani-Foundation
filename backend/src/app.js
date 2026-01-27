@@ -18,9 +18,11 @@ app.use(cookieParser());
 //routes import
 import volunteerRouter from "./routes/volunteer.routes.js"
 import donorRouter from "./routes/donor.routes.js"
+import galleryRouter from "./routes/gallery.routes.js";
 
 //routes declaration
 app.use("/api/volunteers", volunteerRouter)
 app.use("/api/donor", donorRouter)
+app.use("/api/gallery", galleryRouter)
 
 export { app };
