@@ -1,4 +1,6 @@
 import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const volunteerSchema = new Schema(
   {
@@ -11,30 +13,30 @@ const volunteerSchema = new Schema(
       sparse: true, // Allow null values to not conflict
     },
     email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
     emailVerified: {
       type: Boolean,
       default: false,
     },
     username: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true,
-        index: true
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true,
     },
     avatar: {
       type: String, // cloudinary url
     },
-    password : {
-        type : String,
-        required : [true, "Password is required"]
+    password: {
+      type: String,
+      required: [true, "Password is required"],
     },
     refreshToken: {
       type: String,
@@ -57,6 +59,10 @@ const volunteerSchema = new Schema(
       required: true,
     },
     idType: {
+      type: String,
+      required: true,
+    },
+    panNumber: {
       type: String,
       required: true,
     },
@@ -97,5 +103,40 @@ const volunteerSchema = new Schema(
   },
   { timestamps: true },
 );
+
+volunteerSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 10);
+});
+
+volunteerSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+volunteerSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      email: this.email,
+      username: this.username,
+      fullName: this.fullName,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    },
+  );
+};
+volunteerSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+    },
+  );
+};
 
 export const Volunteer = mongoose.model("Volunteer", volunteerSchema);
