@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import { registerVolunteer } from '../controllers/volunteer.controller.js';
+import { registerVolunteer, loginVolunteer } from '../controllers/volunteer.controller.js';
 import multer from 'multer';
 import { upload } from '../middlewares/multer.middleware.js';
 
@@ -14,6 +14,8 @@ router.route("/register").post(
     ]),
     registerVolunteer
 )
+
+router.route("/login").post(loginVolunteer)
 
 
 export default router; 
