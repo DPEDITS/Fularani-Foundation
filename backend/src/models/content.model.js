@@ -5,7 +5,7 @@ const contentSchema = new Schema(
     type: {
       type: String,
       required: true,
-      enum: ["PROJECT", "EVENT"],
+      enum: ["MISSION", "EVENT"],
     },
     title: {
       type: String,
@@ -19,7 +19,7 @@ const contentSchema = new Schema(
       type: String,
     },
     images: {
-      type: [String], // Array of Cloudinary URLs
+      type: [String], 
     },
     coverImage: {
       type: String,
@@ -41,8 +41,8 @@ const contentSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["Planning", "Active", "Completed", "OnHold", "Upcoming", "Past"],
-      default: "Planning",
+      enum: ["planning", "active", "completed", "onhold", "upcoming", "past"],
+      default: "planning",
     },
     isPublished: {
       type: Boolean,
