@@ -128,6 +128,7 @@ const getContentById = asyncHandler(async (req, res) => {
 
 const updateContent = asyncHandler(async (req, res) => {
   const {
+    type,
     title,
     shortDescription,
     fullDescription,
@@ -143,6 +144,7 @@ const updateContent = asyncHandler(async (req, res) => {
   const coverImage = req.files?.coverImage?.[0]?.path;
 
   if (
+    !type ||
     !title ||
     !shortDescription ||
     !fullDescription ||

@@ -25,7 +25,19 @@ contentRouter.route("/create").post(
 );
 contentRouter.route("/").get(getAllContent);
 contentRouter.route("/:id").get(getContentById);
-contentRouter.route("/:id").put(updateContent);
+contentRouter.route("/update/:id").put(
+  upload.fields([
+    {
+      name: "images",
+      maxCount: 10,
+    },
+    {
+      name: "coverImage",
+      maxCount: 1,
+    },
+  ]),
+  updateContent,
+);
 contentRouter.route("/:id").delete(deleteContent);
 
 export default contentRouter;
