@@ -27,18 +27,18 @@ const donationSchema = new Schema(
     paymentId: {
       type: String,
     },
-    paymentStatus: {
-      type: String,
-      enum: ["Pending", "Success", "Failed", "Refunded"],
-      default: "Pending",
-    },
+    // paymentStatus: {
+    //   type: String,
+    //   enum: ["Pending", "Success", "Failed", "Refunded"],
+    //   default: "Pending",
+    // },
     isRecurring: {
       type: Boolean,
       default: false,
     },
     recurringInterval: {
       type: String,
-      enum: ["Monthly", "Quarterly", "Yearly"],
+      enum: ["monthly", "quarterly", "yearly"],
     },
     recurringId: {
       type: String,
