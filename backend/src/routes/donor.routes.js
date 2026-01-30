@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import { registerDonor } from '../controllers/donor.controller.js';
+import { loginDonor, registerDonor } from '../controllers/donor.controller.js';
 import multer from 'multer';
 import { upload } from '../middlewares/multer.middleware.js';
 
@@ -14,6 +14,8 @@ donorRouter.route("/register").post(
     ]),
     registerDonor
 )
+
+donorRouter.route("/login").post(loginDonor)
 
 
 export default donorRouter; 

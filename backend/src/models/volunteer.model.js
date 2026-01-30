@@ -127,6 +127,7 @@ volunteerSchema.methods.generateAccessToken = function () {
     },
   );
 };
+
 volunteerSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
