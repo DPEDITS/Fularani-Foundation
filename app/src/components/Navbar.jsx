@@ -64,7 +64,7 @@ const Navbar = () => {
             <MobileLink href="/contact" label="Contact" />
 
             <a
-              href="/login"
+              href="/volunteer-login"
               className="
     relative overflow-hidden block w-full text-center mt-4 px-5 py-3 rounded-full
     border border-white/20 text-white font-medium
@@ -107,7 +107,7 @@ const NavItem = ({ href, label }) => (
 
 const JoinUsButton = () => (
   <a
-    href="/login"
+    href="/volunteer-login"
     className="
       relative overflow-hidden ml-4 px-5 py-2 rounded-full
       border border-white/20 text-white text-sm font-medium
