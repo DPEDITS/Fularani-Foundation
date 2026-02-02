@@ -4,88 +4,89 @@ import MissionEducation from "../components/MissionEducation";
 import MissionPeriod from "../components/MissionPeriod";
 import MissionThalassemia from "../components/MissionThalassemia";
 import { useEffect, useState } from "react";
-import headerImg from "../assets/missions1.jpeg"; // same as Banner
+import { ArrowRight, Globe, Leaf, Heart, School, Accessibility } from "lucide-react";
+import headerImg from "../assets/missions1.jpeg";
 
 const Missions = () => {
   return (
-    <main className="pt-32 px-2 md:px-10 lg:px-20 space-y-32">
-
+    <div className="bg-[#fbfbfd] min-h-screen">
       {/* PAGE HEADER */}
-      <header className="w-full flex flex-col md:flex-row items-start md:items-center gap-10">
+      <section className="pt-32 pb-20 px-6">
+        <div className="max-w-[1024px] mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-[#0071e3] font-semibold text-[17px] mb-4 block tracking-tight">
+              Impact & Initiatives
+            </span>
+            <h1 className="text-[48px] md:text-[64px] font-bold text-[#1d1d1f] leading-[1.1] tracking-tight mb-8">
+              Changing lives, <br />
+              <span className="text-[#86868b]">one mission at a time.</span>
+            </h1>
+            <p className="text-[21px] md:text-[23px] text-[#86868b] leading-relaxed max-w-[800px] mx-auto font-medium">
+              Fularani Foundation is committed to creating lasting social impact through
+              focused initiatives in healthcare, education, environment, and women's dignity.
+            </p>
+          </div>
 
-        {/* Left: Text content */}
-        <div className="flex-1 space-y-6">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
-            Our Missions
-          </h1>
-
-          <div className="h-1 w-24 md:w-32 bg-red-600 rounded-full"></div>
-
-          <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-full md:max-w-4xl">
-            <b>Fularani Foundation</b> is committed to creating lasting social impact through focused initiatives in healthcare, education, environment, and women’s dignity. Our programs, including Mission Thalassemia, Education For All, Period Pride, Mission Green, and Mission Mobility, empower communities, support underprivileged children, raise awareness, and provide essential resources to foster healthier, educated, and resilient societies.
-          </p>
-
-          {/* STATS CARDS immediately after text */}
-          <section className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            <StatCard end={1500} suffix="+" label="Meals Served" color="blue" />
-            <StatCard end={10000} suffix="+" label="Trees Planted" color="green" />
-            <StatCard end={100} suffix="+" label="Volunteers" color="yellow" />
-            <StatCard end={50} suffix="+" label="Awareness Campaigns" color="purple" />
-          </section>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-24">
+            <StatCard end={1500} suffix="+" label="Meals Served" icon={<Heart size={20} />} />
+            <StatCard end={10000} suffix="+" label="Trees Planted" icon={<Leaf size={20} />} />
+            <StatCard end={100} suffix="+" label="Volunteers" icon={<Globe size={20} />} />
+            <StatCard end={50} suffix="+" label="Campaigns" icon={<School size={20} />} />
+          </div>
         </div>
-
-        {/* Right: SVG logo */}
-        <div className="flex-shrink-0">
-          <img
-            src={headerImg}
-            alt="Fularani Foundation Logo"
-            className="w-150 h-auto rounded-3xl shadow-xl mx-auto md:mx-0"
-          />
-        </div>
-      </header>
-
-      {/* FEATURED MISSION */}
-      <section className="bg-white rounded-3xl shadow-xl p-10 md:p-16 flex flex-col md:flex-row gap-6 md:gap-10 items-center">
-        <div className="md:w-2/3 space-y-4">
-          <span className="text-sm uppercase tracking-wide text-red-600">
-            Featured Mission
-          </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-            Mission Thalassemia
-          </h2>
-          <p className="text-gray-700 leading-relaxed">
-            Thalassemia remains a critical yet under-addressed public health challenge. Our mission focuses on awareness, early screening, and sustained care support for affected children and families.
-          </p>
-          <a
-            href="/missions/thalassemia"
-            className="inline-block mt-4 text-sm font-medium text-red-600 underline underline-offset-4"
-          >
-            View program details
-          </a>
-        </div>
-        <div className="md:w-1/3 h-48 rounded-2xl bg-gradient-to-br from-red-50 to-red-100" />
       </section>
 
-      {/* ALL MISSIONS */}
-      <section className="space-y-10 -mt-20"> {/* negative margin removes extra gap */}
-        <MissionEducation />
-        <MissionThalassemia />
-        <MissionPeriod />
-        <MissionGreen />
-        <MissionMobility />
+      {/* MISSIONS GRID */}
+      <section className="py-24 px-6 bg-white border-t border-black/5">
+        <div className="max-w-[1024px] mx-auto space-y-24">
+          <div className="text-center md:text-left">
+            <h2 className="text-[32px] md:text-[40px] font-bold text-[#1d1d1f] tracking-tight mb-4">Our Dedicated Missions</h2>
+            <p className="text-[19px] text-[#86868b] font-medium max-w-[600px]">
+              Tailored programs designed to address specific social needs and drive sustainable change.
+            </p>
+          </div>
+
+          <div className="space-y-12">
+            <MissionEducation />
+            <MissionThalassemia />
+            <MissionPeriod />
+            <MissionGreen />
+            <MissionMobility />
+          </div>
+        </div>
       </section>
 
-    </main>
+      {/* CALL TO ACTION */}
+      <section className="py-32 px-6">
+        <div className="apple-card max-w-[980px] mx-auto p-12 md:p-20 text-center bg-[#f5f5f7]">
+          <h2 className="text-[32px] md:text-[48px] font-bold text-[#1d1d1f] tracking-tight mb-6">Want to make an impact?</h2>
+          <p className="text-[21px] text-[#86868b] mb-12 max-w-[600px] mx-auto">
+            Join our community of volunteers and donors. Together, we can reach
+            more people and transform more lives.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <button
+              onClick={() => window.location.href = "/volunteer-login"}
+              className="bg-[#0071e3] text-white px-8 py-3 rounded-full text-[17px] font-medium hover:bg-[#0077ed] transition-all flex items-center gap-2 group"
+            >
+              Join the Mission <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+            <a href="/contact" className="text-[#0066cc] text-[17px] font-medium hover:underline flex items-center gap-1 group">
+              Contact Us <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
 
-// Apple-style Stat Card
-const StatCard = ({ end, suffix = "", label, color = "blue" }) => {
+const StatCard = ({ end, suffix = "", label, icon }) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     let start = 0;
-    const duration = 1200;
+    const duration = 1500;
     const increment = end / (duration / 16);
 
     const timer = setInterval(() => {
@@ -101,20 +102,15 @@ const StatCard = ({ end, suffix = "", label, color = "blue" }) => {
     return () => clearInterval(timer);
   }, [end]);
 
-  const colorMap = {
-    blue: "from-blue-50 to-blue-100",
-    green: "from-green-50 to-green-100",
-    yellow: "from-yellow-50 to-yellow-100",
-    purple: "from-purple-50 to-purple-100",
-    red: "from-red-50 to-red-100",
-  };
-
   return (
-    <div className={`rounded-3xl p-6 bg-gradient-to-br ${colorMap[color]} shadow-lg flex flex-col items-start transition-transform transform hover:-translate-y-2`}>
-      <p className="text-3xl font-bold text-gray-900">
+    <div className="apple-card p-6 flex flex-col items-center text-center group">
+      <div className="w-10 h-10 rounded-full bg-blue-50 text-[#0071e3] flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
+        {icon}
+      </div>
+      <h3 className="text-[24px] md:text-[32px] font-bold text-[#1d1d1f] leading-none mb-1">
         {count.toLocaleString()}{suffix}
-      </p>
-      <p className="text-sm text-gray-700 mt-1">{label}</p>
+      </h3>
+      <p className="text-[13px] font-bold text-[#86868b] tracking-wide uppercase">{label}</p>
     </div>
   );
 };

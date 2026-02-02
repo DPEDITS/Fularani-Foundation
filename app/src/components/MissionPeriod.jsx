@@ -1,31 +1,40 @@
-const MissionPeriod = () => (
-  <section className="group bg-white rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] transition-all duration-500">
-    <div className="grid md:grid-cols-2 gap-10 p-10 items-center">
+import { ArrowRight, Heart } from "lucide-react";
 
+const MissionPeriod = () => (
+  <section className="apple-card group overflow-hidden">
+    <div className="grid md:grid-cols-2 gap-12 p-8 md:p-12 items-center">
+      {/* TEXT */}
       <div>
-        <span className="text-xs uppercase tracking-widest text-gray-500">
-          Women’s Health
+        <div className="w-10 h-10 rounded-full bg-red-50 text-[#ff3b30] flex items-center justify-center mb-6">
+          <Heart size={20} />
+        </div>
+        <span className="text-[#ff3b30] font-bold text-[13px] tracking-wide uppercase mb-3 block">
+          Dignity & Health
         </span>
 
-        <h3 className="text-2xl font-semibold text-gray-900 mt-3 mb-4">
+        <h3 className="text-[32px] font-bold text-[#1d1d1f] leading-tight mb-4">
           Mission Period Pride
         </h3>
 
-        <p className="text-gray-600 leading-relaxed max-w-md">
-          Breaking stigma and ensuring menstrual hygiene awareness and access to
-          safe sanitary products for girls and women.
+        <p className="text-[17px] text-[#86868b] leading-relaxed max-w-md font-medium">
+          Breaking taboos and promoting menstrual hygiene through education,
+          resource distribution, and supportive community initiatives.
         </p>
 
         <a
           href="/missions/period-pride"
-          className="inline-flex items-center gap-2 mt-6 text-sm font-medium text-gray-900"
+          className="inline-flex items-center gap-1.5 mt-8 text-[#0066cc] hover:underline font-medium text-[17px] group"
         >
-          Learn more
-          <span className="transition-transform group-hover:translate-x-1">→</span>
+          Explore program <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
         </a>
       </div>
 
-      <div className="h-56 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200" />
+      {/* VISUAL */}
+      <div className="h-64 rounded-2xl bg-[#f5f5f7] flex items-center justify-center overflow-hidden">
+        <div className="w-full h-full bg-gradient-to-br from-red-50 to-rose-50 flex items-center justify-center">
+          <Heart size={64} className="text-[#ff3b30]/20" />
+        </div>
+      </div>
     </div>
   </section>
 );
