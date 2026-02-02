@@ -1,28 +1,30 @@
 import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const donorSchema = new Schema(
   {
     username: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true,
-        index: true
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true
     },
     email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true
     },
     avatar: {
       type: String, // cloudinary url
     },
-    password : {
-        type : String,
-        required : [true, "Password is required"]
+    password: {
+      type: String,
+      required: [true, "Password is required"]
     },
     refreshToken: {
       type: String,
@@ -38,7 +40,7 @@ const donorSchema = new Schema(
     totalDonatedAmount: {
       type: Number,
       default: 0,
-      required : [true, "Total donated amount is required"]
+      required: [true, "Total donated amount is required"]
     },
     donationCount: {
       type: Number,
@@ -46,7 +48,7 @@ const donorSchema = new Schema(
     },
     panNumber: {
       type: String,
-      required : [true, "Pan number is required"]
+      required: [true, "Pan number is required"]
     },
     wants80GReceipt: {
       type: Boolean,
@@ -63,6 +65,19 @@ const donorSchema = new Schema(
   },
   { timestamps: true },
 );
+
+donorSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+donorSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
 
 donorSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);

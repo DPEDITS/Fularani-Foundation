@@ -22,13 +22,15 @@ import contactRouter from "./routes/contact.routes.js"
 import galleryRouter from "./routes/gallery.routes.js";
 import donationRouter from "./routes/donation.routes.js";
 import contentRouter from "./routes/content.routes.js";
+import adminRouter from "./routes/admin.routes.js";
 
 //routes declaration
 app.use("/api/volunteers", volunteerRouter)
 app.use("/api/donor", donorRouter)
 app.use("/api/v1/contact", contactRouter)
 app.use("/api/gallery", galleryRouter)
-app.use("/api/donations", donationRouter)
+app.use("/api/donations", donationRouter) 
 app.use("/api/content", contentRouter)
+app.use("/api/admin", adminRouter)
 
 export { app };
