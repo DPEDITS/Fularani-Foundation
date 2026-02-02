@@ -29,7 +29,7 @@ const Gallery = () => {
     "Mission Green",
     "Mission Period Pride",
     "Mission Mobility",
-    "Mission Thalasemia",
+    "Mission Thalassemia",
   ];
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadFormData, setUploadFormData] = useState({
@@ -47,15 +47,12 @@ const Gallery = () => {
       try {
         setLoading(true);
         const response = await getAllGalleryItems();
-        // The API returns { statusCode, data, message, success }
-        // The data field contains the array of items
         const galleryData = response.data || [];
 
-        // Adapt backend data to frontend structure if necessary and add to state
         const adaptedItems = galleryData.map((item) => ({
           ...item,
-          id: item._id, // map _id to id for compatibility
-          src: item.imageUrl, // map imageUrl to src for compatibility
+          id: item._id,
+          src: item.imageUrl,
         }));
 
         setItems(adaptedItems);
@@ -106,10 +103,8 @@ const Gallery = () => {
 
       if (editingItem) {
         await updateGalleryItem(editingItem._id || editingItem.id, formData);
-        alert("Image updated successfully!");
       } else {
         await createGalleryItem(formData);
-        alert("Image uploaded successfully!");
       }
 
       setIsUploadModalOpen(false);
@@ -121,7 +116,14 @@ const Gallery = () => {
         uploadedBy: "",
         imageUrl: null,
       });
-      window.location.reload();
+      const response = await getAllGalleryItems();
+      const galleryData = response.data || [];
+      const adaptedItems = galleryData.map((item) => ({
+        ...item,
+        id: item._id,
+        src: item.imageUrl,
+      }));
+      setItems(adaptedItems);
     } catch (error) {
       console.error("Operation failed", error);
       alert("Failed to save. Please try again.");
@@ -162,20 +164,20 @@ const Gallery = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-[#d6336c] animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-[#fbfbfd]">
+        <Loader2 className="w-10 h-10 text-[#0071e3] animate-spin" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Oops!</h2>
-        <p className="text-gray-600 mb-4">{error}</p>
+      <div className="min-h-screen flex flex-col items-center justify-center text-center p-6 bg-[#fbfbfd]">
+        <h2 className="text-2xl font-bold text-[#1d1d1f] mb-2">Something went wrong</h2>
+        <p className="text-[#86868b] mb-6">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="px-6 py-2 bg-[#d6336c] text-white rounded-full hover:bg-[#b02a5c] transition-colors"
+          className="px-6 py-2 bg-[#0071e3] text-white rounded-full hover:bg-[#0077ed] transition-colors font-medium"
         >
           Retry
         </button>
@@ -184,48 +186,50 @@ const Gallery = () => {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Our Gallery
-          </h2>
-          <div className="w-24 h-1 bg-[#d6336c] mx-auto mb-6 rounded-full"></div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-10">
-            A glimpse into the work we do. Every picture tells a story of hope,
-            dedication, and change.
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-2 mb-12">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                  activeCategory === category
-                    ? "bg-[#d6336c] text-white shadow-lg scale-105"
-                    : "bg-white text-gray-600 hover:bg-gray-100 hover:shadow-md"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex justify-center mb-8">
-          <button
-            onClick={() => setIsUploadModalOpen(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#d6336c] to-[#FF6B6B] text-white rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 font-semibold"
+    <div className="min-h-screen py-32 px-6 bg-[#fbfbfd]">
+      <div className="max-w-[1024px] mx-auto">
+        <div className="text-center mb-16">
+          <Motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
           >
-            <Plus className="w-5 h-5" />
-            Add New Image
-          </button>
+            <h1 className="text-[48px] md:text-[56px] font-bold text-[#1d1d1f] tracking-tight mb-4">
+              Our Gallery.
+            </h1>
+            <p className="text-[19px] md:text-[21px] text-[#86868b] max-w-[600px] mx-auto mb-12 font-medium">
+              Capturing moments of hope, dedication, and the lasting impact
+              we create together.
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-2 mb-12">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`px-5 py-2 rounded-full text-[14px] font-medium transition-all duration-300 ${activeCategory === category
+                    ? "bg-[#1d1d1f] text-white"
+                    : "bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]"
+                    }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setIsUploadModalOpen(true)}
+              className="inline-flex items-center gap-1.5 text-[#0066cc] hover:underline font-medium text-[17px] group mb-8"
+            >
+              <Plus size={20} className="group-hover:rotate-90 transition-transform" />
+              Add to Gallery
+            </button>
+          </Motion.div>
         </div>
 
         <Motion.div
           layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[300px]"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           <AnimatePresence mode="popLayout">
             {filteredItems.length > 0 ? (
@@ -233,47 +237,39 @@ const Gallery = () => {
                 <Motion.div
                   layout
                   key={item.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                  className="group relative cursor-pointer overflow-hidden rounded-2xl shadow-lg bg-white/50 backdrop-blur-sm border border-white/20 h-full"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+                  className="apple-card group relative cursor-pointer overflow-hidden aspect-[4/5]"
                   onClick={() => setSelectedImage(item)}
                 >
                   <img
                     src={item.src}
                     alt={item.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#d6336c]/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                    <h3 className="text-white text-xl font-bold translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                      {item.title}
-                    </h3>
-                    <p className="text-white/90 text-sm mt-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-                      {item.category}
-                    </p>
-                    <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-[-10px] group-hover:translate-y-0">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute inset-x-0 bottom-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                    <h3 className="text-white text-lg font-bold mb-1">{item.title}</h3>
+                    <p className="text-white/80 text-sm font-medium">{item.category}</p>
+
+                    <div className="flex gap-2 mt-4">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleEdit(item);
                         }}
-                        className="bg-white/20 backdrop-blur-md p-2 rounded-full hover:bg-blue-500 hover:text-white transition-colors"
-                        title="Edit Image"
+                        className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/40 transition-colors"
                       >
-                        <Edit2 className="w-4 h-4 text-white" />
+                        <Edit2 size={14} />
                       </button>
                       <button
                         onClick={(e) => handleDelete(e, item.id)}
-                        className="bg-white/20 backdrop-blur-md p-2 rounded-full hover:bg-red-500 hover:text-white transition-colors"
-                        title="Delete Image"
+                        className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-[#ff3b30] transition-colors"
                       >
-                        <Trash2 className="w-4 h-4 text-white" />
+                        <Trash2 size={14} />
                       </button>
-                      <div className="bg-white/20 backdrop-blur-md p-2 rounded-full hover:bg-[#d6336c] hover:text-white">
-                        <ZoomIn className="w-5 h-5 text-white" />
-                      </div>
                     </div>
                   </div>
                 </Motion.div>
@@ -282,17 +278,15 @@ const Gallery = () => {
               <Motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="col-span-full flex flex-col items-center justify-center py-20 text-center"
+                className="col-span-full py-20 text-center"
               >
-                <div className="w-24 h-24 mb-6 rounded-full bg-gradient-to-br from-[#d6336c]/20 to-[#FF6B6B]/20 flex items-center justify-center">
-                  <ImageIcon className="w-12 h-12 text-[#d6336c]/60" />
+                <div className="w-20 h-20 mb-6 rounded-full bg-[#f5f5f7] flex items-center justify-center mx-auto">
+                  <ImageIcon className="w-10 h-10 text-[#86868b]" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-700 mb-2">
-                  Coming Soon
-                </h3>
-                <p className="text-gray-500 max-w-md">
-                  We're working on adding amazing photos for {activeCategory}.
-                  Check back soon!
+                <h3 className="text-[24px] font-bold text-[#1d1d1f] mb-2">Coming Soon</h3>
+                <p className="text-[#86868b] max-w-sm mx-auto font-medium">
+                  We're curating beautiful moments for {activeCategory}.
+                  Check back for updates.
                 </p>
               </Motion.div>
             )}
@@ -300,76 +294,58 @@ const Gallery = () => {
         </Motion.div>
       </div>
 
+      {/* Lightbox */}
       <AnimatePresence>
         {selectedImage && (
           <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/80 backdrop-blur-2xl"
             onClick={() => setSelectedImage(null)}
           >
             <Motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative max-w-5xl w-full max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/5"
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+              className="relative max-w-[1100px] w-full bg-white rounded-[32px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.1)] border border-black/5"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setSelectedImage(null)}
-                className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-[#d6336c] rounded-full text-white transition-colors duration-300"
+                className="absolute top-6 right-6 z-10 w-10 h-10 bg-[#f5f5f7] hover:bg-[#e8e8ed] rounded-full flex items-center justify-center text-[#1d1d1f] transition-colors"
               >
-                <X className="w-6 h-6" />
+                <X size={20} />
               </button>
 
-              <div className="grid grid-cols-1 md:grid-cols-[1fr,350px] h-full">
-                <div className="h-[50vh] md:h-[80vh] bg-gray-100 flex items-center justify-center overflow-hidden relative">
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px]">
+                <div className="bg-[#f5f5f7] flex items-center justify-center min-h-[400px] lg:h-[80vh]">
                   <img
                     src={selectedImage.src}
                     alt={selectedImage.title}
                     className="max-h-full max-w-full object-contain"
                   />
                 </div>
-                <div className="p-8 flex flex-col justify-center bg-white h-full relative overflow-y-auto">
-                  <div className="mb-6">
-                    <span className="inline-block px-3 py-1 bg-[#d6336c]/10 text-[#d6336c] text-xs font-semibold rounded-full w-fit mb-2">
-                      {selectedImage.category}
-                    </span>
-                    <h3 className="text-3xl font-bold text-gray-900 leading-tight">
-                      {selectedImage.title}
-                    </h3>
-                  </div>
+                <div className="p-10 lg:p-12 flex flex-col justify-center bg-white h-full relative">
+                  <span className="text-[#0071e3] font-bold text-[13px] tracking-wide uppercase mb-3">
+                    {selectedImage.category}
+                  </span>
+                  <h3 className="text-[32px] md:text-[40px] font-bold text-[#1d1d1f] leading-tight mb-6">
+                    {selectedImage.title}
+                  </h3>
+                  <p className="text-[17px] text-[#86868b] leading-relaxed mb-10 font-medium">
+                    {selectedImage.description}
+                  </p>
 
-                  <div className="space-y-6">
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                        Description
-                      </h4>
-                      <p className="text-gray-600 leading-relaxed text-lg">
-                        {selectedImage.description}
-                      </p>
+                  <div className="flex items-center gap-3 pt-6 border-t border-black/5">
+                    <div className="w-10 h-10 rounded-full bg-[#f5f5f7] flex items-center justify-center text-[#1d1d1f] font-bold text-sm">
+                      {selectedImage.uploadedBy.charAt(0)}
                     </div>
-
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                        Uploaded By
-                      </h4>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-sm">
-                          {selectedImage.uploadedBy.charAt(0)}
-                        </div>
-                        <span className="text-gray-900 font-medium">
-                          {selectedImage.uploadedBy}
-                        </span>
-                      </div>
+                    <div className="flex flex-col">
+                      <span className="text-[14px] text-[#86868b] font-medium">Contributed by</span>
+                      <span className="text-[16px] text-[#1d1d1f] font-bold">{selectedImage.uploadedBy}</span>
                     </div>
-                  </div>
-
-                  <div className="mt-auto pt-8 border-t border-gray-100 flex items-center justify-between text-sm text-gray-400">
-                    <span>ID: #{selectedImage.id}</span>
-                    <span>Fularani Foundation</span>
                   </div>
                 </div>
               </div>
@@ -378,151 +354,103 @@ const Gallery = () => {
         )}
       </AnimatePresence>
 
+      {/* Upload Modal */}
       <AnimatePresence>
         {isUploadModalOpen && (
           <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/60 backdrop-blur-xl"
           >
             <Motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden"
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-white rounded-[24px] shadow-[0_32px_80px_rgba(0,0,0,0.15)] w-full max-w-lg overflow-hidden border border-black/5"
             >
-              <div className="p-6 bg-[#d6336c] text-white flex justify-between items-center">
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                  <Upload className="w-5 h-5" />
-                  Upload to Gallery
-                </h3>
+              <div className="p-8 border-b border-black/5 flex justify-between items-center">
+                <h3 className="text-xl font-bold text-[#1d1d1f]">Add to Gallery</h3>
                 <button
                   onClick={() => setIsUploadModalOpen(false)}
-                  className="p-1 hover:bg-white/20 rounded-full transition-colors"
+                  className="w-8 h-8 rounded-full hover:bg-[#f5f5f7] flex items-center justify-center transition-colors"
                 >
-                  <X className="w-6 h-6" />
+                  <X size={20} />
                 </button>
               </div>
 
-              <form onSubmit={handleUploadSubmit} className="p-6 space-y-4">
+              <form onSubmit={handleUploadSubmit} className="p-8 space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Title *
-                  </label>
+                  <label className="block text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight">Title</label>
                   <input
                     type="text"
                     name="title"
                     value={uploadFormData.title}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d6336c] focus:border-transparent outline-none transition-all"
-                    placeholder="Enter image title"
+                    className="w-full h-12 px-4 rounded-xl bg-[#f5f5f7] border-none focus:ring-2 focus:ring-[#0071e3] transition-all outline-none text-[#1d1d1f]"
+                    placeholder="E.g. Empowering Students"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category *
-                  </label>
+                  <label className="block text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight">Category</label>
                   <select
                     name="category"
                     value={uploadFormData.category}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d6336c] focus:border-transparent outline-none transition-all"
+                    className="w-full h-12 px-4 rounded-xl bg-[#f5f5f7] border-none focus:ring-2 focus:ring-[#0071e3] transition-all outline-none text-[#1d1d1f] appearance-none"
                     required
                   >
-                    <option value="">Select a category</option>
-                    <option value="Mission Education">Mission Education</option>
-                    <option value="Mission Green">Mission Green</option>
-                    <option value="Mission Period Pride">
-                      Mission Period Pride
-                    </option>
-                    <option value="Mission Mobility">Mission Mobility</option>
-                    <option value="Mission Thalasemia">
-                      Mission Thalasemia
-                    </option>
+                    <option value="">Select Category</option>
+                    {categories.filter(c => c !== "All").map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description *
-                  </label>
+                  <label className="block text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight">Description</label>
                   <textarea
                     name="description"
                     value={uploadFormData.description}
                     onChange={handleInputChange}
                     rows="3"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d6336c] focus:border-transparent outline-none transition-all"
-                    placeholder="Tell the story behind this image..."
+                    className="w-full p-4 rounded-xl bg-[#f5f5f7] border-none focus:ring-2 focus:ring-[#0071e3] transition-all outline-none text-[#1d1d1f] resize-none"
+                    placeholder="Tell the story..."
                     required
                   ></textarea>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Uploaded By
-                  </label>
-                  <input
-                    type="text"
-                    name="uploadedBy"
-                    value={uploadFormData.uploadedBy}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d6336c] focus:border-transparent outline-none transition-all"
-                    placeholder="Your name (optional)"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Image *
-                  </label>
-                  <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-[#d6336c] transition-colors text-center cursor-pointer">
+                  <label className="block text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight">Image</label>
+                  <div className="relative h-24 rounded-xl bg-[#f5f5f7] border-2 border-dashed border-[#d2d2d7] hover:border-[#0071e3] transition-colors flex items-center justify-center cursor-pointer">
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleFileChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      required
+                      required={!editingItem}
                     />
-                    <div className="flex flex-col items-center justify-center text-gray-500">
+                    <div className="flex flex-col items-center text-[#86868b] pointer-events-none">
                       {uploadFormData.imageUrl ? (
-                        <div className="flex items-center gap-2 text-[#d6336c] font-medium">
-                          <ImageIcon className="w-5 h-5" />
-                          <span>{uploadFormData.imageUrl.name}</span>
-                        </div>
+                        <span className="text-[#0071e3] font-bold text-sm truncate max-w-[200px]">
+                          {uploadFormData.imageUrl.name}
+                        </span>
                       ) : (
-                        <>
-                          <Upload className="w-8 h-8 mb-2" />
-                          <span className="text-sm">Click to upload image</span>
-                        </>
+                        <span className="text-sm font-medium">Click to choose image</span>
                       )}
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4 flex justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsUploadModalOpen(false)}
-                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium"
-                  >
-                    Cancel
-                  </button>
+                <div className="pt-6">
                   <button
                     type="submit"
                     disabled={isUploading}
-                    className="px-6 py-2 bg-[#d6336c] text-white rounded-lg hover:bg-[#b02a5c] transition-colors font-medium flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full h-12 bg-[#0071e3] text-white rounded-full font-bold hover:bg-[#0077ed] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    {isUploading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      "Upload Image"
-                    )}
+                    {isUploading ? <Loader2 size={18} className="animate-spin" /> : "Save to Gallery"}
                   </button>
                 </div>
               </form>
@@ -530,7 +458,7 @@ const Gallery = () => {
           </Motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </div >
   );
 };
 

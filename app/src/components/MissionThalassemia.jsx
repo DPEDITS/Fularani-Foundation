@@ -1,31 +1,40 @@
-const MissionThalassemia = () => (
-  <section className="group bg-white rounded-3xl shadow-[0_12px_40px_rgba(220,38,38,0.12)] transition-all duration-500">
-    <div className="grid md:grid-cols-2 gap-10 p-10 items-center">
+import { ArrowRight, Heart } from "lucide-react";
 
+const MissionThalassemia = () => (
+  <section className="apple-card group overflow-hidden">
+    <div className="grid md:grid-cols-2 gap-12 p-8 md:p-12 items-center">
+      {/* TEXT */}
       <div>
-        <span className="text-xs uppercase tracking-widest text-red-600">
-          Priority Healthcare
+        <div className="w-10 h-10 rounded-full bg-red-50 text-[#ff3b30] flex items-center justify-center mb-6">
+          <Heart size={20} />
+        </div>
+        <span className="text-[#ff3b30] font-bold text-[13px] tracking-wide uppercase mb-3 block">
+          Healthcare & Care
         </span>
 
-        <h3 className="text-2xl font-semibold text-gray-900 mt-3 mb-4">
+        <h3 className="text-[32px] font-bold text-[#1d1d1f] leading-tight mb-4">
           Mission Thalassemia
         </h3>
 
-        <p className="text-gray-600 leading-relaxed max-w-md">
-          Raising awareness, enabling early screening, and supporting long-term
-          treatment for children and families affected by Thalassemia.
+        <p className="text-[17px] text-[#86868b] leading-relaxed max-w-md font-medium">
+          Advocating for regular screenings and providing vital support services for
+          children and families affected by Thalassemia across the region.
         </p>
 
         <a
           href="/missions/thalassemia"
-          className="inline-flex items-center gap-2 mt-6 text-sm font-medium text-red-600"
+          className="inline-flex items-center gap-1.5 mt-8 text-[#0066cc] hover:underline font-medium text-[17px] group"
         >
-          Learn more
-          <span className="transition-transform group-hover:translate-x-1">→</span>
+          Explore program <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
         </a>
       </div>
 
-      <div className="h-56 rounded-2xl bg-gradient-to-br from-red-50 to-red-100" />
+      {/* VISUAL */}
+      <div className="h-64 rounded-2xl bg-[#f5f5f7] flex items-center justify-center overflow-hidden">
+        <div className="w-full h-full bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
+          <Heart size={64} className="text-[#ff3b30]/20" />
+        </div>
+      </div>
     </div>
   </section>
 );

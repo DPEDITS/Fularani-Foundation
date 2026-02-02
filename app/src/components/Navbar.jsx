@@ -1,139 +1,110 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [visible, setVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down & past 100px - hide navbar
-        setVisible(false);
-      } else {
-        // Scrolling up - show navbar
-        setVisible(true);
-      }
-
-      setLastScrollY(currentScrollY);
+      setScrolled(window.scrollY > 10);
     };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   return (
-    <>
-      {/* DESKTOP NAVBAR */}
-      <nav className={`fixed left-1/2 z-50 -translate-x-1/2 hidden md:block transition-all duration-300 ${visible ? 'top-6' : '-top-24'}`}>
-        <div className="flex items-center gap-8 px-10 py-4 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] bg-gradient-to-br from-gray-900/50 to-black/30">
-          <span
-            className="flex flex-col leading-tight italic font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400"
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "glass-nav border-b border-black/5" : "bg-transparent"
+        }`}
+    >
+      <div className="max-w-[1024px] mx-auto px-6 h-12 flex items-center justify-between">
+        {/* Branding */}
+        <a href="/" className="flex items-center gap-2 group transition-opacity hover:opacity-70">
+          <span className="text-xl font-semibold tracking-tight text-[#1d1d1f]">
+            FULARANI
+          </span>
+        </a>
+
+        {/* Desktop Links */}
+        <nav className="hidden md:flex items-center gap-8">
+          <NavItem href="/" label="Home" />
+          <NavItem href="/about" label="About" />
+          <NavItem href="/gallery" label="Gallery" />
+          <NavItem href="/missions" label="Missions" />
+          <NavItem href="/contact" label="Contact" />
+
+          <a
+            href="/volunteer-login"
+            className="flex items-center gap-1.5 bg-[#0071e3] text-white px-3 py-1 rounded-full text-xs font-medium hover:bg-[#0077ed] transition-colors"
           >
-            <span>Fularani</span>
-            <span className="text-xs">Foundation</span>
-          </span>
-          <NavLinks />
-          <JoinUsButton />
-        </div>
-      </nav>
+            <User size={14} />
+            Join
+          </a>
+        </nav>
 
-      {/* MOBILE NAVBAR */}
-      <nav className={`fixed left-4 right-4 z-50 md:hidden transition-all duration-300 ${visible ? 'top-4' : '-top-32'}`}>
-        <div className="flex items-center justify-between px-5 py-4 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] bg-gradient-to-br from-gray-900/50 to-black/30">
-          <span className="flex flex-col leading-tight italic font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400">
-            <span>Fularani</span>
-            <span className="text-xs">Foundation</span>
-          </span>
+        {/* Mobile menu button */}
+        <button
+          onClick={() => setOpen(!open)}
+          className="md:hidden text-[#1d1d1f] hover:opacity-70 transition-opacity"
+        >
+          {open ? <X size={22} /> : <Menu size={22} />}
+        </button>
+      </div>
 
-          <button onClick={() => setOpen(!open)} className="text-white">
-            {open ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+      {/* Mobile Drawer */}
+      <div
+        className={`fixed inset-0 bg-white z-[60] transition-transform duration-500 ease-in-out transform ${open ? "translate-y-0" : "-translate-y-full"
+          } md:hidden`}
+      >
+        <div className="flex flex-col h-full pt-12 px-10">
+          <div className="flex justify-between items-center mb-12">
+            <span className="text-xl font-semibold tracking-tight text-[#1d1d1f]">FULARANI</span>
+            <button onClick={() => setOpen(false)} className="text-[#1d1d1f]">
+              <X size={28} />
+            </button>
+          </div>
 
-        {open && (
-          <div className="mt-3 p-6 rounded-2xl bg-black/95 border border-white/10 shadow-xl space-y-4">
-            <MobileLink href="/" label="Home" />
-            <MobileLink href="/about" label="About" />
-            <MobileLink href="/gallery" label="Gallery" />
-            <MobileLink href="/missions" label="Missions" />
-            <MobileLink href="/contact" label="Contact" />
-
+          <div className="flex flex-col gap-6">
+            <MobileLink href="/" label="Home" onClick={() => setOpen(false)} />
+            <MobileLink href="/about" label="About" onClick={() => setOpen(false)} />
+            <MobileLink href="/gallery" label="Gallery" onClick={() => setOpen(false)} />
+            <MobileLink href="/missions" label="Missions" onClick={() => setOpen(false)} />
+            <MobileLink href="/contact" label="Contact" onClick={() => setOpen(false)} />
             <a
               href="/volunteer-login"
-              className="
-    relative overflow-hidden block w-full text-center mt-4 px-5 py-3 rounded-full
-    border border-white/20 text-white font-medium
-    transition-colors duration-300
-    before:absolute before:inset-0
-    before:bg-pink-500
-    before:translate-x-[-100%]
-    before:transition-transform before:duration-[300ms]
-    hover:before:translate-x-0
-    hover:text-black
-  "
+              onClick={() => setOpen(false)}
+              className="mt-4 text-2xl font-medium text-[#0071e3]"
             >
-              <span className="relative z-10">Join Us</span>
+              Join Us
             </a>
-
-
-
           </div>
-        )}
-      </nav>
-    </>
+        </div>
+      </div>
+    </header>
   );
 };
 
-const NavLinks = () => (
-  <>
-    <NavItem href="/" label="Home" />
-    <NavItem href="/about" label="About" />
-    <NavItem href="/gallery" label="Gallery" />
-    <NavItem href="/missions" label="Missions" />
-    <NavItem href="/contact" label="Contact" />
-  </>
-);
-
 const NavItem = ({ href, label }) => (
-  <a href={href} className="text-white text-sm font-medium hover:text-red-300">
+  <a
+    href={href}
+    className="text-xs font-normal text-[#1d1d1f]/80 hover:text-[#1d1d1f] transition-colors tracking-wide"
+  >
     {label}
   </a>
 );
 
-const JoinUsButton = () => (
-  <a
-    href="/volunteer-login"
-    className="
-      relative overflow-hidden ml-4 px-5 py-2 rounded-full
-      border border-white/20 text-white text-sm font-medium
-      transition-colors duration-300
-      before:absolute before:inset-0
-      before:bg-pink-500
-      before:translate-x-[-100%]
-      before:transition-transform before:duration-[300ms]
-      hover:before:translate-x-0
-      hover:text-black
-    "
-  >
-    <span className="relative z-10">Join Us</span>
-  </a>
-);
-
-
-
-
-const MobileLink = ({ href, label }) => (
+const MobileLink = ({ href, label, onClick }) => (
   <a
     href={href}
-    className="block text-white text-base font-medium hover:text-gray-300"
+    onClick={onClick}
+    className="text-3xl font-semibold text-[#1d1d1f] hover:opacity-70 transition-opacity"
   >
     {label}
   </a>
 );
 
 export default Navbar;
+
+
