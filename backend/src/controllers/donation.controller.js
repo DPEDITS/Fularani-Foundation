@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Donation } from "../models/donation.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { Donor } from "../models/donor.model.js";
 
 const createDonation = asyncHandler(async (req, res) => {
   const {
