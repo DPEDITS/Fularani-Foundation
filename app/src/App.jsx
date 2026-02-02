@@ -12,6 +12,7 @@ import Contact from "./pages/Contact";
 import AboutPage from "./pages/About";
 import VolunteerLogin from "./pages/VolunteerLogin";
 import VolunteerRegister from "./pages/VolunteerRegister";
+import VolunteerDashboard from "./pages/VolunteerDashboard";
 import Footer from "./components/Footer";
 
 const App = () => {
@@ -27,8 +28,10 @@ const App = () => {
           <Route path="/donor-login" element={<DonorLogin />} />
           <Route path="/donor-register" element={<DonorRegister />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/volunteer-login" element={<VolunteerLogin />} />
-          <Route path="/volunteer-register" element={<VolunteerRegister />} />
+          <Route path="/volunteer-login" element={<DonorLogin />} />
+          <Route path="/volunteer-register" element={<DonorRegister />} />
+          <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
+          <Route path="/donor-dashboard" element={<DonorDashboard />} />
         </Routes>
       </main>
       <Footer />

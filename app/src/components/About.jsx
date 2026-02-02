@@ -1,5 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
+import { Link } from "react-router-dom";
+import aboutHero from "../assets/about-hero.png";
 import {
   Download,
   Eye,
@@ -281,16 +283,16 @@ const About = () => {
               </div>
 
               <div className="mt-10 flex flex-wrap gap-4">
-                <button className="bg-gray-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3">
+                <Link to="/volunteer-register" className="bg-gray-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3">
                   <HandHeart size={20} />
                   Join Our Mission
-                </button>
-                <button className="bg-rose-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-rose-700 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3">
+                </Link>
+                <Link to="/donor-register" className="bg-rose-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-rose-700 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3">
                   <Gift size={20} />
                   Donate Now
-                </button>
+                </Link>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -427,9 +429,9 @@ const About = () => {
                   </span>
                 </li>
               </ul>
-              <button className="w-full bg-white text-rose-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 transition-colors shadow-xl">
+              <Link to="/donor-register" className="block w-full bg-white text-rose-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 transition-colors shadow-xl text-center">
                 Donate Now
-              </button>
+              </Link>
             </motion.div>
 
             {/* Volunteer Card */}
@@ -469,9 +471,9 @@ const About = () => {
                   </span>
                 </li>
               </ul>
-              <button className="w-full bg-white text-rose-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 transition-colors shadow-xl">
+              <Link to="/volunteer-register" className="block w-full bg-white text-rose-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 transition-colors shadow-xl text-center">
                 Become a Volunteer
-              </button>
+              </Link>
             </motion.div>
           </div>
         </div>
@@ -497,9 +499,9 @@ const About = () => {
               it's volunteering, donating, or partnering, we're here to guide
               you.
             </p>
-            <button className="bg-rose-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-rose-700 transition-colors shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transform duration-200">
+            <Link to="/contact" className="inline-block bg-rose-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-rose-700 transition-colors shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transform duration-200">
               Contact Support
-            </button>
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -556,7 +558,7 @@ const About = () => {
             </div>
           </div>
         </div>
-      </section> section
+      </section>
     </div>
   );
 };

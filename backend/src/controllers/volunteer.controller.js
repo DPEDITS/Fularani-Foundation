@@ -157,7 +157,6 @@ const registerVolunteer = asyncHandler(async (req, res) => {
 
 const loginVolunteer = asyncHandler(async (req, res) => {
   const { email, username, password } = req.body;
-  console.log(email);
 
   if (!username && !email) {
     throw new ApiError(400, "username or email is required");
@@ -207,4 +206,52 @@ const loginVolunteer = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerVolunteer, loginVolunteer };
+const getVolunteerProfile = asyncHandler(async (req, res) => {
+  const volunteerId = req.user._id;
+
+  const volunteer = await Volunteer.findById(volunteerId).select(
+    "-password -refreshToken",
+  );
+
+  if (!volunteer) {
+    throw new ApiError(404, "Volunteer not found");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, volunteer, "Volunteer profile fetched successfully"),
+    );
+});
+
+const getVolunteerStats = asyncHandler(async (req, res) => {
+  const volunteerId = req.user._id;
+
+  const volunteer = await Volunteer.findById(volunteerId).select(
+    "skills availabilityHours preferredAreas",
+  );
+
+  if (!volunteer) {
+    throw new ApiError(404, "Volunteer not found");
+  }
+
+  const stats = {
+    totalHours: parseInt(volunteer.availabilityHours) || 0,
+    activeMissions: 0,
+    completedMissions: 0,
+    skillCount: volunteer.skills?.length || 0,
+    impactScore: 0,
+  };
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, stats, "Volunteer stats fetched successfully"));
+});
+
+export {
+  registerVolunteer,
+  loginVolunteer,
+  getVolunteerProfile,
+  getVolunteerStats,
+  refreshAccessToken,
+};

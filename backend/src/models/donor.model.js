@@ -66,11 +66,10 @@ const donorSchema = new Schema(
   { timestamps: true },
 );
 
-donorSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+donorSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
   this.password = await bcrypt.hash(this.password, 10);
-  next();
 });
 
 donorSchema.methods.isPasswordCorrect = async function (password) {
