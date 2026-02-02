@@ -20,8 +20,7 @@ const galleryItemSchema = new Schema(
       required: true,
     },
     uploadedBy: {
-      type: Schema.Types.ObjectId,
-      ref: "Volunteer",
+      type: String,
       required: true,
     },
   },
