@@ -1,104 +1,78 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { X, ZoomIn } from "lucide-react";
-import missionImg from "../assets/missions1.jpeg";
-
-const categories = [
-  "All",
-  "Mission Education for all",
-  "Mission Green",
-  "Mission Period Pride",
-  "Mission Mobility",
-  "Mission Thalassemia",
-];
-
-const galleryItems = [
-  {
-    id: 1,
-    title: "School Supplies Distribution",
-    category: "Mission Education for all",
-    uploadedBy: "Rahul Sharma",
-    src: missionImg,
-    description:
-      "Distributing books and stationery to underprivileged children in rural schools.",
-  },
-  {
-    id: 2,
-    title: "Free Health Checkup",
-    category: "Mission Period Pride",
-    uploadedBy: "Dr. Anjali Gupta",
-    src: missionImg,
-    description:
-      "Providing free medical checkups and medicines to the elderly.",
-  },
-  {
-    id: 3,
-    title: "Tree Plantation Drive",
-    category: "Mission Green",
-    uploadedBy: "Vikram Singh",
-    src: missionImg,
-    description: "Planting 500 saplings to promote a greener environment.",
-  },
-  {
-    id: 4,
-    title: "Monthly Ration Kit",
-    category: "Mission Thalassemia",
-    uploadedBy: "Priya Das",
-    src: missionImg,
-    description:
-      "Ensuring food security for families in need with monthly ration kits.",
-  },
-  {
-    id: 5,
-    title: "Skill Development Workshop",
-    category: "Mission Mobility",
-    uploadedBy: "Meera Reddy",  
-    src: missionImg,
-    description:
-      "Training women in tailoring and handicrafts for financial independence.",
-  },
-  {
-    id: 6,
-    title: "Digital Literacy Class",
-    category: "Mission Education for all",
-    uploadedBy: "Amit Patel",
-    src: missionImg,
-    description: "Teaching basic computer skills to students.",
-  },
-  {
-    id: 7,
-    title: "Eye Checkup Camp",
-    category: "Mission Period Pride",
-    uploadedBy: "Dr. Raj Malhotra",
-    src: missionImg,
-    description: "Specialized eye care camp for cataract screening.",
-  },
-  {
-    id: 8,
-    title: "Cleanliness Drive",
-    category: "Mission Green",
-    uploadedBy: "Team Green",
-    src: missionImg,
-    description: "Cleaning up the local river banks and spreading awareness.",
-  },
-  {
-    id: 9,
-    title: "Community Kitchen",
-    category: "Mission Nutrition",
-    uploadedBy: "Suresh Kumar",
-    src: missionImg,
-    description: "Serving hot meals to daily wage workers.",
-  },
-];
+import React, { useState, useEffect } from "react";
+import { motion as Motion, AnimatePresence } from "motion/react";
+import { X, ZoomIn, Loader2 } from "lucide-react";
+import { getAllGalleryItems } from "../services/galleryService";
 
 const Gallery = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [activeCategory, setActiveCategory] = useState("All");
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [categories, setCategories] = useState(["All"]);
+
+  useEffect(() => {
+    const fetchGalleryItems = async () => {
+      try {
+        setLoading(true);
+        const response = await getAllGalleryItems();
+        // The API returns { statusCode, data, message, success }
+        // The data field contains the array of items
+        const galleryData = response.data || [];
+
+        // Adapt backend data to frontend structure if necessary and add to state
+        const adaptedItems = galleryData.map((item) => ({
+          ...item,
+          id: item._id, // map _id to id for compatibility
+          src: item.imageUrl, // map imageUrl to src for compatibility
+        }));
+
+        setItems(adaptedItems);
+
+        // Extract unique categories from fetched items
+        const uniqueCategories = [
+          "All",
+          ...new Set(galleryData.map((item) => item.category)),
+        ];
+        setCategories(uniqueCategories);
+      } catch (err) {
+        console.error("Failed to fetch gallery items:", err);
+        setError("Failed to load gallery images. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGalleryItems();
+  }, []);
 
   const filteredItems =
     activeCategory === "All"
-      ? galleryItems
-      : galleryItems.filter((item) => item.category === activeCategory);
+      ? items
+      : items.filter((item) => item.category === activeCategory);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-[#d6336c] animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Oops!</h2>
+        <p className="text-gray-600 mb-4">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-6 py-2 bg-[#d6336c] text-white rounded-full hover:bg-[#b02a5c] transition-colors"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
@@ -130,13 +104,13 @@ const Gallery = () => {
           </div>
         </div>
 
-        <motion.div
+        <Motion.div
           layout
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[300px]"
         >
           <AnimatePresence mode="popLayout">
             {filteredItems.map((item) => (
-              <motion.div
+              <Motion.div
                 layout
                 key={item.id}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -163,22 +137,22 @@ const Gallery = () => {
                     <ZoomIn className="w-5 h-5 text-white" />
                   </div>
                 </div>
-              </motion.div>
+              </Motion.div>
             ))}
           </AnimatePresence>
-        </motion.div>
+        </Motion.div>
       </div>
 
       <AnimatePresence>
         {selectedImage && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
             onClick={() => setSelectedImage(null)}
           >
-            <motion.div
+            <Motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -242,8 +216,8 @@ const Gallery = () => {
                   </div>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </Motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </div>
