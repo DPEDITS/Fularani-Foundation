@@ -1,10 +1,19 @@
 import {Router} from 'express';
-import { loginDonor, registerDonor } from '../controllers/donor.controller.js';
-import multer from 'multer';
+import { 
+    loginDonor, 
+    registerDonor,
+    logoutDonor,
+    getCurrentDonor,
+    getDonorProfile,
+    getDonorDonations,
+    getDonorStats
+} from '../controllers/donor.controller.js';
 import { upload } from '../middlewares/multer.middleware.js';
+import { verifyJWT } from '../middlewares/auth.middleware.js';
 
 const donorRouter = Router();
 
+// Public routes
 donorRouter.route("/register").post(
     upload.fields([
         {
@@ -17,5 +26,11 @@ donorRouter.route("/register").post(
 
 donorRouter.route("/login").post(loginDonor)
 
+// Protected routes (require authentication)
+donorRouter.route("/logout").post(verifyJWT, logoutDonor)
+donorRouter.route("/current-user").get(verifyJWT, getCurrentDonor)
+donorRouter.route("/profile").get(verifyJWT, getDonorProfile)
+donorRouter.route("/donations").get(verifyJWT, getDonorDonations)
+donorRouter.route("/stats").get(verifyJWT, getDonorStats)
 
 export default donorRouter; 
