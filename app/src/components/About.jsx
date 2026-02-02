@@ -8,6 +8,12 @@ import {
   Users,
   TrendingUp,
   HandHeart,
+  BookOpen,
+  Car,
+  TreePine,
+  Sparkles,
+  Target,
+  Gift,
 } from "lucide-react";
 import aboutHero from "../assets/about-hero.png";
 
@@ -28,44 +34,86 @@ const About = () => {
     },
   };
 
-  const teamMembers = [
+  const missions = [
     {
-      name: "Mr. Raja Monsingh",
-      role: "CEO & Founder",
-      image:
-        "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400",
+      title: "#EducationForAll",
+      subtitle: "Breaking Boundaries in Education",
+      icon: BookOpen,
+      color: "rose",
+      description:
+        "We champion inclusive education that transcends boundaries. Our programs cater to the underprivileged of all age groups, offering basic literacy for adults and comprehensive schooling for children.",
+      highlights: [
+        "Inclusive education for all age groups",
+        "Learning centers in Bhadrak District, Odisha",
+        "Vision to expand across all districts in Odisha",
+      ],
     },
     {
-      name: "L. Charles",
-      role: "Managing Director",
-      image:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400",
+      title: "#MissionMobility",
+      subtitle: "Paving the Path to Healing",
+      icon: Car,
+      color: "blue",
+      description:
+        "Our commitment to ensuring inclusivity in healthcare access. We offer free, eco-friendly transportation to patients and their families, alleviating the financial strain of reaching district hospitals.",
+      highlights: [
+        "Free eco-friendly transportation",
+        "Zero-emission electric vehicles",
+        "Removing financial barriers to healthcare",
+      ],
     },
     {
-      name: "Sarah Johnson",
-      role: "Director of Operations",
-      image:
-        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400",
+      title: "#MissionGreen",
+      subtitle: "Sponsor Tree Plantings",
+      icon: TreePine,
+      color: "green",
+      description:
+        "Every occasion serves as an opportunity to nurture our planet. We've revolutionized celebrations, transforming them into acts of environmental stewardship through tree planting.",
+      highlights: [
+        "Redefining traditions with tree planting",
+        "Community tree planting ceremonies",
+        "Fostering environmental preservation",
+      ],
     },
     {
-      name: "Michael Chen",
-      role: "Head of Outreach",
-      image:
-        "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400",
-    },
-    {
-      name: "Priya Patel",
-      role: "Community Manager",
-      image:
-        "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=400",
-    },
-    {
-      name: "David Wilson",
-      role: "Volunteer Coordinator",
-      image:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400",
+      title: "#MissionPeriodPride",
+      subtitle: "Support Women's Health and Equality",
+      icon: Sparkles,
+      color: "purple",
+      description:
+        "Empowering change through menstrual health awareness, advocating for paid periods, and ensuring accessible healthcare for women's specific health needs.",
+      highlights: [
+        "Advocating for paid menstrual leave",
+        "Menstrual health education programs",
+        "Promoting gender equality",
+      ],
     },
   ];
+
+  const getColorClasses = (color) => {
+    const colors = {
+      rose: {
+        bg: "bg-rose-50",
+        text: "text-rose-600",
+        border: "border-rose-200",
+      },
+      blue: {
+        bg: "bg-blue-50",
+        text: "text-blue-600",
+        border: "border-blue-200",
+      },
+      green: {
+        bg: "bg-green-50",
+        text: "text-green-600",
+        border: "border-green-200",
+      },
+      purple: {
+        bg: "bg-purple-50",
+        text: "text-purple-600",
+        border: "border-purple-200",
+      },
+    };
+    return colors[color] || colors.rose;
+  };
 
   return (
     <div className="bg-gray-50 min-h-screen font-sans selection:bg-rose-100 selection:text-rose-900">
@@ -93,18 +141,18 @@ const About = () => {
             className="mb-1 mt-3 inline-block"
           >
             <span className="py-2 px-6 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-medium tracking-wider uppercase ">
-              About Thaagam Foundation
+              About Fularani Foundation
             </span>
           </motion.div>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-            Together, We Can Make a{" "}
+            Uplifting Lives,{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-orange-300">
-              Difference.
+              Safeguarding Our World
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-200 font-light max-w-3xl mx-auto">
-            Join us in our mission to bring hope, dignity, and sustainable
-            change to communities in need.
+            Genuine progress extends beyond personal achievements — it lies in
+            our capacity to uplift others and protect our cherished planet.
           </p>
         </motion.div>
       </div>
@@ -112,43 +160,58 @@ const About = () => {
       {/* Stats Section */}
       <div className="relative -mt-16 z-20 container mx-auto px-4 pb-20">
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto"
+          className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={staggerContainer}
         >
-          <motion.div
-            variants={fadeIn}
-            className="bg-white rounded-3xl p-8 shadow-xl shadow-gray-200/50 border border-gray-100 flex items-center gap-6 hover:translate-y-[-5px] transition-transform duration-300"
-          >
-            <div className="w-16 h-16 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600">
-              <Users size={32} />
-            </div>
-            <div>
-              <h3 className="text-4xl font-bold text-gray-900 mb-1">
-                115.94 Lakhs+
-              </h3>
-              <p className="text-gray-600 font-medium">
-                Beneficiaries Impacted
-              </p>
-            </div>
-          </motion.div>
-
-          <motion.div
-            variants={fadeIn}
-            className="bg-white rounded-3xl p-8 shadow-xl shadow-gray-200/50 border border-gray-100 flex items-center gap-6 hover:translate-y-[-5px] transition-transform duration-300"
-          >
-            <div className="w-16 h-16 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600">
-              <Heart size={32} />
-            </div>
-            <div>
-              <h3 className="text-4xl font-bold text-gray-900 mb-1">
-                ₹43.46 Crores+
-              </h3>
-              <p className="text-gray-600 font-medium">Total Donated</p>
-            </div>
-          </motion.div>
+          {[
+            {
+              icon: BookOpen,
+              value: "#EducationForAll",
+              label: "Inclusive Learning",
+              color: "rose",
+            },
+            {
+              icon: Car,
+              value: "#MissionMobility",
+              label: "Healthcare Access",
+              color: "blue",
+            },
+            {
+              icon: TreePine,
+              value: "#MissionGreen",
+              label: "Environmental Care",
+              color: "green",
+            },
+            {
+              icon: Sparkles,
+              value: "#MissionPeriodPride",
+              label: "Women's Health",
+              color: "purple",
+            },
+          ].map((stat, index) => (
+            <motion.div
+              key={index}
+              variants={fadeIn}
+              className="bg-white rounded-3xl p-6 shadow-xl shadow-gray-200/50 border border-gray-100 flex items-center gap-4 hover:translate-y-[-5px] transition-transform duration-300"
+            >
+              <div
+                className={`w-14 h-14 rounded-2xl ${getColorClasses(stat.color).bg} flex items-center justify-center ${getColorClasses(stat.color).text}`}
+              >
+                <stat.icon size={28} />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-gray-900 mb-1">
+                  {stat.value}
+                </h3>
+                <p className="text-gray-600 text-sm font-medium">
+                  {stat.label}
+                </p>
+              </div>
+            </motion.div>
+          ))}
         </motion.div>
       </div>
 
@@ -166,14 +229,14 @@ const About = () => {
               <div className="absolute -top-4 -left-4 w-24 h-24 bg-rose-100 rounded-full blur-3xl opacity-60"></div>
               <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-orange-100 rounded-full blur-3xl opacity-60"></div>
               <img
-                src={aboutHero} // Using the hero image as the main detail image too, or could use another
+                src={aboutHero}
                 alt="Our Mission"
                 className="rounded-3xl shadow-2xl relative z-10 w-full h-[600px] object-cover"
               />
               <div className="absolute -bottom-8 -left-8 bg-white p-6 rounded-2xl shadow-xl z-20 max-w-xs hidden md:block">
                 <p className="text-gray-800 font-semibold italic">
-                  "Hope does not end with immediate relief but continues to grow
-                  within the communities we serve."
+                  "Genuine progress lies in our capacity to uplift others and
+                  safeguard our cherished world."
                 </p>
               </div>
             </motion.div>
@@ -186,43 +249,46 @@ const About = () => {
             >
               <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-8 leading-tight">
                 Your Impact Begins with{" "}
-                <span className="text-rose-600">Thaagam Foundation</span>
+                <span className="text-rose-600">Fularani Foundation</span>
               </h2>
               <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
                 <p>
-                  At Thaagam Foundation, our journey begins with a simple yet
-                  powerful belief:{" "}
+                  At Fularani Foundation, we stand firm in the belief that{" "}
                   <strong className="text-gray-900">
-                    every individual deserves dignity, care, and an opportunity
-                    to thrive.
+                    genuine progress extends beyond personal achievements
                   </strong>{" "}
-                  What started as a compassionate response to human suffering
-                  has grown into a mission-driven organization dedicated to
-                  creating lasting social impact.
+                  — it lies in our capacity to uplift others and safeguard our
+                  cherished world.
                 </p>
                 <p>
-                  Through our work in humanitarian aid and community
-                  empowerment, we stand beside vulnerable individuals and
-                  families, addressing urgent needs while nurturing pathways
-                  toward long-term stability and self-reliance. Each initiative
-                  we implement is thoughtfully planned to create sustainable
-                  change.
+                  Our foundation is rooted in compassion and unwavering
+                  commitment, propelling us forward on a journey encapsulating
+                  four impactful verticals:{" "}
+                  <strong className="text-green-600">#MissionGreen</strong>,{" "}
+                  <strong className="text-blue-600">#MissionMobility</strong>,{" "}
+                  <strong className="text-rose-600">#EducationForAll</strong>,
+                  and{" "}
+                  <strong className="text-purple-600">
+                    #MissionPeriodPride
+                  </strong>
+                  .
                 </p>
                 <p>
-                  Equally important to us is the experience of those who walk
-                  this journey with us. We are committed to making your
-                  involvement meaningful, transparent, and impactful—whether you
-                  support us through donations, volunteering, or partnerships.
-                  Backed by a responsive support team and a strong commitment to
-                  accountability, Thaagam Foundation ensures that every act of
-                  generosity translates into real, measurable change.
+                  Every contribution, regardless of size, powers our efforts to
+                  create accessible transportation, inclusive education,
+                  environmental conservation, and menstrual health awareness and
+                  empowerment.
                 </p>
               </div>
 
-              <div className="mt-10">
+              <div className="mt-10 flex flex-wrap gap-4">
                 <button className="bg-gray-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3">
                   <HandHeart size={20} />
                   Join Our Mission
+                </button>
+                <button className="bg-rose-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-rose-700 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3">
+                  <Gift size={20} />
+                  Donate Now
                 </button>
               </div>
             </motion.div>
@@ -230,8 +296,77 @@ const About = () => {
         </div>
       </section>
 
-      {/* Questions Section */}
-      <section className="py-20 bg-rose-900 relative overflow-hidden">
+      {/* Four Missions Section */}
+      <section className="py-24 px-4 bg-white">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center mb-16">
+            <span className="text-rose-600 font-bold tracking-wider uppercase text-sm mb-3 block">
+              Our Initiatives
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Four Pillars of Change
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Our foundation is driven by four impactful verticals, each
+              designed to create lasting positive change in communities.
+            </p>
+          </div>
+
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            {missions.map((mission, index) => {
+              const colorClasses = getColorClasses(mission.color);
+              return (
+                <motion.div
+                  key={index}
+                  variants={fadeIn}
+                  className={`bg-gray-50 rounded-3xl p-8 border ${colorClasses.border} hover:shadow-xl transition-all duration-300`}
+                >
+                  <div className="flex items-start gap-6">
+                    <div
+                      className={`w-16 h-16 rounded-2xl ${colorClasses.bg} flex items-center justify-center ${colorClasses.text} flex-shrink-0`}
+                    >
+                      <mission.icon size={32} />
+                    </div>
+                    <div>
+                      <h3
+                        className={`text-2xl font-bold ${colorClasses.text} mb-1`}
+                      >
+                        {mission.title}
+                      </h3>
+                      <p className="text-gray-500 font-medium mb-4">
+                        {mission.subtitle}
+                      </p>
+                      <p className="text-gray-600 mb-6">
+                        {mission.description}
+                      </p>
+                      <ul className="space-y-2">
+                        {mission.highlights.map((highlight, hIndex) => (
+                          <li
+                            key={hIndex}
+                            className="flex items-center gap-2 text-gray-700"
+                          >
+                            <Target size={16} className={colorClasses.text} />
+                            <span>{highlight}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Donate & Volunteer Section */}
+      <section className="py-20 bg-gradient-to-br from-rose-900 via-rose-800 to-rose-900 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
           <svg width="100%" height="100%">
             <pattern
@@ -254,6 +389,97 @@ const About = () => {
           </svg>
         </div>
 
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            {/* Donate Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20"
+            >
+              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+                <Heart className="text-rose-200 w-8 h-8" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-4 text-center">
+                Donate and Support
+              </h3>
+              <ul className="space-y-4 text-rose-100 mb-8">
+                <li className="flex items-start gap-3">
+                  <span className="text-rose-300 font-bold">•</span>
+                  <span>
+                    Your donations drive the initiatives of all four missions,
+                    fueling our collective goal towards positive change.
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-rose-300 font-bold">•</span>
+                  <span>
+                    Every contribution, regardless of size, powers our efforts
+                    to create real impact.
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-rose-300 font-bold">•</span>
+                  <span>
+                    Your donation isn't just financial — it's a catalyst for
+                    real and impactful change.
+                  </span>
+                </li>
+              </ul>
+              <button className="w-full bg-white text-rose-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 transition-colors shadow-xl">
+                Donate Now
+              </button>
+            </motion.div>
+
+            {/* Volunteer Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20"
+            >
+              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+                <Users className="text-rose-200 w-8 h-8" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-4 text-center">
+                Volunteer and Make a Difference
+              </h3>
+              <ul className="space-y-4 text-rose-100 mb-8">
+                <li className="flex items-start gap-3">
+                  <span className="text-rose-300 font-bold">•</span>
+                  <span>
+                    Join our team to provide inclusive transportation and
+                    healthcare access support.
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-rose-300 font-bold">•</span>
+                  <span>
+                    Help us with green transportation initiatives producing zero
+                    emissions.
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-rose-300 font-bold">•</span>
+                  <span>
+                    Be part of creating a more inclusive and healthier
+                    community.
+                  </span>
+                </li>
+              </ul>
+              <button className="w-full bg-white text-rose-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 transition-colors shadow-xl">
+                Become a Volunteer
+              </button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Questions Section */}
+      <section className="py-20 bg-gray-900 relative overflow-hidden">
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -262,64 +488,19 @@ const About = () => {
             transition={{ duration: 0.6 }}
           >
             <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
-              <HelpCircle className="text-rose-200 w-8 h-8" />
+              <HelpCircle className="text-gray-300 w-8 h-8" />
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Have Questions?
             </h2>
-            <p className="text-xl text-rose-100 max-w-2xl mx-auto mb-10">
-              We’ll help you choose how you want to make a difference. Whether
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
+              We'll help you choose how you want to make a difference. Whether
               it's volunteering, donating, or partnering, we're here to guide
               you.
             </p>
-            <button className="bg-white text-rose-900 px-10 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 transition-colors shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transform duration-200">
+            <button className="bg-rose-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-rose-700 transition-colors shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transform duration-200">
               Contact Support
             </button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section className="py-24 px-4 bg-white">
-        <div className="container mx-auto max-w-7xl">
-          <div className="text-center mb-16">
-            <span className="text-rose-600 font-bold tracking-wider uppercase text-sm mb-3 block">
-              Our Leadership
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Meet our team
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Join THAAGAM FOUNDATION to help provide meals, essential items,
-              educational support, medical aid, blankets for the needy, and tree
-              planting events.
-            </p>
-          </div>
-
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            {teamMembers.map((member, index) => (
-              <motion.div
-                key={index}
-                variants={fadeIn}
-                className="group relative overflow-hidden rounded-3xl h-[400px]"
-              >
-                <img
-                  src={member.image}
-                  alt={member.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent flex flex-col justify-end p-8 text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                  <h3 className="text-2xl font-bold mb-1">{member.name}</h3>
-                  <p className="text-rose-300 font-medium">{member.role}</p>
-                </div>
-              </motion.div>
-            ))}
           </motion.div>
         </div>
       </section>
@@ -340,7 +521,7 @@ const About = () => {
                   Transparency that Builds Trust
                 </h2>
                 <p className="text-gray-600 text-lg mb-8 leading-relaxed">
-                  Explore Thaagam Foundation’s Annual Reports to see the impact
+                  Explore Fularani Foundation's Annual Reports to see the impact
                   we've created together. Our reports provide a detailed
                   overview of our financials, initiatives, and the lives we've
                   touched.
@@ -369,7 +550,7 @@ const About = () => {
                     <p className="text-sm text-gray-500">2024-2025</p>
                   </div>
                   <div className="absolute bottom-0 w-full bg-gray-50 p-4 text-center text-xs font-medium text-gray-500">
-                    Thaagam Foundation
+                    Fularani Foundation
                   </div>
                 </div>
               </div>
