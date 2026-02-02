@@ -21,7 +21,7 @@ const createGalleryItem = asyncHandler(async (req, res) => {
         title,
         category,
         imageUrl: imageUrl?.url || "",
-        uploadedBy: uploadedBy || "",
+        uploadedBy: uploadedBy || "Anonymous",
         description,
     });
     const createdGalleryItem = await GalleryItem.findById(galleryItem._id).select(
@@ -73,33 +73,39 @@ const getAllGalleryItems = asyncHandler(async (req, res) => {
 
 const updateGalleryItem = asyncHandler(async (req, res) => {
     const { title, category, uploadedBy, description } = req.body;
-    if (!title || !category  || !description) {
-        throw new ApiError(400, "All fields are required");
+    
+    const galleryItem = await GalleryItem.findById(req.params.id);
+    if (!galleryItem) {
+        throw new ApiError(404, "Gallery item not found");
     }
+
     const imageUrlLocalPath = req.files?.imageUrl?.[0]?.path;
-    let imageUrl;
+    let imageUrl = galleryItem.imageUrl;
+
     if (imageUrlLocalPath) {
-        imageUrl = await uploadOnCloudinary(imageUrlLocalPath);
+        const uploadedImage = await uploadOnCloudinary(imageUrlLocalPath);
+        if (uploadedImage) {
+            imageUrl = uploadedImage.url;
+        }
     }
-    if(!imageUrl){
-        throw new ApiError(400, "Image is required");
-    }
-    const galleryItem = await GalleryItem.create({
-        title,
-        category,
-        imageUrl: imageUrl?.url || "",
-        uploadedBy: uploadedBy || "",
-        description,
-    });
-    const createdGalleryItem = await GalleryItem.findById(galleryItem._id).select(
-        "-password -refreshToken",
-    );
-    if (!createdGalleryItem) {
-        throw new ApiError(500, "Something went wrong while creating the gallery item");
-    }
+
+    const updatedGalleryItem = await GalleryItem.findByIdAndUpdate(
+        req.params.id,
+        {
+            $set: {
+                title: title || galleryItem.title,
+                category: category || galleryItem.category,
+                description: description || galleryItem.description,
+                uploadedBy: uploadedBy || galleryItem.uploadedBy,
+                imageUrl: imageUrl
+            }
+        },
+        { new: true }
+    ).select("-password -refreshToken");
+
     return res
-        .status(201)
-        .json(new ApiResponse(200, createdGalleryItem, "Gallery item created Successfully"));
+        .status(200)
+        .json(new ApiResponse(200, updatedGalleryItem, "Gallery item updated Successfully"));
 });
 
 export { createGalleryItem, updateGalleryItem, getGalleryItemById, getAllGalleryItems, deleteGalleryItem };
