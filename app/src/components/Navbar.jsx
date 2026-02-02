@@ -1,10 +1,29 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Menu, X, User } from "lucide-react";
+import { isAuthenticated, getDonorUser } from "../services/donorService";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [donorUser, setDonorUser] = useState(null);
+
+  useEffect(() => {
+    // Check auth status on mount and when localStorage changes
+    const checkAuth = () => {
+      setIsLoggedIn(isAuthenticated());
+      setDonorUser(getDonorUser());
+    };
+
+    checkAuth();
+
+    // Listen for storage changes (in case of login/logout in another tab)
+    window.addEventListener("storage", checkAuth);
+
+    return () => window.removeEventListener("storage", checkAuth);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,70 +34,79 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "glass-nav border-b border-black/5" : "bg-transparent"
-        }`}
-    >
-      <div className="max-w-[1024px] mx-auto px-6 h-12 flex items-center justify-between">
-        {/* Branding */}
-        <a href="/" className="flex items-center gap-2 group transition-opacity hover:opacity-70">
-          <span className="text-xl font-semibold tracking-tight text-[#1d1d1f]">
-            FULARANI
-          </span>
-        </a>
-
-        {/* Desktop Links */}
-        <nav className="hidden md:flex items-center gap-8">
-          <NavItem href="/" label="Home" />
-          <NavItem href="/about" label="About" />
-          <NavItem href="/gallery" label="Gallery" />
-          <NavItem href="/missions" label="Missions" />
-          <NavItem href="/contact" label="Contact" />
-
-          <a
-            href="/volunteer-login"
-            className="flex items-center gap-1.5 bg-[#0071e3] text-white px-3 py-1 rounded-full text-xs font-medium hover:bg-[#0077ed] transition-colors"
-          >
-            <User size={14} />
-            Join
-          </a>
-        </nav>
-
-        {/* Mobile menu button */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="md:hidden text-[#1d1d1f] hover:opacity-70 transition-opacity"
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </div>
-
-      {/* Mobile Drawer */}
-      <div
-        className={`fixed inset-0 bg-white z-[60] transition-transform duration-500 ease-in-out transform ${open ? "translate-y-0" : "-translate-y-full"
-          } md:hidden`}
+    <>
+      {/* DESKTOP NAVBAR */}
+      <nav
+        className={`fixed left-1/2 z-50 -translate-x-1/2 hidden md:block transition-all duration-300 ${visible ? "top-6" : "-top-24"}`}
       >
-        <div className="flex flex-col h-full pt-12 px-10">
-          <div className="flex justify-between items-center mb-12">
-            <span className="text-xl font-semibold tracking-tight text-[#1d1d1f]">FULARANI</span>
-            <button onClick={() => setOpen(false)} className="text-[#1d1d1f]">
-              <X size={28} />
-            </button>
-          </div>
+        <div className="flex items-center gap-8 px-10 py-4 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] bg-gradient-to-br from-gray-900/50 to-black/30">
+          <span className="flex flex-col leading-tight italic font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400">
+            <span>Fularani</span>
+            <span className="text-xs">Foundation</span>
+          </span>
+          <NavLinks />
+          {isLoggedIn ? (
+            <DashboardButton username={donorUser?.username} />
+          ) : (
+            <JoinUsButton />
+          )}
+        </div>
+      </nav>
 
-          <div className="flex flex-col gap-6">
-            <MobileLink href="/" label="Home" onClick={() => setOpen(false)} />
-            <MobileLink href="/about" label="About" onClick={() => setOpen(false)} />
-            <MobileLink href="/gallery" label="Gallery" onClick={() => setOpen(false)} />
-            <MobileLink href="/missions" label="Missions" onClick={() => setOpen(false)} />
-            <MobileLink href="/contact" label="Contact" onClick={() => setOpen(false)} />
-            <a
-              href="/volunteer-login"
-              onClick={() => setOpen(false)}
-              className="mt-4 text-2xl font-medium text-[#0071e3]"
-            >
-              Join Us
-            </a>
+      {/* MOBILE NAVBAR */}
+      <nav
+        className={`fixed left-4 right-4 z-50 md:hidden transition-all duration-300 ${visible ? "top-4" : "-top-32"}`}
+      >
+        <div className="flex items-center justify-between px-5 py-4 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] bg-gradient-to-br from-gray-900/50 to-black/30">
+          <span className="flex flex-col leading-tight italic font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400">
+            <span>Fularani</span>
+            <span className="text-xs">Foundation</span>
+          </span>
+
+          <button onClick={() => setOpen(!open)} className="text-white">
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        {open && (
+          <div className="mt-3 p-6 rounded-2xl bg-black/95 border border-white/10 shadow-xl space-y-4">
+            <MobileLink href="/" label="Home" />
+            <MobileLink href="/about" label="About" />
+            <MobileLink href="/gallery" label="Gallery" />
+            <MobileLink href="/missions" label="Missions" />
+            <MobileLink href="/contact" label="Contact" />
+
+            {isLoggedIn ? (
+              <a
+                href="/donor-dashboard"
+                className="
+                  relative overflow-hidden block w-full text-center mt-4 px-5 py-3 rounded-full
+                  bg-gradient-to-r from-pink-500 to-rose-600 text-white font-medium
+                  transition-all duration-300 flex items-center justify-center gap-2
+                  shadow-lg shadow-pink-500/20
+                "
+              >
+                <User className="w-4 h-4" />
+                <span>My Dashboard</span>
+              </a>
+            ) : (
+              <a
+                href="/volunteer-login"
+                className="
+                  relative overflow-hidden block w-full text-center mt-4 px-5 py-3 rounded-full
+                  border border-white/20 text-white font-medium
+                  transition-colors duration-300
+                  before:absolute before:inset-0
+                  before:bg-pink-500
+                  before:translate-x-[-100%]
+                  before:transition-transform before:duration-[300ms]
+                  hover:before:translate-x-0
+                  hover:text-black
+                "
+              >
+                <span className="relative z-10">Join Us</span>
+              </a>
+            )}
           </div>
         </div>
       </div>
@@ -95,7 +123,43 @@ const NavItem = ({ href, label }) => (
   </a>
 );
 
-const MobileLink = ({ href, label, onClick }) => (
+const JoinUsButton = () => (
+  <a
+    href="/volunteer-login"
+    className="
+      relative overflow-hidden ml-4 px-5 py-2 rounded-full
+      border border-white/20 text-white text-sm font-medium
+      transition-colors duration-300
+      before:absolute before:inset-0
+      before:bg-pink-500
+      before:translate-x-[-100%]
+      before:transition-transform before:duration-[300ms]
+      hover:before:translate-x-0
+      hover:text-black
+    "
+  >
+    <span className="relative z-10">Join Us</span>
+  </a>
+);
+
+const DashboardButton = ({ username }) => (
+  <a
+    href="/donor-dashboard"
+    className="
+      ml-4 px-5 py-2 rounded-full
+      bg-gradient-to-r from-pink-500 to-rose-600 
+      text-white text-sm font-medium
+      transition-all duration-300
+      hover:shadow-lg hover:shadow-pink-500/20
+      flex items-center gap-2
+    "
+  >
+    <User className="w-4 h-4" />
+    <span className="relative z-10">{username || "Dashboard"}</span>
+  </a>
+);
+
+const MobileLink = ({ href, label }) => (
   <a
     href={href}
     onClick={onClick}

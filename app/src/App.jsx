@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Gallery from "./pages/Gallery";
 import DonorLogin from "./pages/DonorLogin";
 import DonorRegister from "./pages/DonorRegister";
+import DonorDashboard from "./pages/DonorDashboard";
 import Contact from "./pages/Contact";
 import AboutPage from "./pages/About";
 import VolunteerLogin from "./pages/VolunteerLogin";
