@@ -1,9 +1,9 @@
 import api from './api';
 
 // Auth token management
-const TOKEN_KEY = 'donor_access_token';
-const REFRESH_TOKEN_KEY = 'donor_refresh_token';
-const USER_KEY = 'donor_user';
+const TOKEN_KEY = 'volunteer_access_token';
+const REFRESH_TOKEN_KEY = 'volunteer_refresh_token';
+const USER_KEY = 'volunteer_user';
 
 export const setAuthTokens = (accessToken, refreshToken) => {
     localStorage.setItem(TOKEN_KEY, accessToken);
@@ -13,11 +13,11 @@ export const setAuthTokens = (accessToken, refreshToken) => {
 export const getAccessToken = () => localStorage.getItem(TOKEN_KEY);
 export const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);
 
-export const setDonorUser = (user) => {
+export const setVolunteerUser = (user) => {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
-export const getDonorUser = () => {
+export const getVolunteerUser = () => {
     const user = localStorage.getItem(USER_KEY);
     return user ? JSON.parse(user) : null;
 };
@@ -28,7 +28,7 @@ export const clearAuthData = () => {
     localStorage.removeItem(USER_KEY);
 };
 
-export const isAuthenticated = () => {
+export const isVolunteerAuthenticated = () => {
     return !!getAccessToken();
 };
 
@@ -39,12 +39,12 @@ const authHeader = () => {
 };
 
 // Auth API calls
-export const loginDonor = async (email, password) => {
+export const loginVolunteer = async (email, password) => {
     try {
-        const response = await api.post('/api/donor/login', { email, password });
+        const response = await api.post('/api/volunteers/login', { email, password });
         const { user, accessToken, refreshToken } = response.data.data;
         setAuthTokens(accessToken, refreshToken);
-        setDonorUser(user);
+        setVolunteerUser(user);
         window.dispatchEvent(new Event("storage"));
         return response.data;
     } catch (error) {
@@ -52,9 +52,9 @@ export const loginDonor = async (email, password) => {
     }
 };
 
-export const registerDonor = async (formData) => {
+export const registerVolunteer = async (formData) => {
     try {
-        const response = await api.post('/api/donor/register', formData, {
+        const response = await api.post('/api/volunteers/register', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -65,9 +65,9 @@ export const registerDonor = async (formData) => {
     }
 };
 
-export const logoutDonor = async () => {
+export const logoutVolunteer = async () => {
     try {
-        await api.post('/api/donor/logout', {}, {
+        await api.post('/api/volunteers/logout', {}, {
             headers: authHeader()
         });
         clearAuthData();
@@ -80,10 +80,10 @@ export const logoutDonor = async () => {
     }
 };
 
-export const refreshAccessToken = async () => {
+export const refreshVolunteerAccessToken = async () => {
     try {
         const refreshToken = getRefreshToken();
-        const response = await api.post('/api/donor/refresh-token', { refreshToken });
+        const response = await api.post('/api/volunteers/refresh-token', { refreshToken });
         const { accessToken, refreshToken: newRefreshToken } = response.data.data;
         setAuthTokens(accessToken, newRefreshToken);
         return response.data;
@@ -93,10 +93,10 @@ export const refreshAccessToken = async () => {
     }
 };
 
-// Donor data API calls
-export const getDonorProfile = async () => {
+// Volunteer data API calls
+export const getVolunteerProfile = async () => {
     try {
-        const response = await api.get('/api/donor/profile', {
+        const response = await api.get('/api/volunteers/profile', {
             headers: authHeader()
         });
         return response.data;
@@ -105,9 +105,9 @@ export const getDonorProfile = async () => {
     }
 };
 
-export const getDonorDonations = async () => {
+export const getVolunteerStats = async () => {
     try {
-        const response = await api.get('/api/donor/donations', {
+        const response = await api.get('/api/volunteers/stats', {
             headers: authHeader()
         });
         return response.data;
@@ -116,20 +116,9 @@ export const getDonorDonations = async () => {
     }
 };
 
-export const getDonorStats = async () => {
+export const getCurrentVolunteer = async () => {
     try {
-        const response = await api.get('/api/donor/stats', {
-            headers: authHeader()
-        });
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
-
-export const getCurrentDonor = async () => {
-    try {
-        const response = await api.get('/api/donor/current-user', {
+        const response = await api.get('/api/volunteers/current-user', {
             headers: authHeader()
         });
         return response.data;

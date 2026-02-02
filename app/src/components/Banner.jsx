@@ -67,11 +67,11 @@ export const Banner = () => {
           <div className="flex flex-col sm:flex-row items-center gap-6 mb-20">
             <button
               onClick={() => {
-                window.location.href = "/volunteer-login";
+                window.location.href = "/donor-register";
               }}
               className="bg-[#0071e3] text-white px-8 py-3 rounded-full text-[17px] font-medium hover:bg-[#0077ed] transition-all shadow-sm flex items-center gap-2 group"
             >
-              Join the Mission <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              Donate <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
             <a href="/about" className="text-[#0066cc] text-[17px] hover:underline flex items-center gap-1 group">
               Learn more <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />

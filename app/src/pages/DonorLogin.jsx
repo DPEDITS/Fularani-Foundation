@@ -12,9 +12,13 @@ import {
   Loader2,
 } from "lucide-react";
 import { loginDonor, isAuthenticated } from "../services/donorService";
+import { loginVolunteer, isVolunteerAuthenticated } from "../services/volunteerService";
 
 const DonorLogin = () => {
   const navigate = useNavigate();
+  const [role, setRole] = useState(() => {
+    return window.location.pathname.includes("volunteer") ? "volunteer" : "donor";
+  });
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -25,10 +29,12 @@ const DonorLogin = () => {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (isAuthenticated()) {
+    if (role === "donor" && isAuthenticated()) {
       navigate("/donor-dashboard");
+    } else if (role === "volunteer" && isVolunteerAuthenticated()) {
+      navigate("/volunteer-dashboard");
     }
-  }, [navigate]);
+  }, [navigate, role]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -41,8 +47,13 @@ const DonorLogin = () => {
     setLoading(true);
 
     try {
-      await loginDonor(form.email, form.password);
-      navigate("/donor-dashboard");
+      if (role === "donor") {
+        await loginDonor(form.email, form.password);
+        navigate("/donor-dashboard");
+      } else {
+        await loginVolunteer(form.email, form.password);
+        navigate("/volunteer-dashboard");
+      }
     } catch (err) {
       console.error("Login error:", err);
       const errorMessage =
@@ -58,10 +69,10 @@ const DonorLogin = () => {
   const isPasswordValid = form.password.length >= 6;
 
   return (
-    <main className="min-h-screen md:h-screen flex items-start justify-center px-4 md:px-8 lg:px-12 pt-26 overflow-auto md:overflow-hidden">
+    <main className="min-h-screen md:h-screen flex items-start justify-center px-4 md:px-8 lg:px-12 overflow-auto md:overflow-hidden">
       <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid md:grid-cols-2 min-h-[600px] md:max-h-[85vh]">
         {/* LEFT SIDE: Brand & Visuals */}
-        <div className="relative bg-gradient-to-br from-pink-400 to-rose-600 p-10 md:p-12 flex flex-col justify-between text-white overflow-hidden">
+        <div className="relative bg-gradient-to-br from-emerald-400 to-teal-600 p-10 md:p-12 flex flex-col justify-start gap-4 text-white overflow-hidden">
           {/* Decorative Background Elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
@@ -71,30 +82,52 @@ const DonorLogin = () => {
             <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4 -mt-6">
               Welcome Back,
               <br />
-              Donor
+              {role === "donor" ? "Donor" : "Volunteer"}
             </h1>
             <div className="h-1.5 w-35 bg-black rounded-full mb-6 mx-auto md:mx-0" />
 
-            <p className="text-red-50 text-lg leading-relaxed max-w-sm">
-              Your generosity drives our mission. Sign in to manage your
-              contributions and see the impact you're making.
+            <p className="text-emerald-50 text-lg leading-relaxed max-w-sm mx-auto md:mx-0">
+              {role === "donor"
+                ? "Your generosity drives our mission. Sign in to manage your contributions and see the impact you're making."
+                : "Your dedication changes lives. Sign in to track your volunteer hours and upcoming missions."}
             </p>
           </div>
 
-          <div className="relative z-10 mt-8 flex justify-center md:justify-start">
+          <div className="relative z-10 mt-4 flex justify-center md:justify-start">
             <img
               src={headerImg}
               alt="Fularani Foundation"
-              className="w-64 rounded-xl shadow-lg transform md:group-hover:scale-105 transition-transform duration-500"
+              className="w-60 rounded-xl shadow-lg transform md:group-hover:scale-105 transition-transform duration-500"
             />
           </div>
         </div>
 
         {/* RIGHT SIDE: Login Form */}
-        <div className="p-10 md:p-14 flex flex-col justify-center bg-white">
-          <div className="max-w-md w-full mx-auto space-y-8">
+        <div className="p-6 md:p-8 flex flex-col justify-center bg-white overflow-y-auto">
+          <div className="max-w-md w-full mx-auto space-y-4">
+            {/* ROLE TOGGLE */}
+            <div className="flex p-1 bg-gray-50 rounded-xl mb-2 relative">
+              <div
+                className={`absolute inset-y-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm transition-transform duration-300 ease-out border border-gray-100 ${role === "volunteer" ? "translate-x-[calc(100%+4px)]" : "translate-x-0"}`}
+              />
+              <button
+                onClick={() => setRole("donor")}
+                className={`flex-1 py-3 text-xs font-bold rounded-lg relative z-10 transition-colors duration-300 ${role === "donor" ? "text-emerald-600" : "text-gray-500"}`}
+              >
+                Donor
+              </button>
+              <button
+                onClick={() => setRole("volunteer")}
+                className={`flex-1 py-3 text-xs font-bold rounded-lg relative z-10 transition-colors duration-300 ${role === "volunteer" ? "text-emerald-600" : "text-gray-500"}`}
+              >
+                Volunteer
+              </button>
+            </div>
+
             <div className="text-center md:text-left">
-              <h2 className="text-3xl font-bold text-gray-900">Donor Login</h2>
+              <h2 className="text-4xl font-bold text-gray-900 -mt-2">
+                {role === "donor" ? "Donor Login" : "Volunteer Login"}
+              </h2>
               <p className="text-gray-500 mt-2">
                 Enter your details to access your account
               </p>
@@ -102,27 +135,26 @@ const DonorLogin = () => {
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Field */}
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700 ml-1">
                   Email Address
                 </label>
                 <div className="relative">
                   <Mail
                     className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300
-                    ${
-                      form.email
+                    ${form.email
                         ? isEmailValid
                           ? "text-green-600"
                           : "text-red-500"
                         : "text-gray-400"
-                    }`}
+                      }`}
                   />
                   <input
                     type="email"
@@ -134,32 +166,28 @@ const DonorLogin = () => {
                     placeholder="you@example.com"
                     className={`w-full pl-12 pr-4 py-3 rounded-xl border outline-none
                       transition-all duration-300 disabled:opacity-50
-                      ${
-                        form.email
-                          ? isEmailValid
-                            ? "border-green-500 bg-green-50 focus:ring-2 focus:ring-green-500/20"
-                            : "border-red-500 bg-red-50 focus:ring-2 focus:ring-red-500/20"
-                          : "border-gray-200 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 hover:border-gray-300"
+                      ${isEmailValid
+                        ? "border-green-500 bg-green-50 focus:ring-4 focus:ring-green-500/10"
+                        : "border-red-500 bg-red-50 focus:ring-4 focus:ring-red-500/10"
                       }`}
                   />
                 </div>
               </div>
 
               {/* Password Field */}
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700 ml-1">
                   Password
                 </label>
                 <div className="relative">
                   <Lock
                     className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300
-                                        ${
-                                          form.password
-                                            ? isPasswordValid
-                                              ? "text-green-600"
-                                              : "text-red-500"
-                                            : "text-gray-400"
-                                        }`}
+                                        ${form.password
+                        ? isPasswordValid
+                          ? "text-green-600"
+                          : "text-red-500"
+                        : "text-gray-400"
+                      }`}
                   />
                   <input
                     type={showPassword ? "text" : "password"}
@@ -171,13 +199,10 @@ const DonorLogin = () => {
                     placeholder="••••••••"
                     className={`w-full pl-12 pr-12 py-3 rounded-xl border outline-none
                                             transition-all duration-300 disabled:opacity-50
-                                            ${
-                                              form.password
-                                                ? isPasswordValid
-                                                  ? "border-green-500 bg-green-50 focus:ring-2 focus:ring-green-500/20"
-                                                  : "border-red-500 bg-red-50 focus:ring-2 focus:ring-red-500/20"
-                                                : "border-gray-200 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 hover:border-gray-300"
-                                            }`}
+                                            ${isPasswordValid
+                        ? "border-green-500 bg-green-50 focus:ring-4 focus:ring-green-500/10"
+                        : "border-red-500 bg-red-50 focus:ring-4 focus:ring-red-500/10"
+                      }`}
                   />
                   <button
                     type="button"
@@ -199,7 +224,7 @@ const DonorLogin = () => {
                 <label className="flex items-center gap-2 cursor-pointer group">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                    className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
                   />
                   <span className="text-gray-600 group-hover:text-gray-800">
                     Remember me
@@ -207,7 +232,7 @@ const DonorLogin = () => {
                 </label>
                 <a
                   href="/forgot-password"
-                  className="text-red-600 hover:text-red-700 font-medium hover:underline"
+                  className="text-emerald-600 hover:text-emerald-700 font-medium hover:underline"
                 >
                   Forgot Password?
                 </a>
@@ -239,45 +264,44 @@ const DonorLogin = () => {
                 Don't have an account?{" "}
                 <a
                   href="/donor-register"
-                  className="text-red-600 hover:text-red-700 font-semibold hover:underline"
+                  className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline"
                 >
                   Register Now
                 </a>
               </div>
-              <div className="relative flex items-center justify-center mt-6">
+              <div className="relative flex items-center justify-center mt-2">
                 <div className="absolute w-full border-t border-gray-200"></div>
                 <span className="relative bg-white px-3 text-sm text-gray-400">
                   Or continue with
                 </span>
               </div>
 
-              <button
-                type="button"
-                disabled={loading}
-                className="w-full md:w-9 md:h-9 py-3 px-4 md:p-0 rounded-xl md:rounded-full border border-gray-200 flex items-center justify-center gap-3 md:gap-0 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 md:mx-auto disabled:opacity-50"
-              >
-                <svg className="w-6 h-6 md:w-6 md:h-6" viewBox="0 0 24 24">
-                  <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26.81-.58z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
-                  />
-                </svg>
-                <span className="text-gray-700 font-medium md:hidden">
-                  Google
-                </span>
-              </button>
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  disabled={loading}
+                  className="w-9 h-9 p-0 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 disabled:opacity-50"
+                >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24">
+                    <path
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      fill="#4285F4"
+                    />
+                    <path
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      fill="#34A853"
+                    />
+                    <path
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.26.81-.58z"
+                      fill="#FBBC05"
+                    />
+                    <path
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                      fill="#EA4335"
+                    />
+                  </svg>
+                </button>
+              </div>
             </form>
           </div>
         </div>

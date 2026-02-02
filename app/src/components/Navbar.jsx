@@ -1,174 +1,227 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Menu, X, User } from "lucide-react";
-import { isAuthenticated, getDonorUser } from "../services/donorService";
+import { Menu, X, User, LogOut } from "lucide-react";
+import { isAuthenticated as isDonorAuthenticated, getDonorUser, logoutDonor } from "../services/donorService";
+import { isVolunteerAuthenticated, getVolunteerUser, logoutVolunteer } from "../services/volunteerService";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [donorUser, setDonorUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    // Check auth status on mount and when localStorage changes
     const checkAuth = () => {
-      setIsLoggedIn(isAuthenticated());
-      setDonorUser(getDonorUser());
+      const isDonor = isDonorAuthenticated();
+      const isVolunteer = isVolunteerAuthenticated();
+
+      setIsLoggedIn(isDonor || isVolunteer);
+      if (isVolunteer) {
+        setUserRole("volunteer");
+        setCurrentUser(getVolunteerUser());
+      } else if (isDonor) {
+        setUserRole("donor");
+        setCurrentUser(getDonorUser());
+      } else {
+        setUserRole(null);
+        setCurrentUser(null);
+      }
     };
-
     checkAuth();
-
-    // Listen for storage changes (in case of login/logout in another tab)
     window.addEventListener("storage", checkAuth);
-
     return () => window.removeEventListener("storage", checkAuth);
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      if (userRole === "volunteer") {
+        await logoutVolunteer();
+      } else {
+        await logoutDonor();
+      }
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Logout failed:", err);
+      window.location.href = "/";
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
+      const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 20);
+
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setVisible(false);
+      } else {
+        setVisible(true);
+      }
+      setLastScrollY(currentScrollY);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   return (
     <>
-      {/* DESKTOP NAVBAR */}
       <nav
-        className={`fixed left-1/2 z-50 -translate-x-1/2 hidden md:block transition-all duration-300 ${visible ? "top-6" : "-top-24"}`}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] border-b border-white/10 ${visible ? "translate-y-0" : "-translate-y-full"
+          } ${isScrolled ? "bg-black/80 backdrop-blur-xl" : "bg-black/60 backdrop-blur-lg"}`}
       >
-        <div className="flex items-center gap-8 px-10 py-4 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] bg-gradient-to-br from-gray-900/50 to-black/30">
-          <span className="flex flex-col leading-tight italic font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400">
-            <span>Fularani</span>
-            <span className="text-xs">Foundation</span>
-          </span>
-          <NavLinks />
-          {isLoggedIn ? (
-            <DashboardButton username={donorUser?.username} />
-          ) : (
-            <JoinUsButton />
-          )}
+        <div className="max-w-[1200px] mx-auto px-6 h-[52px] md:h-[48px] flex items-center justify-between">
+          <a href="/" className="group flex flex-col leading-none tracking-tight">
+            <span className="text-[17px] font-semibold text-white/95 transition-opacity group-hover:opacity-75">Fularani</span>
+            <span className="text-[9px] font-medium text-white/30 uppercase tracking-[0.25em] mt-0.5">Foundation</span>
+          </a>
+
+          <div className="hidden md:block">
+            <NavLinks />
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="hidden md:block">
+              {isLoggedIn ? (
+                <div className="flex items-center gap-3">
+                  <DashboardButton
+                    username={currentUser?.username}
+                    role={userRole}
+                    avatar={currentUser?.avatar}
+                  />
+                  <button
+                    onClick={handleLogout}
+                    className="p-1.5 rounded-full bg-white/5 text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300"
+                    title="Logout"
+                  >
+                    <LogOut size={16} strokeWidth={1.5} />
+                  </button>
+                </div>
+              ) : (
+                <LoginButton />
+              )}
+            </div>
+
+            <button
+              onClick={() => setOpen(!open)}
+              className="md:hidden text-white/90 p-1 hover:opacity-70 transition-opacity"
+            >
+              {open ? <X size={20} strokeWidth={1.5} /> : <Menu size={20} strokeWidth={1.5} />}
+            </button>
+          </div>
         </div>
       </nav>
 
-      {/* MOBILE NAVBAR */}
-      <nav
-        className={`fixed left-4 right-4 z-50 md:hidden transition-all duration-300 ${visible ? "top-4" : "-top-32"}`}
-      >
-        <div className="flex items-center justify-between px-5 py-4 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] bg-gradient-to-br from-gray-900/50 to-black/30">
-          <span className="flex flex-col leading-tight italic font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400">
-            <span>Fularani</span>
-            <span className="text-xs">Foundation</span>
-          </span>
+      {/* MOBILE MENU OVERLAY */}
+      {open && (
+        <div className="fixed inset-0 w-full h-screen bg-black/95 backdrop-blur-2xl z-[60] flex flex-col pt-[52px] animate-in fade-in duration-500">
+          <div className="absolute top-0 left-0 w-full h-[52px] flex items-center justify-between px-6 border-b border-white/5">
+            <div className="flex flex-col leading-none tracking-tight">
+              <span className="text-[17px] font-semibold text-white">Fularani</span>
+              <span className="text-[9px] font-medium text-white/30 uppercase tracking-[0.25em] mt-1">Foundation</span>
+            </div>
+            <button onClick={() => setOpen(false)} className="text-white/90 p-1">
+              <X size={24} strokeWidth={1.5} />
+            </button>
+          </div>
 
-          <button onClick={() => setOpen(!open)} className="text-white">
-            {open ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+          <div className="flex flex-col gap-6 px-10 pt-12">
+            <MobileLink href="/" label="Home" onClick={() => setOpen(false)} />
+            <MobileLink href="/about" label="About" onClick={() => setOpen(false)} />
+            <MobileLink href="/gallery" label="Gallery" onClick={() => setOpen(false)} />
+            <MobileLink href="/missions" label="Missions" onClick={() => setOpen(false)} />
+            <MobileLink href="/contact" label="Contact" onClick={() => setOpen(false)} />
 
-        {open && (
-          <div className="mt-3 p-6 rounded-2xl bg-black/95 border border-white/10 shadow-xl space-y-4">
-            <MobileLink href="/" label="Home" />
-            <MobileLink href="/about" label="About" />
-            <MobileLink href="/gallery" label="Gallery" />
-            <MobileLink href="/missions" label="Missions" />
-            <MobileLink href="/contact" label="Contact" />
-
-            {isLoggedIn ? (
-              <a
-                href="/donor-dashboard"
-                className="
-                  relative overflow-hidden block w-full text-center mt-4 px-5 py-3 rounded-full
-                  bg-gradient-to-r from-pink-500 to-rose-600 text-white font-medium
-                  transition-all duration-300 flex items-center justify-center gap-2
-                  shadow-lg shadow-pink-500/20
-                "
-              >
-                <User className="w-4 h-4" />
-                <span>My Dashboard</span>
-              </a>
-            ) : (
-              <a
-                href="/volunteer-login"
-                className="
-                  relative overflow-hidden block w-full text-center mt-4 px-5 py-3 rounded-full
-                  border border-white/20 text-white font-medium
-                  transition-colors duration-300
-                  before:absolute before:inset-0
-                  before:bg-pink-500
-                  before:translate-x-[-100%]
-                  before:transition-transform before:duration-[300ms]
-                  hover:before:translate-x-0
-                  hover:text-black
-                "
-              >
-                <span className="relative z-10">Join Us</span>
-              </a>
-            )}
+            <div className="mt-8 pt-8 border-t border-white/10 flex flex-col gap-4">
+              {isLoggedIn ? (
+                <div className="flex flex-col gap-4">
+                  <a
+                    href={userRole === "volunteer" ? "/volunteer-dashboard" : "/donor-dashboard"}
+                    onClick={() => setOpen(false)}
+                    className="w-full h-11 flex items-center justify-center gap-2 rounded-xl bg-white text-black text-[15px] font-semibold transition-transform active:scale-95"
+                  >
+                    <User size={16} />
+                    <span>Dashboard</span>
+                  </a>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full h-11 flex items-center justify-center gap-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-[15px] font-semibold transition-transform active:scale-95"
+                  >
+                    <LogOut size={16} />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              ) : (
+                <a
+                  href="/donor-register"
+                  onClick={() => setOpen(false)}
+                  className="w-full h-11 flex items-center justify-center rounded-xl bg-white text-black text-[15px] font-semibold transition-transform active:scale-95"
+                >
+                  Login
+                </a>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      )}
+    </>
   );
 };
+
+const NavLinks = () => (
+  <div className="flex items-center gap-8">
+    <NavItem href="/" label="Home" />
+    <NavItem href="/about" label="About" />
+    <NavItem href="/gallery" label="Gallery" />
+    <NavItem href="/missions" label="Missions" />
+    <NavItem href="/contact" label="Contact" />
+  </div>
+);
 
 const NavItem = ({ href, label }) => (
   <a
     href={href}
-    className="text-xs font-normal text-[#1d1d1f]/80 hover:text-[#1d1d1f] transition-colors tracking-wide"
+    className="text-[12px] font-medium text-white/70 hover:text-white transition-all duration-300 tracking-tight"
   >
     {label}
   </a>
 );
 
-const JoinUsButton = () => (
+const LoginButton = () => (
   <a
-    href="/volunteer-login"
-    className="
-      relative overflow-hidden ml-4 px-5 py-2 rounded-full
-      border border-white/20 text-white text-sm font-medium
-      transition-colors duration-300
-      before:absolute before:inset-0
-      before:bg-pink-500
-      before:translate-x-[-100%]
-      before:transition-transform before:duration-[300ms]
-      hover:before:translate-x-0
-      hover:text-black
-    "
+    href="/donor-register"
+    className="px-4 py-1.5 rounded-full bg-white text-black text-[12px] font-semibold transition-all duration-300 hover:bg-white/90 active:scale-95"
   >
-    <span className="relative z-10">Join Us</span>
+    Login
   </a>
 );
 
-const DashboardButton = ({ username }) => (
+const DashboardButton = ({ username, role, avatar }) => (
   <a
-    href="/donor-dashboard"
-    className="
-      ml-4 px-5 py-2 rounded-full
-      bg-gradient-to-r from-pink-500 to-rose-600 
-      text-white text-sm font-medium
-      transition-all duration-300
-      hover:shadow-lg hover:shadow-pink-500/20
-      flex items-center gap-2
-    "
+    href={role === "volunteer" ? "/volunteer-dashboard" : "/donor-dashboard"}
+    className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 text-white/90 text-[12px] font-semibold border transition-all duration-300 hover:bg-white/10 active:scale-95 ${role === "volunteer" ? "border-emerald-500/30 text-emerald-400" : "border-white/15"
+      }`}
   >
-    <User className="w-4 h-4" />
-    <span className="relative z-10">{username || "Dashboard"}</span>
+    <div className="w-5 h-5 rounded-full overflow-hidden bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
+      {avatar ? (
+        <img src={avatar} alt={username} className="w-full h-full object-cover" />
+      ) : (
+        <User size={10} className={role === "volunteer" ? "text-emerald-400" : "text-white/40"} />
+      )}
+    </div>
+    <span>{(username && username !== "undefined") ? username : "Account"}</span>
   </a>
 );
 
-const MobileLink = ({ href, label }) => (
+const MobileLink = ({ href, label, onClick }) => (
   <a
     href={href}
     onClick={onClick}
-    className="text-3xl font-semibold text-[#1d1d1f] hover:opacity-70 transition-opacity"
+    className="text-3xl font-semibold text-white/90 hover:text-white transition-colors tracking-tight"
   >
     {label}
   </a>
 );
 
 export default Navbar;
-
-
