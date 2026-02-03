@@ -1,17 +1,17 @@
-import { Banner } from "../components/Banner";
-import FeaturedMissions from "../components/FeaturedMissions";
-import HomeAbout from "../components/HomeAbout";
-import HomeGallery from "../components/HomeGallery";
+import Hero from "./Hero";
+import TrustStrip from "../components/TrustStrip";
+import BentoGrid from "../components/BentoGrid";
+import Stories from "../components/Stories";
 import CTASection from "../components/CTASection";
 
 const Home = () => {
   return (
     <div className="bg-white">
       <main>
-        <Banner />
-        <FeaturedMissions />
-        <HomeAbout />
-        <HomeGallery />
+        <Hero />
+        <TrustStrip />
+        <BentoGrid />
+        <Stories />
         <CTASection />
       </main>
     </div>

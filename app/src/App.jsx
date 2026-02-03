@@ -19,7 +19,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <main className="pt-[72px] md:pt-[88px]">
+      <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
