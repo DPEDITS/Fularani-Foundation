@@ -29,7 +29,7 @@ app.use("/api/volunteers", volunteerRouter)
 app.use("/api/donor", donorRouter)
 app.use("/api/v1/contact", contactRouter)
 app.use("/api/gallery", galleryRouter)
-app.use("/api/donations", donationRouter) 
+app.use("/api/donations", donationRouter)
 app.use("/api/content", contentRouter)
 app.use("/api/admin", adminRouter)
 

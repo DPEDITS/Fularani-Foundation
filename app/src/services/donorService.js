@@ -137,3 +137,45 @@ export const getCurrentDonor = async () => {
         throw error;
     }
 };
+
+export const updateDonorProfile = async (data) => {
+    try {
+        const response = await api.patch('/api/donor/update-profile', data, {
+            headers: authHeader()
+        });
+        const updatedUser = response.data.data;
+        setDonorUser(updatedUser);
+        window.dispatchEvent(new Event("storage"));
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateDonorAvatar = async (formData) => {
+    try {
+        const response = await api.patch('/api/donor/update-avatar', formData, {
+            headers: {
+                ...authHeader(),
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        const updatedUser = response.data.data;
+        setDonorUser(updatedUser);
+        window.dispatchEvent(new Event("storage"));
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createDonation = async (donationData) => {
+    try {
+        const response = await api.post('/api/donation/create', donationData, {
+            headers: authHeader()
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
