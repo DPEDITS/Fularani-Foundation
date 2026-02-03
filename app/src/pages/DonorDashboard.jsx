@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Heart,
@@ -22,6 +22,10 @@ import {
   ArrowUpRight,
   ShieldCheck,
   CreditCard,
+  Edit2,
+  X,
+  Check,
+  Camera,
 } from "lucide-react";
 import {
   getDonorProfile,
@@ -30,16 +34,23 @@ import {
   logoutDonor,
   isAuthenticated,
   getDonorUser,
+  updateDonorProfile,
+  updateDonorAvatar,
+  createDonation,
 } from "../services/donorService";
 
 const DonorDashboard = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [donations, setDonations] = useState([]);
   const [stats, setStats] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [error, setError] = useState(null);
+  const [showDonationModal, setShowDonationModal] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -78,6 +89,67 @@ const DonorDashboard = () => {
     } catch (err) {
       console.error("Logout error:", err);
       navigate("/donor-login");
+    }
+  };
+
+  const handleSimulateDonation = async (amount, isRecurring) => {
+    try {
+      setIsUpdating(true);
+      const donor = getDonorUser();
+      const donationData = {
+        donorId: donor._id,
+        amount: parseInt(amount),
+        currency: "INR",
+        paymentGateway: "Simulation",
+        paymentId: `sim_${Math.random().toString(36).substr(2, 9)}`,
+        isRecurring: isRecurring,
+        recurringInterval: isRecurring ? "monthly" : "once",
+        recurringId: isRecurring ? `rec_${Math.random().toString(36).substr(2, 9)}` : "na",
+        receiptNumber: `FF-${Date.now()}`,
+        receiptUrl: "https://example.com/receipt.pdf",
+        receiptGeneratedAt: new Date().toISOString(),
+        donatedAt: new Date().toISOString(),
+      };
+
+      await createDonation(donationData);
+      await fetchDashboardData();
+      setShowDonationModal(false);
+    } catch (err) {
+      console.error("Donation simulation failed:", err);
+      alert("Donation failed. Please try again.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleUpdateProfile = async (data) => {
+    try {
+      setIsUpdating(true);
+      await updateDonorProfile(data);
+      await fetchDashboardData();
+    } catch (err) {
+      console.error("Profile update failed:", err);
+      alert("Failed to update profile.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsUpdating(true);
+      const formData = new FormData();
+      formData.append("avatar", file);
+      await updateDonorAvatar(formData);
+      await fetchDashboardData();
+    } catch (err) {
+      console.error("Avatar update failed:", err);
+      alert("Failed to update avatar.");
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -139,7 +211,7 @@ const DonorDashboard = () => {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
           <div className="flex items-center gap-6">
-            <div className="relative">
+            <div className="relative group cursor-pointer" onClick={() => fileInputRef.current.click()}>
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-[32px] overflow-hidden bg-white shadow-sm border border-black/5 flex items-center justify-center">
                 {user?.avatar ? (
                   <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
@@ -148,7 +220,18 @@ const DonorDashboard = () => {
                     {user?.username?.[0]?.toUpperCase() || "D"}
                   </div>
                 )}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-[32px]">
+                  <Camera className="text-white" size={24} />
+                </div>
               </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                disabled={isUpdating}
+              />
               <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center border border-black/5">
                 <Sparkles className="w-4 h-4 text-rose-500" />
               </div>
@@ -169,7 +252,7 @@ const DonorDashboard = () => {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate("/contact")}
+              onClick={() => setShowDonationModal(true)}
               className="px-6 py-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-rose-500/20 active:scale-95"
             >
               <Gift size={18} />
@@ -224,6 +307,7 @@ const DonorDashboard = () => {
               donations={donations}
               formatCurrency={formatCurrency}
               formatDate={formatDate}
+              setActiveTab={setActiveTab}
             />
           )}
           {activeTab === "donations" && (
@@ -231,13 +315,79 @@ const DonorDashboard = () => {
               donations={donations}
               formatCurrency={formatCurrency}
               formatDate={formatDate}
+              setShowDonationModal={setShowDonationModal}
             />
           )}
           {activeTab === "profile" && (
-            <ProfileTab profile={profile} user={user} handleLogout={handleLogout} />
+            <ProfileTab
+              user={user}
+              onUpdate={handleUpdateProfile}
+              isUpdating={isUpdating}
+            />
           )}
         </div>
       </div>
+
+      {/* Donation Simulation Modal */}
+      {showDonationModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[#1d1d1f]">Make a Donation</h2>
+              <button onClick={() => setShowDonationModal(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <label className="text-xs font-bold text-[#86868b] uppercase tracking-wider mb-2 block">Amount (INR)</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {[500, 1000, 2000, 5000, 10000].map((amt) => (
+                    <button
+                      key={amt}
+                      onClick={() => handleSimulateDonation(amt, false)}
+                      className="py-3 px-2 rounded-xl border border-black/5 bg-[#f5f5f7] hover:bg-rose-50 hover:border-rose-200 text-[#1d1d1f] font-bold text-sm transition-all"
+                    >
+                      ₹{amt}
+                    </button>
+                  ))}
+                  <div className="relative">
+                    <input
+                      type="number"
+                      placeholder="Custom"
+                      className="w-full py-3 px-3 rounded-xl border border-black/5 bg-[#f5f5f7] font-bold text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSimulateDonation(e.target.value, false);
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                <div className="flex gap-3">
+                  <RefreshCcw className="text-blue-500 shrink-0" size={20} />
+                  <div>
+                    <p className="text-blue-900 font-bold text-sm">Monthly Giving</p>
+                    <p className="text-blue-700/70 text-xs mt-1">Become a recurring donor to provide consistent support.</p>
+                    <button
+                      onClick={() => handleSimulateDonation(1000, true)}
+                      className="mt-3 text-blue-600 font-bold text-xs hover:underline"
+                    >
+                      Start Monthly ₹1,000 →
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-[#86868b] text-center leading-relaxed">
+                This is a simulation. In a production environment, this would redirect you to a secure payment gateway like Razorpay or Stripe.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
@@ -252,12 +402,12 @@ const StatCard = ({ icon: Icon, label, value, accent }) => (
   </div>
 );
 
-const OverviewTab = ({ stats, donations, formatCurrency, formatDate }) => {
+const OverviewTab = ({ stats, donations, formatCurrency, formatDate, setActiveTab }) => {
   const recentDonations = donations?.slice(0, 3) || [];
 
   return (
     <div className="grid md:grid-cols-2 gap-8">
-      {/* Average Donation & Year Progress */}
+      {/* Giving Insight */}
       <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5 flex flex-col justify-between">
         <div>
           <h3 className="text-xl font-bold text-[#1d1d1f] mb-8">Giving Insight</h3>
@@ -309,7 +459,10 @@ const OverviewTab = ({ stats, donations, formatCurrency, formatDate }) => {
             <p className="text-[#86868b] text-center py-10 italic">No recent donations yet.</p>
           )}
           {recentDonations.length > 0 && (
-            <button className="w-full py-3 mt-4 text-[#86868b] text-sm font-bold hover:text-[#1d1d1f] transition-colors">
+            <button
+              onClick={() => setActiveTab("donations")}
+              className="w-full py-3 mt-4 text-[#86868b] text-sm font-bold hover:text-[#1d1d1f] transition-colors"
+            >
               View All History
             </button>
           )}
@@ -319,7 +472,7 @@ const OverviewTab = ({ stats, donations, formatCurrency, formatDate }) => {
   );
 };
 
-const DonationsTab = ({ donations, formatCurrency, formatDate }) => (
+const DonationsTab = ({ donations, formatCurrency, formatDate, setShowDonationModal }) => (
   <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-black/5">
     <div className="flex items-center justify-between mb-10">
       <h3 className="text-2xl font-bold text-[#1d1d1f]">Donation History</h3>
@@ -354,13 +507,12 @@ const DonationsTab = ({ donations, formatCurrency, formatDate }) => (
                   )}
                 </td>
                 <td className="py-6 px-4 text-right">
-                  {donation.receiptUrl ? (
-                    <a href={donation.receiptUrl} className="inline-flex items-center gap-1.5 text-rose-500 font-bold text-sm hover:underline">
-                      <Download size={14} /> Download
-                    </a>
-                  ) : (
-                    <span className="text-[#86868b]/40">—</span>
-                  )}
+                  <button
+                    onClick={() => window.open(donation.receiptUrl, '_blank')}
+                    className="inline-flex items-center gap-1.5 text-rose-500 font-bold text-sm hover:underline"
+                  >
+                    <Download size={14} /> Download
+                  </button>
                 </td>
               </tr>
             ))}
@@ -371,110 +523,217 @@ const DonationsTab = ({ donations, formatCurrency, formatDate }) => (
       <div className="text-center py-20 bg-[#fbfbfd] rounded-3xl border border-dashed border-black/10">
         <DollarSign size={40} className="mx-auto text-[#86868b] mb-4 opacity-30" />
         <p className="text-[#86868b] font-medium">Your donation history is currently empty.</p>
-        <button className="mt-6 text-rose-500 font-bold text-sm hover:underline">Make your first donation</button>
+        <button
+          onClick={() => setShowDonationModal(true)}
+          className="mt-6 text-rose-500 font-bold text-sm hover:underline"
+        >
+          Make your first donation
+        </button>
       </div>
     )}
   </div>
 );
 
-const ProfileTab = ({ profile, user, handleLogout }) => {
-  const data = profile || user;
+const ProfileTab = ({ user, onUpdate, isUpdating }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [formData, setFormData] = useState({
+    username: user?.username || "",
+    phone: user?.phone || "",
+    address: user?.address || "",
+    panNumber: user?.panNumber || "",
+    wants80GReceipt: user?.wants80GReceipt || false,
+  });
+
+  // Sync form data when user prop changes (after successful update)
+  useEffect(() => {
+    if (user && !isEditing) {
+      setFormData({
+        username: user.username || "",
+        phone: user.phone || "",
+        address: user.address || "",
+        panNumber: user.panNumber || "",
+        wants80GReceipt: !!user.wants80GReceipt,
+      });
+    }
+  }, [user, isEditing]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await onUpdate(formData);
+      setIsEditing(false);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (err) {
+      console.error("Update error:", err);
+      // Show error from backend if available
+      const errorMessage = err.response?.data?.message || "Failed to update profile. Please try again.";
+      alert(errorMessage);
+    }
+  };
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center gap-5 p-8 bg-white rounded-[32px] shadow-sm border border-black/5">
-        <div className="w-20 h-20 rounded-2xl overflow-hidden bg-[#f5f5f7] border border-black/5 shrink-0 flex items-center justify-center shadow-inner">
-          {data?.avatar ? (
-            <img src={data.avatar} alt={data.username} className="w-full h-full object-cover" />
-          ) : (
-            <User size={32} className="text-[#86868b]" />
-          )}
+    <div className="space-y-8 relative">
+      {showSuccess && (
+        <div className="fixed top-24 right-8 z-[110] bg-green-500 text-white px-6 py-3 rounded-2xl shadow-lg shadow-green-500/20 flex items-center gap-3 animate-in slide-in-from-right duration-500">
+          <div className="bg-white/20 p-1 rounded-full"><Check size={16} /></div>
+          <p className="font-bold text-sm">Profile updated successfully!</p>
         </div>
-        <div>
-          <h3 className="text-2xl font-bold text-[#1d1d1f] tracking-tight">Profile & Fiscal Settings</h3>
-          <p className="text-[#86868b] text-sm font-medium">Manage your personal information and tax preferences</p>
-        </div>
-      </div>
-      <div className="grid md:grid-cols-2 gap-8">
-        {/* Personal Details Card */}
-        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5">
-          <h3 className="text-lg font-bold text-[#1d1d1f] mb-8">Personal Information</h3>
-          <div className="space-y-6">
-            <ProfileRow icon={User} label="Display Name" value={data?.username} />
-            <ProfileRow icon={Mail} label="Email Address" value={data?.email} />
-            <ProfileRow icon={Phone} label="Primary Contact" value={data?.phone} />
-            <ProfileRow icon={MapPin} label="Mailing Address" value={data?.address} />
-          </div>
-        </div>
+      )}
 
-        {/* Identity & Fiscal Card */}
-        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5">
-          <h3 className="text-lg font-bold text-[#1d1d1f] mb-8">Fiscal Identity</h3>
-          <div className="space-y-8">
-            <ProfileRow icon={FileText} label="PAN Identification" value={data?.panNumber ? `•••• •••• ${data.panNumber.slice(-4)}` : 'N/A'} />
-
-            <div className="p-6 bg-rose-50 rounded-2xl border border-rose-100">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0">
-                  <ShieldCheck size={20} className="text-rose-500" />
-                </div>
-                <div>
-                  <p className="text-[#1d1d1f] font-bold text-sm">80G Tax Benefit</p>
-                  <p className="text-[#86868b] text-xs leading-relaxed mt-1">
-                    Your account is set to {data?.wants80GReceipt ? 'receive' : 'not receive'} 80G tax receipts automatically for all eligible donations.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 p-4 bg-[#f5f5f7] rounded-2xl">
-              <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center font-black text-rose-500 text-xl shadow-sm">
-                1
-              </div>
-              <div>
-                <p className="text-[#1d1d1f] font-bold text-sm">Member Level</p>
-                <p className="text-[#86868b] text-[11px] font-bold uppercase tracking-wider">Foundation Pillar</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer Controls */}
-      <div className="flex flex-col md:flex-row items-center justify-between p-8 bg-[#f5f5f7] rounded-[32px] gap-6">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 p-8 bg-white rounded-[32px] shadow-sm border border-black/5">
         <div className="flex items-center gap-5">
-          <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#1d1d1f]">
-            <Calendar size={20} />
+          <div className="w-16 h-16 rounded-2xl overflow-hidden bg-[#f5f5f7] border border-black/5 shrink-0 flex items-center justify-center">
+            <User size={28} className="text-[#86868b]" />
           </div>
           <div>
-            <p className="text-[#1d1d1f] font-bold">Member Since</p>
-            <p className="text-[#86868b] text-xs font-medium">Actively supporting since {data?.createdAt ? new Date(data.createdAt).getFullYear() : '2024'}</p>
+            <h3 className="text-2xl font-bold text-[#1d1d1f] tracking-tight">Identity Settings</h3>
+            <p className="text-[#86868b] text-sm font-medium">Manage your personal information and preferences</p>
           </div>
         </div>
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <button className="flex-1 md:flex-none px-6 py-3 bg-white border border-black/5 rounded-2xl font-bold text-sm shadow-sm hover:bg-gray-50 transition-all">
-            Edit Profile
-          </button>
+        {!isEditing ? (
           <button
-            onClick={handleLogout}
-            className="flex-1 md:flex-none px-6 py-3 bg-red-500 text-white rounded-2xl font-bold text-sm hover:bg-red-600 transition-all shadow-md shadow-red-500/20 active:scale-95"
+            onClick={() => setIsEditing(true)}
+            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#f5f5f7] text-[#1d1d1f] font-bold text-sm hover:bg-[#efeff2] transition-all"
           >
-            Log Out
+            <Edit2 size={16} /> Edit Profile
           </button>
+        ) : (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsEditing(false)}
+              className="px-6 py-3 rounded-2xl bg-gray-100 text-[#1d1d1f] font-bold text-sm hover:bg-gray-200 transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={isUpdating}
+              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#1d1d1f] text-white font-bold text-sm hover:bg-black transition-all disabled:opacity-50"
+            >
+              {isUpdating ? "Saving..." : <><Check size={16} /> Save Changes</>}
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5">
+          <h3 className="text-lg font-bold text-[#1d1d1f] mb-8">Contact Information</h3>
+          <div className="space-y-6">
+            <ProfileField
+              icon={User}
+              label="Username"
+              name="username"
+              value={formData.username}
+              isEditing={isEditing}
+              onChange={(val) => setFormData({ ...formData, username: val })}
+            />
+            <ProfileField
+              icon={Phone}
+              label="Phone"
+              name="phone"
+              value={formData.phone}
+              isEditing={isEditing}
+              type="tel"
+              onChange={(val) => setFormData({ ...formData, phone: val })}
+            />
+            <ProfileField
+              icon={MapPin}
+              label="Address"
+              name="address"
+              value={formData.address}
+              isEditing={isEditing}
+              onChange={(val) => setFormData({ ...formData, address: val })}
+            />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5">
+          <h3 className="text-lg font-bold text-[#1d1d1f] mb-8">Fiscal Identity</h3>
+          <div className="space-y-6">
+            <ProfileField
+              icon={FileText}
+              label="PAN Number"
+              name="panNumber"
+              value={formData.panNumber}
+              isEditing={isEditing}
+              isReadOnly={true}
+              placeholder="ABCDE1234F"
+              onChange={(val) => setFormData({ ...formData, panNumber: val })}
+            />
+
+            <div className="pt-4 mt-4 border-t border-black/5">
+              <label className="flex items-start gap-4 cursor-pointer group">
+                <div className="relative flex items-center pt-1">
+                  <input
+                    type="checkbox"
+                    className="peer hidden"
+                    checked={formData.wants80GReceipt}
+                    onChange={(e) => isEditing && setFormData({ ...formData, wants80GReceipt: e.target.checked })}
+                    disabled={!isEditing}
+                  />
+                  <div className={`w-5 h-5 rounded border-2 transition-all flex items-center justify-center ${formData.wants80GReceipt ? 'bg-rose-500 border-rose-500' : 'bg-transparent border-gray-300'}`}>
+                    {formData.wants80GReceipt && <Check size={14} className="text-white" />}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[#1d1d1f] font-bold text-sm">Automated 80G Receipts</p>
+                  <p className="text-[#86868b] text-[11px] leading-relaxed mt-1">Receive tax exemption certificates automatically in your email after every donation.</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Fiscal Benefit Card */}
+      <div className="p-8 bg-rose-50 rounded-[32px] border border-rose-100">
+        <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+          <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
+            <ShieldCheck size={32} className="text-rose-500" />
+          </div>
+          <div className="flex-1">
+            <h4 className="text-xl font-bold text-rose-900 mb-1">Tax Benefits (Sec 80G)</h4>
+            <p className="text-rose-700/70 text-sm leading-relaxed max-w-2xl">
+              All your donations to Fularani Foundation are 50% tax-exempt under Section 80G of the Income Tax Act. Ensure your PAN is updated to receive accurate receipts.
+            </p>
+          </div>
+          <a href="/about" className="px-6 py-3 bg-white text-rose-500 rounded-2xl font-bold text-sm shadow-sm hover:shadow-md transition-all">
+            Learn More
+          </a>
         </div>
       </div>
     </div>
   );
 };
 
-const ProfileRow = ({ icon: Icon, label, value }) => (
+const ProfileField = ({ icon: Icon, label, value, isEditing, onChange, type = "text", placeholder, isReadOnly = false }) => (
   <div className="flex items-start gap-5">
     <div className="w-10 h-10 rounded-xl bg-[#f5f5f7] flex items-center justify-center shrink-0">
       <Icon size={18} className="text-[#86868b]" />
     </div>
-    <div>
+    <div className="flex-1">
       <p className="text-[#86868b] text-[11px] font-bold uppercase tracking-wider mb-0.5">{label}</p>
-      <p className="text-[#1d1d1f] font-bold text-[15px]">{value || "—"}</p>
+      {isEditing && !isReadOnly ? (
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="w-full bg-[#f5f5f7] border-none rounded-lg px-3 py-1.5 text-[15px] font-medium text-[#1d1d1f] focus:ring-2 focus:ring-rose-500/20"
+        />
+      ) : (
+        <div className="flex items-center gap-2">
+          <p className={`text-[#1d1d1f] font-bold text-[15px] min-h-[22.5px] ${isReadOnly && isEditing ? "opacity-50" : ""}`}>
+            {value || "—"}
+          </p>
+          {isReadOnly && isEditing && (
+            <ShieldCheck size={14} className="text-[#86868b]" title="Verified & Immutable" />
+          )}
+        </div>
+      )}
     </div>
   </div>
 );

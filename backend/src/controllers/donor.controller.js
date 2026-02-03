@@ -203,9 +203,9 @@ const getCurrentDonor = asyncHandler(async (req, res) => {
 
 const getDonorProfile = asyncHandler(async (req, res) => {
   const donorId = req.user._id;
-  
+
   const donor = await Donor.findById(donorId).select("-password -refreshToken");
-  
+
   if (!donor) {
     throw new ApiError(404, "Donor not found");
   }
@@ -217,7 +217,7 @@ const getDonorProfile = asyncHandler(async (req, res) => {
 
 const getDonorDonations = asyncHandler(async (req, res) => {
   const donorId = req.user._id;
-  
+
   const donations = await Donation.find({ donorId })
     .sort({ donatedAt: -1 });
 
@@ -230,9 +230,9 @@ const getDonorStats = asyncHandler(async (req, res) => {
   const donorId = req.user._id;
 
   const donor = await Donor.findById(donorId).select("totalDonatedAmount donationCount");
-  
+
   const donations = await Donation.find({ donorId });
-  
+
   // Calculate additional stats
   const thisYearDonations = donations.filter(d => {
     const donationDate = new Date(d.donatedAt);
@@ -240,17 +240,17 @@ const getDonorStats = asyncHandler(async (req, res) => {
   });
 
   const thisYearTotal = thisYearDonations.reduce((sum, d) => sum + d.amount, 0);
-  
+
   const recurringDonations = donations.filter(d => d.isRecurring);
-  
+
   const stats = {
     totalDonatedAmount: donor?.totalDonatedAmount || 0,
     donationCount: donor?.donationCount || donations.length,
     thisYearTotal,
     thisYearCount: thisYearDonations.length,
     recurringCount: recurringDonations.length,
-    averageDonation: donations.length > 0 
-      ? Math.round(donations.reduce((sum, d) => sum + d.amount, 0) / donations.length) 
+    averageDonation: donations.length > 0
+      ? Math.round(donations.reduce((sum, d) => sum + d.amount, 0) / donations.length)
       : 0
   };
 
@@ -259,13 +259,79 @@ const getDonorStats = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, stats, "Donor stats fetched successfully"));
 });
 
-export { 
-  registerDonor, 
-  loginDonor, 
-  logoutDonor, 
+const updateDonorProfile = asyncHandler(async (req, res) => {
+  const { username, phone, address, panNumber, wants80GReceipt } = req.body;
+
+  const updateFields = {};
+  if (username) {
+    const newUsername = username.toLowerCase();
+    // Only check if username is actually changing
+    if (newUsername !== req.user.username) {
+      const existingUser = await Donor.findOne({ username: newUsername });
+      if (existingUser) {
+        throw new ApiError(400, "Username already exists");
+      }
+      updateFields.username = newUsername;
+    }
+  }
+
+  if (phone) updateFields.phone = phone;
+  if (address) updateFields.address = address;
+  if (wants80GReceipt !== undefined) updateFields.wants80GReceipt = wants80GReceipt;
+  // Note: panNumber is removed from here to make it immutable after registration.
+
+  const donor = await Donor.findByIdAndUpdate(
+    req.user._id,
+    { $set: updateFields },
+    { new: true, runValidators: true }
+  ).select("-password -refreshToken");
+
+  if (!donor) {
+    throw new ApiError(404, "Donor not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, donor, "Profile updated successfully"));
+});
+
+const updateDonorAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar file is missing");
+  }
+
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  if (!avatar.url) {
+    throw new ApiError(400, "Error while uploading avatar");
+  }
+
+  const donor = await Donor.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, donor, "Avatar image updated successfully"));
+});
+
+export {
+  registerDonor,
+  loginDonor,
+  logoutDonor,
   refreshAccessToken,
   getCurrentDonor,
-  getDonorProfile, 
-  getDonorDonations, 
-  getDonorStats 
+  getDonorProfile,
+  getDonorDonations,
+  getDonorStats,
+  updateDonorProfile,
+  updateDonorAvatar
 };
