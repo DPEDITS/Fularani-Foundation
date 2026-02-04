@@ -42,7 +42,7 @@ export const Navbar = ({ children, className }) => {
       className={cn(
         "fixed z-50 transition-colors duration-300",
         // Position & Layout - Always Floating Pill
-        "top-4 left-0 right-0 mx-auto w-[calc(100%-2rem)] max-w-5xl rounded-2xl border border-white/10 shadow-2xl shadow-black/50",
+        "top-0 left-0 right-0 w-full border-b border-white/10 shadow-2xl shadow-black/50",
         // Background - iOS Dark Liquid Glass
         "bg-[#161617]/70 backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-[#161617]/60",
         className,

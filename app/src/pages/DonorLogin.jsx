@@ -12,12 +12,17 @@ import {
   Loader2,
 } from "lucide-react";
 import { loginDonor, isAuthenticated } from "../services/donorService";
-import { loginVolunteer, isVolunteerAuthenticated } from "../services/volunteerService";
+import {
+  loginVolunteer,
+  isVolunteerAuthenticated,
+} from "../services/volunteerService";
 
 const DonorLogin = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState(() => {
-    return window.location.pathname.includes("volunteer") ? "volunteer" : "donor";
+    return window.location.pathname.includes("volunteer")
+      ? "volunteer"
+      : "donor";
   });
   const [form, setForm] = useState({
     email: "",
@@ -69,7 +74,7 @@ const DonorLogin = () => {
   const isPasswordValid = form.password.length >= 6;
 
   return (
-    <main className="min-h-screen md:h-screen flex items-start justify-center px-4 md:px-8 lg:px-12 overflow-auto md:overflow-hidden">
+    <main className="min-h-screen md:h-screen flex items-start justify-center px-4 md:px-8 lg:px-12 overflow-auto md:overflow-hidden ">
       <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid md:grid-cols-2 min-h-[600px] md:max-h-[85vh]">
         {/* LEFT SIDE: Brand & Visuals */}
         <div className="relative bg-gradient-to-br from-emerald-400 to-teal-600 p-10 md:p-12 flex flex-col justify-start gap-4 text-white overflow-hidden">
@@ -149,12 +154,13 @@ const DonorLogin = () => {
                 <div className="relative">
                   <Mail
                     className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300
-                    ${form.email
+                    ${
+                      form.email
                         ? isEmailValid
                           ? "text-green-600"
                           : "text-red-500"
                         : "text-gray-400"
-                      }`}
+                    }`}
                   />
                   <input
                     type="email"
@@ -166,9 +172,10 @@ const DonorLogin = () => {
                     placeholder="you@example.com"
                     className={`w-full pl-12 pr-4 py-3 rounded-xl border outline-none
                       transition-all duration-300 disabled:opacity-50
-                      ${isEmailValid
-                        ? "border-green-500 bg-green-50 focus:ring-4 focus:ring-green-500/10"
-                        : "border-red-500 bg-red-50 focus:ring-4 focus:ring-red-500/10"
+                      ${
+                        isEmailValid
+                          ? "border-green-500 bg-green-50 focus:ring-4 focus:ring-green-500/10"
+                          : "border-red-500 bg-red-50 focus:ring-4 focus:ring-red-500/10"
                       }`}
                   />
                 </div>
@@ -182,12 +189,13 @@ const DonorLogin = () => {
                 <div className="relative">
                   <Lock
                     className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300
-                                        ${form.password
-                        ? isPasswordValid
-                          ? "text-green-600"
-                          : "text-red-500"
-                        : "text-gray-400"
-                      }`}
+                                        ${
+                                          form.password
+                                            ? isPasswordValid
+                                              ? "text-green-600"
+                                              : "text-red-500"
+                                            : "text-gray-400"
+                                        }`}
                   />
                   <input
                     type={showPassword ? "text" : "password"}
@@ -199,10 +207,11 @@ const DonorLogin = () => {
                     placeholder="••••••••"
                     className={`w-full pl-12 pr-12 py-3 rounded-xl border outline-none
                                             transition-all duration-300 disabled:opacity-50
-                                            ${isPasswordValid
-                        ? "border-green-500 bg-green-50 focus:ring-4 focus:ring-green-500/10"
-                        : "border-red-500 bg-red-50 focus:ring-4 focus:ring-red-500/10"
-                      }`}
+                                            ${
+                                              isPasswordValid
+                                                ? "border-green-500 bg-green-50 focus:ring-4 focus:ring-green-500/10"
+                                                : "border-red-500 bg-red-50 focus:ring-4 focus:ring-red-500/10"
+                                            }`}
                   />
                   <button
                     type="button"

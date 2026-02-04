@@ -88,7 +88,7 @@ const Navbar = () => {
             ) : (
                 <>
                     <a href="/volunteer-login">
-                        <NavbarButton variant="ghost">Volunteer</NavbarButton>
+                        <NavbarButton variant="ghost">Join Us</NavbarButton>
                     </a>
                     <a href="/donor-register">
                         <NavbarButton variant="primary">Donate Now</NavbarButton>
