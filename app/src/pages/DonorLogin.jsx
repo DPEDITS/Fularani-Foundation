@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import headerImg from "../assets/logindonor.svg";
 import {
   Mail,
@@ -19,10 +19,11 @@ import {
 
 const DonorLogin = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [role, setRole] = useState(() => {
-    return window.location.pathname.includes("volunteer")
-      ? "volunteer"
-      : "donor";
+    const roleParam = searchParams.get("role");
+    if (roleParam) return roleParam;
+    return window.location.pathname.includes("volunteer") ? "volunteer" : "donor";
   });
   const [form, setForm] = useState({
     email: "",
@@ -74,7 +75,8 @@ const DonorLogin = () => {
   const isPasswordValid = form.password.length >= 6;
 
   return (
-    <main className="min-h-screen md:h-screen flex items-start justify-center px-4 md:px-8 lg:px-12 overflow-auto md:overflow-hidden ">
+    <main className="min-h-screen md:h-screen flex items-center justify-center px-4 md:px-8 lg:px-12 pt-28 pb-10 overflow-auto md:overflow-hidden">
+
       <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid md:grid-cols-2 min-h-[600px] md:max-h-[85vh]">
         {/* LEFT SIDE: Brand & Visuals */}
         <div className="relative bg-gradient-to-br from-emerald-400 to-teal-600 p-10 md:p-12 flex flex-col justify-start gap-4 text-white overflow-hidden">
@@ -272,7 +274,7 @@ const DonorLogin = () => {
               <div className="text-center text-sm text-gray-500">
                 Don't have an account?{" "}
                 <a
-                  href="/donor-register"
+                  href={role === "donor" ? "/donor-register" : "/donor-register?role=volunteer"}
                   className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline"
                 >
                   Register Now

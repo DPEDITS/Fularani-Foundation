@@ -14,11 +14,12 @@ const uploadOnCloudinary = async (localFilePath) => {
       resource_type: "auto",
     });
     // file has been uploaded successfull
+    console.log("Cloudinary upload success:", response.url);
     fs.unlinkSync(localFilePath);
     return response;
   } catch (error) {
-    console.error("Cloudinary upload error:", error);
-    fs.unlinkSync(localFilePath);
+    console.error("Cloudinary upload error full details:", error);
+    if (fs.existsSync(localFilePath)) fs.unlinkSync(localFilePath);
     return null;
   }
 };

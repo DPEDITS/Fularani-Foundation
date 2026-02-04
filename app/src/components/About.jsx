@@ -117,7 +117,8 @@ const About = () => {
   };
 
   return (
-    <div className="bg-[#fbfbfd] min-h-screen">
+    <div className="bg-[#fbfbfd] min-h-screen pt-20">
+
       {/* Hero Section */}
       <div className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
