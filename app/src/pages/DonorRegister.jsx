@@ -23,12 +23,17 @@ import {
   Camera,
 } from "lucide-react";
 import { registerDonor, isAuthenticated } from "../services/donorService";
-import { registerVolunteer, isVolunteerAuthenticated } from "../services/volunteerService";
+import {
+  registerVolunteer,
+  isVolunteerAuthenticated,
+} from "../services/volunteerService";
 
 const DonorRegister = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState(() => {
-    return window.location.pathname.includes("volunteer") ? "volunteer" : "donor";
+    return window.location.pathname.includes("volunteer")
+      ? "volunteer"
+      : "donor";
   });
   const [form, setForm] = useState({
     username: "",
@@ -128,7 +133,7 @@ const DonorRegister = () => {
         formData.append("phone", form.phone);
         formData.append("gender", form.gender.toLowerCase());
 
-        // Format date to dd/mm/yyyy for backend regex if needed, 
+        // Format date to dd/mm/yyyy for backend regex if needed,
         // but backend also handles Date objects if it's matched.
         // Let's send it in a way the backend likes.
         const [year, month, day] = form.dateOfBirth.split("-");
@@ -138,20 +143,18 @@ const DonorRegister = () => {
         formData.append("idType", form.idType);
 
         // Split strings into arrays for backend
-        form.skills.split(",").forEach(skill => {
+        form.skills.split(",").forEach((skill) => {
           formData.append("skills", skill.trim());
         });
 
-        form.preferredAreas.split(",").forEach(area => {
+        form.preferredAreas.split(",").forEach((area) => {
           formData.append("preferredAreas", area.trim());
         });
 
         formData.append("availabilityHours", form.availabilityHours);
         formData.append("motivation", form.motivation);
 
-        if (avatar) {
-          formData.append("avatar", avatar);
-        }
+        // formData.append("avatar", avatar); // Removed: already appended on line 117
 
         await registerVolunteer(formData);
         setSuccess(true);
@@ -190,7 +193,12 @@ const DonorRegister = () => {
 
   const nextStep = () => {
     if (currentStep === 1) {
-      if (!isUsernameValid || !isEmailValid || !isPasswordValid || !isConfirmValid) {
+      if (
+        !isUsernameValid ||
+        !isEmailValid ||
+        !isPasswordValid ||
+        !isConfirmValid
+      ) {
         setError("Please fill in all account details correctly");
         return;
       }
@@ -203,7 +211,9 @@ const DonorRegister = () => {
     }
     if (currentStep === 3 && role === "volunteer") {
       if (!form.address || !form.preferredAreas || !isPanValid) {
-        setError("Please fill in your location, preferences, and valid PAN number");
+        setError(
+          "Please fill in your location, preferences, and valid PAN number",
+        );
         return;
       }
     }
@@ -276,8 +286,9 @@ const DonorRegister = () => {
                 {[...Array(totalSteps)].map((_, i) => (
                   <div
                     key={i}
-                    className={`h-1.5 w-8 rounded-full transition-all duration-300 ${currentStep > i ? "bg-emerald-600 w-12" : "bg-gray-200"
-                      }`}
+                    className={`h-1.5 w-8 rounded-full transition-all duration-300 ${
+                      currentStep > i ? "bg-emerald-600 w-12" : "bg-gray-200"
+                    }`}
                   />
                 ))}
               </div>
@@ -289,14 +300,22 @@ const DonorRegister = () => {
             <div className="text-center md:text-left">
               <h2 className="text-3xl font-bold text-gray-900">
                 {currentStep === 1 && "Account Setup"}
-                {currentStep === 2 && (role === "donor" ? "Additional Info" : "Personal Info")}
-                {currentStep === 3 && (role === "volunteer" ? "Location & Preferences" : "")}
+                {currentStep === 2 &&
+                  (role === "donor" ? "Additional Info" : "Personal Info")}
+                {currentStep === 3 &&
+                  (role === "volunteer" ? "Location & Preferences" : "")}
                 {currentStep === 4 && "Volunteer Profile"}
               </h2>
               <p className="text-gray-500 mt-1 text-sm">
                 {currentStep === 1 && "Start with your basic credentials"}
-                {currentStep === 2 && (role === "donor" ? "Final details for your account" : "Basic details about yourself")}
-                {currentStep === 3 && (role === "volunteer" ? "Where and how you'd like to help" : "")}
+                {currentStep === 2 &&
+                  (role === "donor"
+                    ? "Final details for your account"
+                    : "Basic details about yourself")}
+                {currentStep === 3 &&
+                  (role === "volunteer"
+                    ? "Where and how you'd like to help"
+                    : "")}
                 {currentStep === 4 && "Define how you want to contribute"}
               </p>
             </div>
@@ -322,7 +341,9 @@ const DonorRegister = () => {
                       Username
                     </label>
                     <div className="relative">
-                      <User className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300 ${form.username ? (isUsernameValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`} />
+                      <User
+                        className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300 ${form.username ? (isUsernameValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
+                      />
                       <input
                         type="text"
                         name="username"
@@ -342,7 +363,9 @@ const DonorRegister = () => {
                       Email Address
                     </label>
                     <div className="relative">
-                      <Mail className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300 ${form.email ? (isEmailValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`} />
+                      <Mail
+                        className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300 ${form.email ? (isEmailValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
+                      />
                       <input
                         type="email"
                         name="email"
@@ -359,9 +382,13 @@ const DonorRegister = () => {
                   {/* Password Section */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">Password</label>
+                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
+                        Password
+                      </label>
                       <div className="relative">
-                        <Lock className={`absolute left-4 top-3.5 w-4 h-4 transition-colors duration-300 ${form.password ? (isPasswordValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`} />
+                        <Lock
+                          className={`absolute left-4 top-3.5 w-4 h-4 transition-colors duration-300 ${form.password ? (isPasswordValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
+                        />
                         <input
                           type={showPassword ? "text" : "password"}
                           name="password"
@@ -372,15 +399,27 @@ const DonorRegister = () => {
                           placeholder="••••••"
                           className={`w-full pl-10 pr-10 py-3 rounded-xl border outline-none text-sm transition-all duration-300 disabled:opacity-50 ${isPasswordValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
                         />
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 outline-none">
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 outline-none"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
                         </button>
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">Confirm</label>
+                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
+                        Confirm
+                      </label>
                       <div className="relative">
-                        <Lock className={`absolute left-4 top-3.5 w-4 h-4 transition-colors duration-300 ${form.confirmPassword ? (isConfirmValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`} />
+                        <Lock
+                          className={`absolute left-4 top-3.5 w-4 h-4 transition-colors duration-300 ${form.confirmPassword ? (isConfirmValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
+                        />
                         <input
                           type={showConfirmPassword ? "text" : "password"}
                           name="confirmPassword"
@@ -391,8 +430,18 @@ const DonorRegister = () => {
                           placeholder="••••••"
                           className={`w-full pl-10 pr-10 py-3 rounded-xl border outline-none text-sm transition-all duration-300 disabled:opacity-50 ${isConfirmValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
                         />
-                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 outline-none">
-                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 outline-none"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -408,7 +457,11 @@ const DonorRegister = () => {
                         <div className="relative group cursor-pointer">
                           <div className="w-20 h-20 rounded-2xl bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden transition-all group-hover:border-rose-400">
                             {avatarPreview ? (
-                              <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                              <img
+                                src={avatarPreview}
+                                alt="Avatar"
+                                className="w-full h-full object-cover"
+                              />
                             ) : (
                               <Camera className="w-8 h-8 text-gray-400" />
                             )}
@@ -420,14 +473,18 @@ const DonorRegister = () => {
                             className="absolute inset-0 opacity-0 cursor-pointer"
                           />
                         </div>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Profile Picture (Optional)</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          Profile Picture (Optional)
+                        </span>
                       </div>
 
                       <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
                         PAN Number (Required for 80G)
                       </label>
                       <div className="relative">
-                        <FileText className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300 ${form.panNumber ? (isPanValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`} />
+                        <FileText
+                          className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300 ${form.panNumber ? (isPanValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
+                        />
                         <input
                           type="text"
                           name="panNumber"
@@ -447,7 +504,11 @@ const DonorRegister = () => {
                         <div className="relative group cursor-pointer">
                           <div className="w-20 h-20 rounded-2xl bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden transition-all group-hover:border-emerald-400">
                             {avatarPreview ? (
-                              <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                              <img
+                                src={avatarPreview}
+                                alt="Avatar"
+                                className="w-full h-full object-cover"
+                              />
                             ) : (
                               <Camera className="w-8 h-8 text-gray-400" />
                             )}
@@ -459,12 +520,16 @@ const DonorRegister = () => {
                             className="absolute inset-0 opacity-0 cursor-pointer"
                           />
                         </div>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Profile Picture</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          Profile Picture
+                        </span>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
-                          <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">Phone</label>
+                          <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
+                            Phone
+                          </label>
                           <div className="relative">
                             <Phone className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
                             <input
@@ -479,7 +544,9 @@ const DonorRegister = () => {
                           </div>
                         </div>
                         <div className="space-y-1">
-                          <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">Gender</label>
+                          <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
+                            Gender
+                          </label>
                           <select
                             name="gender"
                             value={form.gender}
@@ -496,7 +563,9 @@ const DonorRegister = () => {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">Date of Birth</label>
+                        <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
+                          Date of Birth
+                        </label>
                         <div className="relative">
                           <Calendar className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
                           <input
@@ -517,7 +586,9 @@ const DonorRegister = () => {
               {currentStep === 3 && role === "volunteer" && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">Address</label>
+                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
+                      Address
+                    </label>
                     <div className="relative">
                       <MapPin className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
                       <input
@@ -533,7 +604,9 @@ const DonorRegister = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">Preferred Areas</label>
+                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
+                      Preferred Areas
+                    </label>
                     <div className="relative">
                       <Target className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
                       <input
@@ -549,9 +622,13 @@ const DonorRegister = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">PAN Number (Required)</label>
+                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
+                      PAN Number (Required)
+                    </label>
                     <div className="relative">
-                      <FileText className={`absolute left-4 top-3.5 w-4 h-4 transition-colors duration-300 ${form.panNumber ? (isPanValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`} />
+                      <FileText
+                        className={`absolute left-4 top-3.5 w-4 h-4 transition-colors duration-300 ${form.panNumber ? (isPanValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
+                      />
                       <input
                         type="text"
                         name="panNumber"
@@ -570,7 +647,9 @@ const DonorRegister = () => {
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">Skills</label>
+                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
+                        Skills
+                      </label>
                       <div className="relative">
                         <Wrench className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
                         <input
@@ -584,7 +663,9 @@ const DonorRegister = () => {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">Hours/Week</label>
+                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
+                        Hours/Week
+                      </label>
                       <div className="relative">
                         <Clock className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
                         <input
@@ -600,7 +681,9 @@ const DonorRegister = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">Motivation</label>
+                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
+                      Motivation
+                    </label>
                     <div className="relative">
                       <Edit3 className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
                       <textarea
