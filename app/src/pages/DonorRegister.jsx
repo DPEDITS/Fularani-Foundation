@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import headerImg from "../assets/logindonor.svg";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { motion as Motion, AnimatePresence } from "motion/react";
 import {
   Mail,
   Lock,
@@ -9,18 +9,14 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  Heart,
-  FileText,
   Loader2,
   Phone,
   Calendar,
   MapPin,
-  UserCircle,
-  Wrench,
-  Clock,
-  Target,
-  Edit3,
+  ChevronLeft,
   Camera,
+  CheckCircle2,
+  Target,
 } from "lucide-react";
 import { registerDonor, isAuthenticated } from "../services/donorService";
 import {
@@ -34,25 +30,27 @@ const DonorRegister = () => {
   const [role, setRole] = useState(() => {
     const roleParam = searchParams.get("role");
     if (roleParam) return roleParam;
-    return window.location.pathname.includes("volunteer") ? "volunteer" : "donor";
+    return window.location.pathname.includes("volunteer")
+      ? "volunteer"
+      : "donor";
   });
+
   const [form, setForm] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
     panNumber: "",
-    // Volunteer specific fields
     phone: "",
     gender: "",
     dateOfBirth: "",
     address: "",
-    idType: "PAN",
     skills: "",
     availabilityHours: "",
     preferredAreas: "",
     motivation: "",
   });
+
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -64,7 +62,6 @@ const DonorRegister = () => {
 
   const totalSteps = role === "donor" ? 2 : 4;
 
-  // Redirect if already logged in
   useEffect(() => {
     if (role === "donor" && isAuthenticated()) {
       navigate("/donor-dashboard");
@@ -72,24 +69,6 @@ const DonorRegister = () => {
       navigate("/volunteer-dashboard");
     }
   }, [navigate, role]);
-
-  const handleDateChange = (e) => {
-    let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
-    if (value.length > 8) value = value.slice(0, 8);
-
-    let formattedValue = "";
-    if (value.length > 0) {
-      formattedValue = value.slice(0, 2);
-      if (value.length > 2) {
-        formattedValue += "/" + value.slice(2, 4);
-        if (value.length > 4) {
-          formattedValue += "/" + value.slice(4, 8);
-        }
-      }
-    }
-    setForm({ ...form, dateOfBirth: formattedValue });
-    setError("");
-  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -100,142 +79,19 @@ const DonorRegister = () => {
     const file = e.target.files[0];
     if (file) {
       setAvatar(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setAvatarPreview(URL.createObjectURL(file));
     }
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (role === "volunteer") {
-      if (!avatar) {
-        setError("A profile picture is required for volunteers");
-        return;
-      }
-      if (!isPhoneValid || !isGenderValid || !isDobValid || !isAddressValid || !isPanValid) {
-        setError("Please fill in all personal and location details correctly");
-        return;
-      }
-    }
-
-    setLoading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append("username", form.username.trim());
-      formData.append("email", form.email.trim());
-      formData.append("password", form.password);
-      formData.append("panNumber", form.panNumber.trim().toUpperCase());
-      formData.append("idType", form.idType || "PAN");
-
-
-      if (role === "donor") {
-        if (avatar) formData.append("avatar", avatar);
-        await registerDonor(formData);
-        setSuccess(true);
-        setTimeout(() => {
-          navigate("/donor-login");
-        }, 2000);
-      } else {
-        // Volunteer specific fields
-        formData.append("phone", form.phone.trim());
-        formData.append("gender", form.gender.toLowerCase());
-
-        // Handle Date of Birth formatting
-        if (form.dateOfBirth.includes("-")) {
-          const [year, month, day] = form.dateOfBirth.split("-");
-          formData.append("dateOfBirth", `${day}/${month}/${year}`);
-        } else {
-          formData.append("dateOfBirth", form.dateOfBirth);
-        }
-
-        formData.append("address", form.address.trim());
-
-        // Send as comma-separated strings for better compatibility
-        formData.append("skills", form.skills.trim());
-        formData.append("preferredAreas", form.preferredAreas.trim());
-
-        formData.append("availabilityHours", String(form.availabilityHours));
-        formData.append("motivation", form.motivation.trim());
-
-        if (avatar) formData.append("avatar", avatar);
-
-        // Debug: Log FormData keys (for dev visibility)
-        console.log("Submitting Volunteer FormData:");
-        for (let pair of formData.entries()) {
-          console.log(pair[0] + ': ' + (pair[0] === 'avatar' ? '[File]' : pair[1]));
-        }
-
-        await registerVolunteer(formData);
-        setSuccess(true);
-        setTimeout(() => {
-          navigate("/volunteer-login");
-        }, 2000);
-      }
-    } catch (err) {
-      console.error("Registration error full details:", err);
-      const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        "Registration failed. Please try again.";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const isUsernameValid = form.username.length >= 3;
-  const isEmailValid = form.email.includes("@") && form.email.includes(".");
-  const isPasswordValid = form.password.length >= 6;
-  const isConfirmValid =
-    form.confirmPassword === form.password && form.confirmPassword.length > 0;
-  const isPanValid = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(
-    form.panNumber.toUpperCase(),
-  );
-
-  // Volunteer specific validations
-  const isPhoneValid = form.phone.length >= 10;
-  const isGenderValid = form.gender !== "";
-  const isDobValid = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.test(form.dateOfBirth);
-  const isAddressValid = form.address.length >= 5;
-  const isPreferredAreasValid = form.preferredAreas.length > 0;
-  const isSkillsValid = form.skills.length > 0;
-  const isAvailabilityValid = form.availabilityHours !== "";
-  const isMotivationValid = form.motivation.length > 5;
 
   const nextStep = () => {
     if (currentStep === 1) {
       if (
-        !isUsernameValid ||
-        !isEmailValid ||
-        !isPasswordValid ||
-        !isConfirmValid
+        !form.username ||
+        !form.email ||
+        !form.password ||
+        form.password !== form.confirmPassword
       ) {
-        setError("Please fill in all account details correctly");
-        return;
-      }
-    }
-    if (currentStep === 2 && role === "volunteer") {
-      if (!form.phone || !form.gender || !isDobValid) {
-        setError("Please fill in your personal details and provide a valid date of birth (DD/MM/YYYY)");
-        return;
-      }
-    }
-    if (currentStep === 3 && role === "volunteer") {
-      if (!form.address || !form.preferredAreas || !isPanValid) {
-        setError(
-          "Please fill in your location, preferences, and valid PAN number",
-        );
+        setError("Please check your basic credentials");
         return;
       }
     }
@@ -248,547 +104,472 @@ const DonorRegister = () => {
     setError("");
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const formData = new FormData();
+      Object.keys(form).forEach((key) => formData.append(key, form[key]));
+      if (avatar) formData.append("avatar", avatar);
+
+      if (role === "donor") {
+        await registerDonor(formData);
+      } else {
+        await registerVolunteer(formData);
+      }
+      setSuccess(true);
+      setTimeout(
+        () =>
+          navigate(
+            role === "donor" ? "/donor-login" : "/donor-login?role=volunteer",
+          ),
+        2000,
+      );
+    } catch (err) {
+      setError(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="bg-white min-h-screen flex items-center justify-center p-4">
+        <Motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="text-center"
+        >
+          <div className="w-20 h-20 bg-accent rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-accent/20">
+            <CheckCircle2 className="text-secondary" size={40} />
+          </div>
+          <h2 className="text-5xl font-black text-secondary tracking-tighter lowercase mb-2">
+            Welcome aboard!
+          </h2>
+          <p className="text-[12px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
+            Setting up your mission...
+          </p>
+        </Motion.div>
+      </div>
+    );
+  }
+
   return (
-    <main className="min-h-screen md:h-screen flex items-center justify-center px-4 md:px-8 lg:px-12 pt-28 pb-10 overflow-auto md:overflow-hidden">
+    <div className="bg-white min-h-screen flex flex-col overflow-hidden relative">
+      <div className="absolute top-0 right-0 w-1/4 h-full bg-primary/5 -skew-x-12 translate-x-1/2 z-0"></div>
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-[100px] -translate-x-1/4"></div>
 
-      <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid md:grid-cols-2 min-h-[600px] md:max-h-[85vh]">
-        {/* LEFT SIDE: Brand & Visuals */}
-        <div className="relative bg-gradient-to-br from-emerald-400 to-teal-600 p-10 md:p-12 flex flex-col justify-start gap-4 text-white overflow-hidden">
-          {/* Decorative Background Elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+      <div className="flex-grow flex items-center justify-center p-6 relative z-10 pt-12 pb-12">
+        <div className="w-full max-w-[1100px] grid lg:grid-cols-2 gap-16 items-center">
+          {/* Left Side: Dynamic Branding & Progress */}
+          <Motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="hidden lg:block space-y-8"
+          >
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-primary text-xs font-black uppercase tracking-widest hover:opacity-70 transition-opacity"
+            >
+              <ChevronLeft size={16} /> back to home
+            </Link>
 
-          {/* Content */}
-          <div className="relative z-10 text-center md:text-left">
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4 -mt-6">
-              Join Us as a<br />
-              {role === "donor" ? "Donor" : "Volunteer"}
-            </h1>
-            <div className="h-1.5 w-35 bg-black rounded-full mb-6 mx-auto md:mx-0" />
+            <div className="space-y-4">
+              <h1 className="text-7xl xl:text-8xl font-black text-secondary leading-[0.9] tracking-tighter lowercase">
+                Join the <br />
+                <span className="text-white bg-primary px-6 py-2 inline-block -rotate-1 mt-2">
+                  Mission.
+                </span>
+              </h1>
 
-            <p className="text-red-50 text-lg leading-relaxed max-w-sm mx-auto md:mx-0 mb-0">
+              <div className="pt-4 space-y-4">
+                <p className="text-[14px] font-black text-muted-foreground uppercase tracking-[0.3em]">
+                  {role === "donor"
+                    ? "donor registration"
+                    : "volunteer registration"}
+                </p>
+                <div className="flex items-center gap-6">
+                  <div className="h-[1px] w-20 bg-secondary/10"></div>
+                  <span className="text-primary font-black text-2xl tracking-tighter">
+                    Step {currentStep}{" "}
+                    <span className="text-secondary/20">/ {totalSteps}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-xl text-muted-foreground font-bold leading-tight max-w-[400px]">
               {role === "donor"
-                ? "Become a part of our family. registered donors can track their impact and receive regular updates on our missions."
-                : "Become a changemaker. Join our community of volunteers and contribute your skills to our various missions."}
+                ? "Your small contribution can light up a child's future."
+                : "Your hands-on dedication is the backbone of our change on the ground."}
             </p>
-          </div>
+          </Motion.div>
 
-          <div className="relative z-10 flex justify-center md:justify-start">
-            <img
-              src={headerImg}
-              alt="Fularani Foundation"
-              className="w-60 rounded-xl shadow-lg transform md:group-hover:scale-105 transition-transform duration-500"
-            />
-          </div>
-        </div>
+          {/* Right Side: Compact Form Card */}
+          <Motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white p-8 md:p-10 rounded-[48px] shadow-2xl border border-secondary/5 relative overflow-hidden max-w-[500px] mx-auto lg:mr-0 lg:ml-auto"
+          >
+            {/* Progress Bar (Mobile) */}
+            <div className="lg:hidden flex items-center justify-between mb-8">
+              <Link to="/" className="text-primary">
+                <ChevronLeft size={20} />
+              </Link>
+              <span className="text-[10px] font-black uppercase tracking-widest text-primary">
+                Step {currentStep} of {totalSteps}
+              </span>
+            </div>
 
-        {/* RIGHT SIDE: Register Form */}
-        <div className="p-6 md:p-8 flex flex-col justify-start md:py-10 bg-white overflow-y-auto">
-          <div className="max-w-md w-full mx-auto space-y-3">
-            {/* ROLE TOGGLE - Integrated into original UI style */}
-            <div className="flex p-1 bg-gray-50 rounded-xl mb-2 relative">
+            <div className="flex p-1 bg-muted/30 rounded-2xl mb-8 relative">
               <div
-                className={`absolute inset-y-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm transition-transform duration-300 ease-out border border-gray-100 ${role === "volunteer" ? "translate-x-[calc(100%+4px)]" : "translate-x-0"}`}
+                className={`absolute inset-y-1 w-[calc(50%-4px)] bg-white rounded-xl shadow-sm transition-transform duration-500 ease-out ${role === "volunteer" ? "translate-x-[calc(100%+4px)]" : "translate-x-0"}`}
               />
               <button
-                onClick={() => setRole("donor")}
-                className={`flex-1 py-3 text-xs font-bold rounded-lg relative z-10 transition-colors duration-300 ${role === "donor" ? "text-emerald-600" : "text-gray-500"}`}
+                onClick={() => {
+                  setRole("donor");
+                  setCurrentStep(1);
+                }}
+                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "donor" ? "text-primary" : "text-secondary/40"}`}
               >
                 Donor
               </button>
               <button
-                onClick={() => setRole("volunteer")}
-                className={`flex-1 py-3 text-xs font-bold rounded-lg relative z-10 transition-colors duration-300 ${role === "volunteer" ? "text-emerald-600" : "text-gray-500"}`}
+                onClick={() => {
+                  setRole("volunteer");
+                  setCurrentStep(1);
+                }}
+                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "volunteer" ? "text-primary" : "text-secondary/40"}`}
               >
                 Volunteer
               </button>
             </div>
 
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex gap-2">
-                {[...Array(totalSteps)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-1.5 w-8 rounded-full transition-all duration-300 ${
-                      currentStep > i ? "bg-emerald-600 w-12" : "bg-gray-200"
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                Step {currentStep} of {totalSteps}
-              </span>
-            </div>
-
-            <div className="text-center md:text-left">
-              <h2 className="text-3xl font-bold text-gray-900">
-                {currentStep === 1 && "Account Setup"}
-                {currentStep === 2 &&
-                  (role === "donor" ? "Additional Info" : "Personal Info")}
-                {currentStep === 3 &&
-                  (role === "volunteer" ? "Location & Preferences" : "")}
-                {currentStep === 4 && "Volunteer Profile"}
-              </h2>
-              <p className="text-gray-500 mt-1 text-sm">
-                {currentStep === 1 && "Start with your basic credentials"}
-                {currentStep === 2 &&
-                  (role === "donor"
-                    ? "Final details for your account"
-                    : "Basic details about yourself")}
-                {currentStep === 3 &&
-                  (role === "volunteer"
-                    ? "Where and how you'd like to help"
-                    : "")}
-                {currentStep === 4 && "Define how you want to contribute"}
-              </p>
-            </div>
-
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs font-medium animate-shake">
+              <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-xs font-bold border border-red-100 lowercase">
                 {error}
               </div>
             )}
 
-            {success && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-green-600 text-xs font-medium">
-                Registration successful! Redirecting...
-              </div>
-            )}
-
-            <form
-              onSubmit={handleSubmit}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && currentStep < totalSteps) {
-                  e.preventDefault();
-                  nextStep();
-                }
-              }}
-              className="space-y-4"
-            >
-              {currentStep === 1 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                  {/* Username Field */}
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                      Username
-                    </label>
-                    <div className="relative">
-                      <User
-                        className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300 ${form.username ? (isUsernameValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
-                      />
-                      <input
-                        type="text"
-                        name="username"
-                        value={form.username}
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <AnimatePresence mode="wait">
+                {currentStep === 1 && (
+                  <Motion.div
+                    key="1"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-5"
+                  >
+                    <Field
+                      label="Full Name"
+                      icon={<User size={18} />}
+                      name="username"
+                      value={form.username}
+                      onChange={handleChange}
+                      placeholder="John Doe"
+                    />
+                    <Field
+                      label="Email"
+                      icon={<Mail size={18} />}
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="you@mission.org"
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <Field
+                        label="Password"
+                        icon={<Lock size={18} />}
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={form.password}
                         onChange={handleChange}
-                        required
-                        disabled={loading || success}
-                        placeholder="johndoe123"
-                        className={`w-full pl-12 pr-4 py-3 rounded-xl border outline-none transition-all duration-300 disabled:opacity-50 ${isUsernameValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
+                        placeholder="••••"
+                        toggleShow={() => setShowPassword(!showPassword)}
+                        isShowing={showPassword}
                       />
-                    </div>
-                  </div>
-
-                  {/* Email Field */}
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                      Email Address
-                    </label>
-                    <div className="relative">
-                      <Mail
-                        className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300 ${form.email ? (isEmailValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
-                      />
-                      <input
-                        type="email"
-                        name="email"
-                        value={form.email}
+                      <Field
+                        label="Confirm"
+                        icon={<Lock size={18} />}
+                        type={showConfirmPassword ? "text" : "password"}
+                        name="confirmPassword"
+                        value={form.confirmPassword}
                         onChange={handleChange}
-                        required
-                        disabled={loading || success}
-                        placeholder="you@example.com"
-                        className={`w-full pl-12 pr-4 py-3 rounded-xl border outline-none transition-all duration-300 disabled:opacity-50 ${isEmailValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
+                        placeholder="••••"
+                        toggleShow={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        isShowing={showConfirmPassword}
                       />
                     </div>
-                  </div>
+                  </Motion.div>
+                )}
 
-                  {/* Password Section */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                        Password
-                      </label>
-                      <div className="relative">
-                        <Lock
-                          className={`absolute left-4 top-3.5 w-4 h-4 transition-colors duration-300 ${form.password ? (isPasswordValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
+                {currentStep === 2 && role === "donor" && (
+                  <Motion.div
+                    key="donor2"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-5"
+                  >
+                    <Field
+                      label="PAN Number"
+                      icon={<FileText size={18} />}
+                      name="panNumber"
+                      value={form.panNumber}
+                      onChange={handleChange}
+                      placeholder="ABCDE1234F"
+                    />
+                    <div className="flex flex-col items-center justify-center border-2 border-dashed border-muted rounded-3xl p-8 transition-colors hover:border-primary/20 group">
+                      {avatarPreview ? (
+                        <img
+                          src={avatarPreview}
+                          className="w-20 h-20 rounded-full object-cover mb-4"
                         />
+                      ) : (
+                        <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center text-secondary/20 mb-4">
+                          <Camera size={32} />
+                        </div>
+                      )}
+                      <label className="text-[11px] font-black text-primary uppercase tracking-widest cursor-pointer hover:underline">
+                        Upload Avatar
                         <input
-                          type={showPassword ? "text" : "password"}
-                          name="password"
-                          value={form.password}
-                          onChange={handleChange}
-                          required
-                          disabled={loading || success}
-                          placeholder="••••••"
-                          className={`w-full pl-10 pr-10 py-3 rounded-xl border outline-none text-sm transition-all duration-300 disabled:opacity-50 ${isPasswordValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
+                          type="file"
+                          className="hidden"
+                          onChange={handleAvatarChange}
+                          accept="image/*"
                         />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 outline-none"
-                        >
-                          {showPassword ? (
-                            <EyeOff className="w-4 h-4" />
-                          ) : (
-                            <Eye className="w-4 h-4" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                        Confirm
                       </label>
-                      <div className="relative">
-                        <Lock
-                          className={`absolute left-4 top-3.5 w-4 h-4 transition-colors duration-300 ${form.confirmPassword ? (isConfirmValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
-                        />
-                        <input
-                          type={showConfirmPassword ? "text" : "password"}
-                          name="confirmPassword"
-                          value={form.confirmPassword}
-                          onChange={handleChange}
-                          required
-                          disabled={loading || success}
-                          placeholder="••••••"
-                          className={`w-full pl-10 pr-10 py-3 rounded-xl border outline-none text-sm transition-all duration-300 disabled:opacity-50 ${isConfirmValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                          className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 outline-none"
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOff className="w-4 h-4" />
-                          ) : (
-                            <Eye className="w-4 h-4" />
-                          )}
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
+                  </Motion.div>
+                )}
 
-              {currentStep === 2 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                  {role === "donor" ? (
-                    <div className="space-y-1">
-                      <div className="flex flex-col items-center gap-2 mb-4">
-                        <div className="relative group cursor-pointer">
-                          <div className="w-20 h-20 rounded-2xl bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden transition-all group-hover:border-rose-400">
-                            {avatarPreview ? (
-                              <img
-                                src={avatarPreview}
-                                alt="Avatar"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <Camera className="w-8 h-8 text-gray-400" />
-                            )}
-                          </div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleAvatarChange}
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                          />
-                        </div>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                          Profile Picture {role === "volunteer" ? "(Required)" : "(Optional)"}
-                        </span>
-                      </div>
-
-                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                        PAN Number (Required for 80G)
+                {currentStep === 2 && role === "volunteer" && (
+                  <Motion.div
+                    key="vol2"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-5"
+                  >
+                    <Field
+                      label="Phone"
+                      icon={<Phone size={18} />}
+                      name="phone"
+                      value={form.phone}
+                      onChange={handleChange}
+                      placeholder="+91 0000000000"
+                    />
+                    <Field
+                      label="Date of Birth"
+                      icon={<Calendar size={18} />}
+                      name="dateOfBirth"
+                      value={form.dateOfBirth}
+                      onChange={handleChange}
+                      placeholder="YYYY-MM-DD"
+                    />
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
+                        Gender
                       </label>
-                      <div className="relative">
-                        <FileText
-                          className={`absolute left-4 top-3.5 w-5 h-5 transition-colors duration-300 ${form.panNumber ? (isPanValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
-                        />
-                        <input
-                          type="text"
-                          name="panNumber"
-                          value={form.panNumber}
-                          onChange={handleChange}
-                          required
-                          disabled={loading || success}
-                          placeholder="ABCDE1234F"
-                          className={`w-full pl-12 pr-4 py-3 rounded-xl border outline-none uppercase transition-all duration-300 disabled:opacity-50 ${isPanValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Avatar Upload */}
-                      <div className="flex flex-col items-center gap-2 mb-2">
-                        <div className="relative group cursor-pointer">
-                          <div className="w-20 h-20 rounded-2xl bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden transition-all group-hover:border-emerald-400">
-                            {avatarPreview ? (
-                              <img
-                                src={avatarPreview}
-                                alt="Avatar"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <Camera className="w-8 h-8 text-gray-400" />
-                            )}
-                          </div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleAvatarChange}
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                          />
-                        </div>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                          Profile Picture {role === "volunteer" ? "(Required)" : "(Optional)"}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                            Phone
-                          </label>
-                          <div className="relative">
-                            <Phone className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
-                            <input
-                              type="tel"
-                              name="phone"
-                              value={form.phone}
-                              onChange={handleChange}
-                              required
-                              placeholder="9876543210"
-                              className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none text-sm transition-all duration-300 ${isPhoneValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                            Gender
-                          </label>
-                          <select
-                            name="gender"
-                            value={form.gender}
-                            onChange={handleChange}
-                            required
-                            className={`w-full px-4 py-3 rounded-xl border outline-none text-sm transition-all duration-300 bg-white ${isGenderValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
-                          >
-                            <option value="">Select</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                          Date of Birth
-                        </label>
-                        <div className="relative">
-                          <Calendar className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
-                          <input
-                            type="text"
-                            name="dateOfBirth"
-                            value={form.dateOfBirth}
-                            onChange={handleDateChange}
-                            required
-                            placeholder="DD/MM/YYYY"
-                            className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none text-sm transition-all duration-300 ${isDobValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {currentStep === 3 && role === "volunteer" && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                      Address
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
-                      <input
-                        type="text"
-                        name="address"
-                        value={form.address}
+                      <select
+                        name="gender"
+                        value={form.gender}
                         onChange={handleChange}
-                        required
-                        placeholder="Street, City, State, Zip"
-                        className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none text-sm transition-all duration-300 ${isAddressValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
-                      />
+                        className="w-full h-14 px-4 rounded-2xl bg-muted/20 border-none outline-none font-black text-base appearance-none cursor-pointer"
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
                     </div>
-                  </div>
+                  </Motion.div>
+                )}
 
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                      Preferred Areas
-                    </label>
-                    <div className="relative">
-                      <Target className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
-                      <input
-                        type="text"
-                        name="preferredAreas"
-                        value={form.preferredAreas}
-                        onChange={handleChange}
-                        required
-                        placeholder="Education, Healthcare, Environment..."
-                        className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none text-sm transition-all duration-300 ${isPreferredAreasValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
-                      />
-                    </div>
-                  </div>
+                {currentStep === 3 && role === "volunteer" && (
+                  <Motion.div
+                    key="vol3"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-5"
+                  >
+                    <Field
+                      label="Address"
+                      icon={<MapPin size={18} />}
+                      name="address"
+                      value={form.address}
+                      onChange={handleChange}
+                      placeholder="Your City, District"
+                    />
+                    <Field
+                      label="PAN Number"
+                      icon={<FileText size={18} />}
+                      name="panNumber"
+                      value={form.panNumber}
+                      onChange={handleChange}
+                      placeholder="ABCDE1234F"
+                    />
+                    <Field
+                      label="Preferred Areas"
+                      icon={<Target size={18} />}
+                      name="preferredAreas"
+                      value={form.preferredAreas}
+                      onChange={handleChange}
+                      placeholder="Education, Green, etc"
+                    />
+                  </Motion.div>
+                )}
 
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                      PAN Number (Required)
-                    </label>
-                    <div className="relative">
-                      <FileText
-                        className={`absolute left-4 top-3.5 w-4 h-4 transition-colors duration-300 ${form.panNumber ? (isPanValid ? "text-green-600" : "text-red-500") : "text-gray-400"}`}
-                      />
-                      <input
-                        type="text"
-                        name="panNumber"
-                        value={form.panNumber}
-                        onChange={handleChange}
-                        required
-                        placeholder="ABCDE1234F"
-                        className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none uppercase transition-all duration-300 ${isPanValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 4 && role === "volunteer" && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                        Skills
+                {currentStep === 4 && role === "volunteer" && (
+                  <Motion.div
+                    key="vol4"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-5"
+                  >
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
+                        Motivation
                       </label>
-                      <div className="relative">
-                        <Wrench className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
-                        <input
-                          type="text"
-                          name="skills"
-                          value={form.skills}
-                          onChange={handleChange}
-                          placeholder="Teaching, Design..."
-                          className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none text-sm transition-all duration-300 ${isSkillsValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                        Hours/Week
-                      </label>
-                      <div className="relative">
-                        <Clock className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
-                        <input
-                          type="number"
-                          name="availabilityHours"
-                          value={form.availabilityHours}
-                          onChange={handleChange}
-                          placeholder="5"
-                          className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none text-sm transition-all duration-300 ${isAvailabilityValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
-                      Motivation
-                    </label>
-                    <div className="relative">
-                      <Edit3 className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
                       <textarea
                         name="motivation"
                         value={form.motivation}
                         onChange={handleChange}
                         rows="3"
-                        placeholder="Why do you want to join us?"
-                        className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none text-sm transition-all duration-300 resize-none ${isMotivationValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
+                        className="w-full p-5 rounded-2xl bg-muted/20 border-none outline-none font-black text-base resize-none"
+                        placeholder="What drives you to join us?"
                       />
                     </div>
-                  </div>
-                </div>
-              )}
+                    <div className="flex flex-col items-center justify-center border-2 border-dashed border-muted rounded-2xl p-6">
+                      {avatarPreview ? (
+                        <img
+                          src={avatarPreview}
+                          className="w-16 h-16 rounded-full object-cover mb-4"
+                        />
+                      ) : (
+                        <Camera size={28} className="text-muted mb-4" />
+                      )}
+                      <label className="text-[10px] font-black text-primary uppercase tracking-widest cursor-pointer">
+                        Add Photo
+                        <input
+                          type="file"
+                          className="hidden"
+                          onChange={handleAvatarChange}
+                          accept="image/*"
+                        />
+                      </label>
+                    </div>
+                  </Motion.div>
+                )}
+              </AnimatePresence>
 
-              {/* Navigation Buttons */}
-              <div className="flex gap-4 pt-2">
+              <div className="flex gap-4 pt-4">
                 {currentStep > 1 && (
                   <button
                     type="button"
                     onClick={prevStep}
-                    className="flex-1 py-3.5 px-4 rounded-xl border-2 border-gray-900 text-gray-900 font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                    className="flex-1 h-14 bg-muted/20 text-secondary rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-muted/40 transition-all"
                   >
                     Back
                   </button>
                 )}
-
                 {currentStep < totalSteps ? (
                   <button
                     type="button"
                     onClick={nextStep}
-                    className="flex-[2] py-3.5 px-4 rounded-xl bg-gray-900 text-white font-bold hover:shadow-lg hover:shadow-gray-900/20 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                    className="flex-[2] h-14 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-xl shadow-primary/20"
                   >
-                    Next Step
-                    <ArrowRight className="w-4 h-4" />
+                    Next <ArrowRight size={18} />
                   </button>
                 ) : (
                   <button
                     type="submit"
-                    disabled={loading || success}
-                    className="flex-[2] py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold hover:shadow-lg hover:shadow-emerald-600/20 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    disabled={loading}
+                    className="flex-[2] h-14 bg-accent text-secondary rounded-2xl font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-xl shadow-accent/20 active:scale-95 disabled:opacity-50"
                   >
                     {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Creating...</span>
-                      </>
+                      <Loader2 className="w-6 h-6 animate-spin" />
                     ) : (
                       <>
-                        <span>Finish Signup</span>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        Complete <ArrowRight size={18} />
                       </>
                     )}
                   </button>
                 )}
               </div>
-
-              <div className="text-center text-sm text-gray-500">
-                Already have an account?{" "}
-                <a
-                  href={role === "donor" ? "/donor-login" : "/donor-login?role=volunteer"}
-                  className="text-emerald-600 hover:text-emerald-700 font-bold hover:underline"
-                >
-                  Login
-                </a>
-              </div>
             </form>
-          </div>
+
+            <div className="mt-8 text-center pt-2">
+              <p className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">
+                Already registered?{" "}
+                <Link
+                  to="/donor-login"
+                  className="text-primary hover:underline underline-offset-4 decoration-2"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </Motion.div>
         </div>
       </div>
-    </main>
+    </div>
   );
 };
+
+const Field = ({ label, icon, toggleShow, isShowing, ...props }) => (
+  <div className="space-y-1.5">
+    <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
+      {label}
+    </label>
+    <div className="relative">
+      <div className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary/20 flex items-center">
+        {icon}
+      </div>
+      <input
+        {...props}
+        className={`w-full h-14 pl-14 ${toggleShow ? "pr-14" : "pr-5"} rounded-2xl bg-muted/20 border-none outline-none font-black text-base placeholder:text-gray-300 transition-all focus:ring-2 focus:ring-primary/10`}
+      />
+      {toggleShow && (
+        <button
+          type="button"
+          onClick={toggleShow}
+          className="absolute right-5 top-1/2 -translate-y-1/2 text-secondary/40 hover:text-secondary transition-colors"
+        >
+          {isShowing ? <EyeOff size={20} /> : <Eye size={20} />}
+        </button>
+      )}
+    </div>
+  </div>
+);
+
+const FileText = ({ size, className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+    <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+    <path d="M10 9H8" />
+    <path d="M16 13H8" />
+    <path d="M16 17H8" />
+  </svg>
+);
 
 export default DonorRegister;

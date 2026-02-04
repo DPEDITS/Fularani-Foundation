@@ -8,90 +8,125 @@ import {
   Twitter,
   Instagram,
   Linkedin,
-  ExternalLink,
-  Shield,
   ShieldCheck,
+  ChevronRight,
+  Globe,
+  Award,
 } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
-    foundation: [
-      { label: "About Us", href: "/about" },
-      { label: "Our Missions", href: "/missions" },
-      { label: "Photo Gallery", href: "/gallery" },
-      { label: "Contact Us", href: "/contact" },
-    ],
-    missions: [
+    work: [
       { label: "Mission Education", href: "/missions" },
       { label: "Mission Green", href: "/missions" },
       { label: "Mission Mobility", href: "/missions" },
-      { label: "Period Pride", href: "/missions" },
+      { label: "Mission Period Pride", href: "/missions" },
+      { label: "Health & Nutrition", href: "/missions" },
     ],
-    support: [
-      { label: "Donor Login", href: "/donor-login" },
-      { label: "Volunteer Login", href: "/volunteer-login" },
-      { label: "Make a Donation", href: "/contact" },
-      { label: "Get Involved", href: "/contact" },
+    transparency: [
+      { label: "Annual Reports", href: "/about" },
+      { label: "Financial Statements", href: "/about" },
+      { label: "Our Reach & Impact", href: "/about" },
+      { label: "FCRA Compliance", href: "/about" },
+      { label: "Privacy Policy", href: "/about" },
+    ],
+    connect: [
+      { label: "Donor Portal", href: "/donor-login" },
+      { label: "Join as Volunteer", href: "/donor-register?role=volunteer" },
+      { label: "Careers", href: "/contact" },
+      { label: "Partner with Us", href: "/contact" },
+      { label: "Contact Us", href: "/contact" },
     ],
   };
 
   return (
-    <footer className="bg-[#f5f5f7] border-t border-black/5 pt-20 pb-12 px-6">
-      <div className="max-w-[1024px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
-          {/* Brand Section */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-2 group cursor-default">
-              <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center border border-black/5 group-hover:scale-105 transition-transform">
-                <Heart size={20} className="text-[#0071e3]" fill="#0071e3" />
+    <footer className="bg-secondary text-white pt-24 pb-12 px-6 overflow-hidden relative">
+      <div className="absolute top-0 left-1/4 w-1/2 h-1 bg-primary"></div>
+
+      <div className="max-w-[1200px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
+          {/* Brand & Manifesto */}
+          <div className="lg:col-span-1 space-y-8">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center font-black text-2xl text-white">
+                F
               </div>
-              <span className="text-[21px] font-bold text-[#1d1d1f] tracking-tight">
-                Fularani
-                <br />
-                <span className="text-[17px] text-[#86868b] -mt-1 block font-medium">
+              <div className="flex flex-col">
+                <span className="text-2xl font-black uppercase tracking-tight leading-none">
+                  Fularani
+                </span>
+                <span className="text-[10px] font-bold text-white/50 uppercase tracking-[0.3em] leading-none">
                   Foundation
                 </span>
-              </span>
+              </div>
             </div>
-            <p className="text-[14px] text-[#86868b] leading-relaxed font-medium">
-              Empowering lives through education, health, and sustainable
-              development. Together, we can build a brighter future for every
-              individual.
+
+            <p className="text-sm font-bold text-white/60 leading-relaxed">
+              Fularani Foundation is a registered non-profit organization
+              dedicated to creating a resilient Bhadrak through education,
+              climate action, and equitable healthcare.
             </p>
-            <div className="flex gap-4 pt-2">
-              <SocialIcon icon={<Facebook size={18} />} href="#" />
-              <SocialIcon icon={<Twitter size={18} />} href="#" />
-              <SocialIcon icon={<Instagram size={18} />} href="#" />
-              <SocialIcon icon={<Linkedin size={18} />} href="#" />
+
+            <div className="flex gap-4 pt-4">
+              <SocialIcon icon={<Facebook size={18} />} />
+              <SocialIcon icon={<Twitter size={18} />} />
+              <SocialIcon icon={<Instagram size={18} />} />
+              <SocialIcon icon={<Linkedin size={18} />} />
             </div>
           </div>
 
-          {/* Links Sections */}
-          <FooterColumn title="Foundation" links={footerLinks.foundation} />
-          <FooterColumn title="Our Missions" links={footerLinks.missions} />
-          <FooterColumn title="Get Involved" links={footerLinks.support} />
+          {/* Quick Links Columns */}
+          <FooterColumn title="Our Work" links={footerLinks.work} />
+          <FooterColumn title="Transparency" links={footerLinks.transparency} />
+          <FooterColumn title="Get Involved" links={footerLinks.connect} />
         </div>
 
-        <div className="pt-12 border-t border-black/5 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 text-[13px] text-[#86868b] font-medium">
-            <span>
-              © {currentYear} Fularani Foundation. All rights reserved.
-            </span>
-            <div className="flex gap-6">
-              <a href="#" className="hover:text-[#1d1d1f] transition-colors">
+        {/* Impact Badges & Certification */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-12 border-y border-white/10 mb-12">
+          <Badge
+            icon={<ShieldCheck className="text-primary" />}
+            text="Verified NGO"
+            subtext="Bhadrak, Odisha"
+          />
+          <Badge
+            icon={<Award className="text-primary" />}
+            text="100% Tax Exempt"
+            subtext="Under 80G/12A"
+          />
+          <Badge
+            icon={<Globe className="text-primary" />}
+            text="Local Impact"
+            subtext="20+ Villages"
+          />
+          <Badge
+            icon={<Heart className="text-primary" />}
+            text="Volunteer Driven"
+            subtext="500+ Peers"
+          />
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-12 text-[10px] font-black uppercase tracking-widest text-white/40">
+            <span>© {currentYear} Fularani Foundation (NGO)</span>
+            <div className="flex gap-8">
+              <a href="#" className="hover:text-primary transition-all">
                 Privacy Policy
               </a>
-              <a href="#" className="hover:text-[#1d1d1f] transition-colors">
+              <a href="#" className="hover:text-primary transition-all">
                 Terms of Service
+              </a>
+              <a href="#" className="hover:text-primary transition-all">
+                Donor Refund Policy
               </a>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-[13px] text-[#86868b] font-medium bg-white px-4 py-2 rounded-full border border-black/5 shadow-sm">
-            <ShieldCheck size={14} className="text-[#0071e3]" fill="#0071e3" />
-            <span>Verified NGO</span>
+          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 italic">
+            Made with <Heart size={10} className="text-accent fill-accent" />{" "}
+            for the children of Bhadrak.
           </div>
         </div>
       </div>
@@ -100,22 +135,22 @@ const Footer = () => {
 };
 
 const FooterColumn = ({ title, links }) => (
-  <div className="space-y-6">
-    <h3 className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-tight">
+  <div className="space-y-8">
+    <h3 className="text-xs font-black text-primary uppercase tracking-[0.3em]">
       {title}
     </h3>
-    <ul className="space-y-3">
+    <ul className="space-y-4">
       {links.map((link, index) => (
         <li key={index}>
           <a
             href={link.href}
-            className="text-[14px] text-[#86868b] hover:text-[#0066cc] font-medium transition-colors flex items-center gap-1 group"
+            className="text-[13px] font-extrabold text-white/70 hover:text-white transition-all flex items-center gap-2 group"
           >
-            {link.label}
-            <ArrowRight
+            <ChevronRight
               size={12}
-              className="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all"
+              className="text-primary opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"
             />
+            {link.label}
           </a>
         </li>
       ))}
@@ -123,29 +158,25 @@ const FooterColumn = ({ title, links }) => (
   </div>
 );
 
-const SocialIcon = ({ icon, href }) => (
+const SocialIcon = ({ icon, href = "#" }) => (
   <a
     href={href}
-    className="w-9 h-9 rounded-full bg-white border border-black/5 flex items-center justify-center text-[#1d1d1f] hover:bg-[#0071e3] hover:text-white transition-all shadow-sm"
+    className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/60 hover:bg-primary hover:text-secondary transition-all shadow-lg"
   >
     {icon}
   </a>
 );
 
-const ArrowRight = ({ size, className }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M5 12h14m-7-7 7 7-7 7" />
-  </svg>
+const Badge = ({ icon, text, subtext }) => (
+  <div className="flex flex-col items-center md:items-start gap-2">
+    <div className="mb-1">{icon}</div>
+    <span className="text-xs font-black uppercase tracking-widest leading-none">
+      {text}
+    </span>
+    <span className="text-[10px] font-bold text-white/30 tracking-tight leading-none">
+      {subtext}
+    </span>
+  </div>
 );
 
 export default Footer;

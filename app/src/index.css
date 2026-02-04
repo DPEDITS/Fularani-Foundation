@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -35,25 +33,25 @@
 }
 
 :root {
-  --background: #fbfbfd;
-  --foreground: #1d1d1f;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
   --card: #ffffff;
-  --card-foreground: #1d1d1f;
+  --card-foreground: #1a1a1a;
   --popover: #ffffff;
-  --popover-foreground: #1d1d1f;
-  --primary: #0071e3;
+  --popover-foreground: #1a1a1a;
+  --primary: #0066cc; /* NGO Blue */
   --primary-foreground: #ffffff;
-  --secondary: #f5f5f7;
-  --secondary-foreground: #1d1d1f;
-  --muted: #f5f5f7;
-  --muted-foreground: #86868b;
-  --accent: #0071e3;
-  --accent-foreground: #ffffff;
+  --secondary: #1a1a1a; /* Charcoal */
+  --secondary-foreground: #ffffff;
+  --muted: #f4f4f4;
+  --muted-foreground: #666666;
+  --accent: #ffc20e; /* Impact Yellow */
+  --accent-foreground: #1a1a1a;
   --destructive: #ff3b30;
-  --border: #d2d2d7;
-  --input: #d2d2d7;
-  --ring: #0071e3;
-  --radius: 12px;
+  --border: #e2e2e2;
+  --input: #e2e2e2;
+  --ring: #0066cc;
+  --radius: 8px;
 }
 
 .dark {
@@ -81,10 +79,39 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
+  html, body {
     @apply bg-background text-foreground;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
-    letter-spacing: -0.011em;
+    line-height: 1.6;
+    overflow-x: hidden;
+    width: 100%;
+  }
+}
+
+@layer utilities {
+  .ngo-card {
+    background: #ffffff;
+    border: 1px solid #e2e2e2;
+    transition: all 0.3s ease;
+  }
+
+  .ngo-card:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-color: #ffc20e;
+  }
+
+  .btn-donate {
+    @apply bg-accent text-white font-bold py-3 px-8 rounded-md transition-all hover:bg-accent/90 active:scale-95;
+    box-shadow: 0 4px 6px rgba(229, 62, 62, 0.2);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
