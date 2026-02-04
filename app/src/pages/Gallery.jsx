@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { motion as Motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   X,
-  ZoomIn,
-  Loader2,
   Plus,
-  Upload,
   Image as ImageIcon,
   Edit2,
   Trash2,
+  Filter,
+  ArrowRight,
+  Maximize2,
+  Heart,
+  Calendar,
+  User,
+  Info,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   getAllGalleryItems,
@@ -23,6 +29,17 @@ const Gallery = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [uploadFormData, setUploadFormData] = useState({
+    title: "",
+    category: "",
+    description: "",
+    uploadedBy: "",
+    imageUrl: null,
+  });
+
   const categories = [
     "All",
     "Mission Education",
@@ -31,41 +48,31 @@ const Gallery = () => {
     "Mission Mobility",
     "Mission Thalassemia",
   ];
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [uploadFormData, setUploadFormData] = useState({
-    title: "",
-    category: "",
-    description: "",
-    uploadedBy: "",
-    imageUrl: null,
-  });
-  const [isUploading, setIsUploading] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
 
   useEffect(() => {
-    const fetchGalleryItems = async () => {
-      try {
-        setLoading(true);
-        const response = await getAllGalleryItems();
-        const galleryData = response.data || [];
-
-        const adaptedItems = galleryData.map((item) => ({
-          ...item,
-          id: item._id,
-          src: item.imageUrl,
-        }));
-
-        setItems(adaptedItems);
-      } catch (err) {
-        console.error("Failed to fetch gallery items:", err);
-        setError("Failed to load gallery images. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchGalleryItems();
   }, []);
+
+  const fetchGalleryItems = async () => {
+    try {
+      setLoading(true);
+      const response = await getAllGalleryItems();
+      const galleryData = response.data || [];
+
+      const adaptedItems = galleryData.map((item) => ({
+        ...item,
+        id: item._id,
+        src: item.imageUrl,
+      }));
+
+      setItems(adaptedItems);
+    } catch (err) {
+      console.error("Failed to fetch gallery items:", err);
+      setError("Failed to load gallery images. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -86,7 +93,6 @@ const Gallery = () => {
       !uploadFormData.category ||
       !uploadFormData.description
     ) {
-      alert("Please fill in all required fields.");
       return;
     }
 
@@ -116,17 +122,9 @@ const Gallery = () => {
         uploadedBy: "",
         imageUrl: null,
       });
-      const response = await getAllGalleryItems();
-      const galleryData = response.data || [];
-      const adaptedItems = galleryData.map((item) => ({
-        ...item,
-        id: item._id,
-        src: item.imageUrl,
-      }));
-      setItems(adaptedItems);
+      fetchGalleryItems();
     } catch (error) {
       console.error("Operation failed", error);
-      alert("Failed to save. Please try again.");
     } finally {
       setIsUploading(false);
     }
@@ -150,9 +148,9 @@ const Gallery = () => {
       try {
         await deleteGalleryItem(id);
         setItems((prev) => prev.filter((item) => item.id !== id));
+        if (selectedImage?.id === id) setSelectedImage(null);
       } catch (error) {
         console.error(error);
-        alert("Failed to delete image.");
       }
     }
   };
@@ -162,284 +160,473 @@ const Gallery = () => {
       ? items
       : items.filter((item) => item.category === activeCategory);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fbfbfd]">
-        <Loader2 className="w-10 h-10 text-[#0071e3] animate-spin" />
-      </div>
-    );
-  }
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center p-6 bg-[#fbfbfd]">
-        <h2 className="text-2xl font-bold text-[#1d1d1f] mb-2">Something went wrong</h2>
-        <p className="text-[#86868b] mb-6">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-6 py-2 bg-[#0071e3] text-white rounded-full hover:bg-[#0077ed] transition-colors font-medium"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: [0.23, 1, 0.32, 1] },
+    },
+  };
 
   return (
-    <div className="min-h-screen py-32 px-6 bg-[#fbfbfd]">
-      <div className="max-w-[1024px] mx-auto">
-        <div className="text-center mb-16">
-          <Motion.div
-            initial={{ opacity: 0, y: 20 }}
+    <div className="min-h-screen bg-[#f1f2f6] text-[#1d1d1f] overflow-x-hidden font-sans">
+      {/* Dynamic Header/Hero */}
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+        <div className="max-w-[1200px] mx-auto relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-center"
           >
-            <h1 className="text-[48px] md:text-[56px] font-bold text-[#1d1d1f] tracking-tight mb-4">
-              Our Gallery.
+            <span className="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-[0.2em] uppercase bg-emerald-100 text-emerald-700 rounded-full">
+              Visual Chronicles
+            </span>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.95]">
+              Moments of <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">
+                Hope & Impact.
+              </span>
             </h1>
-            <p className="text-[19px] md:text-[21px] text-[#86868b] max-w-[600px] mx-auto mb-12 font-medium">
-              Capturing moments of hope, dedication, and the lasting impact
-              we create together.
+            <p className="max-w-2xl mx-auto text-lg md:text-xl text-[#86868b] font-medium leading-relaxed mb-12">
+              Every image tells a story of transformation. Witness the
+              real-world impact of our missions through the lenses of those on
+              the ground.
             </p>
 
-            <div className="flex flex-wrap justify-center gap-2 mb-12">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setActiveCategory(category)}
-                  className={`px-5 py-2 rounded-full text-[14px] font-medium transition-all duration-300 ${activeCategory === category
-                    ? "bg-[#1d1d1f] text-white"
-                    : "bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]"
-                    }`}
-                >
-                  {category}
-                </button>
-              ))}
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              <button
+                onClick={() => setIsUploadModalOpen(true)}
+                className="group relative px-8 py-4 bg-[#1d1d1f] text-white rounded-2xl font-bold flex items-center gap-3 overflow-hidden transition-all hover:shadow-[0_20px_40px_rgba(0,0,0,0.1)] active:scale-95"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Plus
+                  size={20}
+                  className="relative z-10 group-hover:rotate-90 transition-transform duration-500"
+                />
+                <span className="relative z-10">Contribute Image</span>
+              </button>
             </div>
-
-            <button
-              onClick={() => setIsUploadModalOpen(true)}
-              className="inline-flex items-center gap-1.5 text-[#0066cc] hover:underline font-medium text-[17px] group mb-8"
-            >
-              <Plus size={20} className="group-hover:rotate-90 transition-transform" />
-              Add to Gallery
-            </button>
-          </Motion.div>
+          </motion.div>
         </div>
 
-        <Motion.div
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredItems.length > 0 ? (
-              filteredItems.map((item) => (
-                <Motion.div
-                  layout
-                  key={item.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-                  className="apple-card group relative cursor-pointer overflow-hidden aspect-[4/5]"
-                  onClick={() => setSelectedImage(item)}
-                >
-                  <img
-                    src={item.src}
-                    alt={item.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="absolute inset-x-0 bottom-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                    <h3 className="text-white text-lg font-bold mb-1">{item.title}</h3>
-                    <p className="text-white/80 text-sm font-medium">{item.category}</p>
+        {/* Decorative Background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+          <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-emerald-200/30 blur-[120px] rounded-full" />
+          <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] bg-blue-200/20 blur-[120px] rounded-full" />
+        </div>
+      </section>
 
-                    <div className="flex gap-2 mt-4">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEdit(item);
-                        }}
-                        className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/40 transition-colors"
-                      >
-                        <Edit2 size={14} />
-                      </button>
-                      <button
-                        onClick={(e) => handleDelete(e, item.id)}
-                        className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-[#ff3b30] transition-colors"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </Motion.div>
-              ))
-            ) : (
-              <Motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="col-span-full py-20 text-center"
+      {/* Sticky Filter Bar */}
+      <div className="sticky top-0 z-40 bg-[#fbfbfd]/80 backdrop-blur-xl border-y border-black/5 py-4 px-6">
+        <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2">
+            <Filter size={16} className="text-[#86868b]" />
+            <span className="text-sm font-bold text-[#86868b] uppercase tracking-wider whitespace-nowrap mr-4">
+              Filter By
+            </span>
+          </div>
+          <div className="flex gap-2">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
+                  activeCategory === category
+                    ? "bg-emerald-500 text-white shadow-[0_10px_20px_rgba(16,185,129,0.2)]"
+                    : "bg-white text-[#1d1d1f] hover:bg-gray-50 border border-black/[0.03]"
+                }`}
               >
-                <div className="w-20 h-20 mb-6 rounded-full bg-[#f5f5f7] flex items-center justify-center mx-auto">
-                  <ImageIcon className="w-10 h-10 text-[#86868b]" />
-                </div>
-                <h3 className="text-[24px] font-bold text-[#1d1d1f] mb-2">Coming Soon</h3>
-                <p className="text-[#86868b] max-w-sm mx-auto font-medium">
-                  We're curating beautiful moments for {activeCategory}.
-                  Check back for updates.
-                </p>
-              </Motion.div>
-            )}
-          </AnimatePresence>
-        </Motion.div>
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Gallery Grid */}
+      <main className="max-w-[1400px] mx-auto py-16 px-6">
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-40 gap-4">
+              <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+              <p className="text-[#86868b] font-bold animate-pulse">
+                Curating Gallery...
+              </p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-40">
+              <div className="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <Info size={40} />
+              </div>
+              <h3 className="text-2xl font-bold mb-2">Unavailable</h3>
+              <p className="text-[#86868b] max-w-sm mx-auto mb-8">{error}</p>
+              <button
+                onClick={fetchGalleryItems}
+                className="px-8 py-3 bg-[#1d1d1f] text-white rounded-xl font-bold"
+              >
+                Retry Request
+              </button>
+            </div>
+          ) : (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+            >
+              {filteredItems.length > 0 ? (
+                filteredItems.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    variants={itemVariants}
+                    layoutId={item.id}
+                    className="group relative bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] transition-all duration-500 cursor-pointer aspect-[3/4]"
+                    onClick={() => setSelectedImage(item)}
+                  >
+                    {/* Image Layer */}
+                    <img
+                      src={item.src}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    />
+
+                    {/* Overlay Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
+
+                    {/* Content Overlay */}
+                    <div className="absolute inset-0 p-8 flex flex-col justify-end text-white">
+                      <div className="mb-4">
+                        <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-widest mb-3 border border-white/20">
+                          {item.category}
+                        </span>
+                        <h3 className="text-2xl font-bold leading-tight group-hover:translate-y-[-4px] transition-transform duration-500">
+                          {item.title}
+                        </h3>
+                      </div>
+
+                      <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-xs font-bold border border-white/10">
+                            {item.uploadedBy.charAt(0)}
+                          </div>
+                          <span className="text-xs font-medium text-white/80">
+                            {item.uploadedBy}
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(item);
+                            }}
+                            className="p-2.5 rounded-xl bg-white/10 hover:bg-emerald-500 hover:text-white transition-all border border-white/10"
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                          <button
+                            onClick={(e) => handleDelete(e, item.id)}
+                            className="p-2.5 rounded-xl bg-white/10 hover:bg-red-500 hover:text-white transition-all border border-white/10"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Quick View Button */}
+                    <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-90 transition-all duration-500">
+                      <div className="p-3 rounded-full bg-white text-black shadow-xl">
+                        <Maximize2 size={18} />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))
+              ) : (
+                <div className="col-span-full py-32 flex flex-col items-center justify-center text-center opacity-50">
+                  <div className="w-24 h-24 bg-gray-100 rounded-[2.5rem] flex items-center justify-center mb-8 border border-dashed border-gray-300">
+                    <ImageIcon size={40} className="text-gray-400" />
+                  </div>
+                  <h3 className="text-3xl font-bold mb-2">Awaiting Stories</h3>
+                  <p className="text-lg max-w-sm">
+                    We're just getting started with this category. Be the first
+                    to share a moment.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      {/* Lightbox / Full Detail Modal */}
       <AnimatePresence>
         {selectedImage && (
-          <Motion.div
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/80 backdrop-blur-2xl"
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl flex items-center justify-center p-0 md:p-8"
             onClick={() => setSelectedImage(null)}
           >
-            <Motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-              className="relative max-w-[1100px] w-full bg-white rounded-[32px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.1)] border border-black/5"
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 50 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative w-full max-w-[1400px] h-full md:h-[90vh] bg-white rounded-none md:rounded-[3rem] overflow-hidden flex flex-col lg:flex-row shadow-[0_50px_100px_rgba(0,0,0,0.4)]"
               onClick={(e) => e.stopPropagation()}
             >
-              <button
-                onClick={() => setSelectedImage(null)}
-                className="absolute top-6 right-6 z-10 w-10 h-10 bg-[#f5f5f7] hover:bg-[#e8e8ed] rounded-full flex items-center justify-center text-[#1d1d1f] transition-colors"
-              >
-                <X size={20} />
-              </button>
+              {/* Image Control / Viewport */}
+              <div className="flex-1 bg-[#121212] relative group overflow-hidden flex items-center justify-center">
+                <img
+                  src={selectedImage.src}
+                  alt={selectedImage.title}
+                  className="max-h-full max-w-full object-contain"
+                />
 
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px]">
-                <div className="bg-[#f5f5f7] flex items-center justify-center min-h-[400px] lg:h-[80vh]">
-                  <img
-                    src={selectedImage.src}
-                    alt={selectedImage.title}
-                    className="max-h-full max-w-full object-contain"
-                  />
-                </div>
-                <div className="p-10 lg:p-12 flex flex-col justify-center bg-white h-full relative">
-                  <span className="text-[#0071e3] font-bold text-[13px] tracking-wide uppercase mb-3">
-                    {selectedImage.category}
-                  </span>
-                  <h3 className="text-[32px] md:text-[40px] font-bold text-[#1d1d1f] leading-tight mb-6">
-                    {selectedImage.title}
-                  </h3>
-                  <p className="text-[17px] text-[#86868b] leading-relaxed mb-10 font-medium">
-                    {selectedImage.description}
-                  </p>
+                {/* Internal Navigation Buttons (Placeholders) */}
+                <button className="absolute left-6 top-1/2 -translate-y-1/2 p-4 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all opacity-0 group-hover:opacity-100">
+                  <ChevronLeft size={24} />
+                </button>
+                <button className="absolute right-6 top-1/2 -translate-y-1/2 p-4 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all opacity-0 group-hover:opacity-100">
+                  <ChevronRight size={24} />
+                </button>
 
-                  <div className="flex items-center gap-3 pt-6 border-t border-black/5">
-                    <div className="w-10 h-10 rounded-full bg-[#f5f5f7] flex items-center justify-center text-[#1d1d1f] font-bold text-sm">
-                      {selectedImage.uploadedBy.charAt(0)}
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[14px] text-[#86868b] font-medium">Contributed by</span>
-                      <span className="text-[16px] text-[#1d1d1f] font-bold">{selectedImage.uploadedBy}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Motion.div>
-          </Motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Upload Modal */}
-      <AnimatePresence>
-        {isUploadModalOpen && (
-          <Motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/60 backdrop-blur-xl"
-          >
-            <Motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white rounded-[24px] shadow-[0_32px_80px_rgba(0,0,0,0.15)] w-full max-w-lg overflow-hidden border border-black/5"
-            >
-              <div className="p-8 border-b border-black/5 flex justify-between items-center">
-                <h3 className="text-xl font-bold text-[#1d1d1f]">Add to Gallery</h3>
+                {/* Close Button Mobile */}
                 <button
-                  onClick={() => setIsUploadModalOpen(false)}
-                  className="w-8 h-8 rounded-full hover:bg-[#f5f5f7] flex items-center justify-center transition-colors"
+                  onClick={() => setSelectedImage(null)}
+                  className="absolute top-6 right-6 p-4 rounded-full bg-white text-black shadow-2xl lg:hidden"
                 >
                   <X size={20} />
                 </button>
               </div>
 
-              <form onSubmit={handleUploadSubmit} className="p-8 space-y-5">
-                <div>
-                  <label className="block text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight">Title</label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={uploadFormData.title}
-                    onChange={handleInputChange}
-                    className="w-full h-12 px-4 rounded-xl bg-[#f5f5f7] border-none focus:ring-2 focus:ring-[#0071e3] transition-all outline-none text-[#1d1d1f]"
-                    placeholder="E.g. Empowering Students"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight">Category</label>
-                  <select
-                    name="category"
-                    value={uploadFormData.category}
-                    onChange={handleInputChange}
-                    className="w-full h-12 px-4 rounded-xl bg-[#f5f5f7] border-none focus:ring-2 focus:ring-[#0071e3] transition-all outline-none text-[#1d1d1f] appearance-none"
-                    required
+              {/* Sidebar Info */}
+              <div className="w-full lg:w-[450px] bg-white p-8 md:p-12 flex flex-col h-full overflow-y-auto">
+                <div className="flex items-center justify-between mb-10">
+                  <span className="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-black uppercase tracking-widest border border-emerald-100">
+                    {selectedImage.category}
+                  </span>
+                  <button
+                    onClick={() => setSelectedImage(null)}
+                    className="hidden lg:flex p-3 rounded-full hover:bg-gray-100 transition-colors"
                   >
-                    <option value="">Select Category</option>
-                    {categories.filter(c => c !== "All").map(c => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
+                    <X size={20} />
+                  </button>
                 </div>
 
-                <div>
-                  <label className="block text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight">Description</label>
-                  <textarea
-                    name="description"
-                    value={uploadFormData.description}
-                    onChange={handleInputChange}
-                    rows="3"
-                    className="w-full p-4 rounded-xl bg-[#f5f5f7] border-none focus:ring-2 focus:ring-[#0071e3] transition-all outline-none text-[#1d1d1f] resize-none"
-                    placeholder="Tell the story..."
-                    required
-                  ></textarea>
+                <div className="flex-1">
+                  <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-8 leading-none">
+                    {selectedImage.title}
+                  </h2>
+
+                  <div className="space-y-10">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-blue-50 text-blue-500 rounded-2xl shrink-0">
+                        <Info size={24} />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-black text-[#86868b] uppercase tracking-widest mb-2">
+                          The Story
+                        </h4>
+                        <p className="text-lg text-[#1d1d1f] font-medium leading-relaxed">
+                          {selectedImage.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-8 pt-10 border-t border-black/5">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2 text-[#86868b]">
+                          <User size={14} />
+                          <span className="text-[10px] font-black uppercase tracking-widest">
+                            Contributed By
+                          </span>
+                        </div>
+                        <p className="font-bold text-lg">
+                          {selectedImage.uploadedBy}
+                        </p>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2 text-[#86868b]">
+                          <Calendar size={14} />
+                          <span className="text-[10px] font-black uppercase tracking-widest">
+                            Added On
+                          </span>
+                        </div>
+                        <p className="font-bold text-lg">
+                          {new Date(selectedImage.createdAt).toLocaleDateString(
+                            "en-IN",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
+                <div className="mt-12 pt-10 border-t border-black/5">
+                  <button
+                    onClick={() => {
+                      window.location.href = "/donor-register";
+                      setSelectedImage(null);
+                    }}
+                    className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-black text-lg flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(16,185,129,0.2)] hover:scale-[1.02] active:scale-95 transition-all"
+                  >
+                    Support This Mission <ArrowRight size={20} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modern Upload/Edit Modal */}
+      <AnimatePresence>
+        {isUploadModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] bg-white/60 backdrop-blur-2xl flex items-center justify-center p-6"
+            onClick={() => setIsUploadModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 30, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 30, opacity: 0 }}
+              className="bg-white w-full max-w-xl rounded-[2.5rem] shadow-[0_50px_100px_rgba(0,0,0,0.2)] border border-black/5 overflow-hidden flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-10 flex justify-between items-center border-b border-black/5">
                 <div>
-                  <label className="block text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight">Image</label>
-                  <div className="relative h-24 rounded-xl bg-[#f5f5f7] border-2 border-dashed border-[#d2d2d7] hover:border-[#0071e3] transition-colors flex items-center justify-center cursor-pointer">
+                  <h3 className="text-3xl font-black tracking-tight">
+                    {editingItem ? "Refine Story" : "New Chronicle"}
+                  </h3>
+                  <p className="text-[#86868b] font-medium">
+                    Sharing hope, one image at a time.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsUploadModalOpen(false)}
+                  className="p-4 rounded-full bg-gray-50 text-black hover:bg-gray-100 transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <form
+                onSubmit={handleUploadSubmit}
+                className="p-10 space-y-8 overflow-y-auto max-h-[70vh] no-scrollbar"
+              >
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-[11px] font-black text-[#86868b] mb-3 uppercase tracking-[0.2em] ml-1">
+                      Title your moment
+                    </label>
                     <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      required={!editingItem}
+                      type="text"
+                      name="title"
+                      value={uploadFormData.title}
+                      onChange={handleInputChange}
+                      className="w-full h-16 px-6 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none font-bold text-lg placeholder:text-gray-300"
+                      placeholder="E.g. The First Day of School"
+                      required
                     />
-                    <div className="flex flex-col items-center text-[#86868b] pointer-events-none">
-                      {uploadFormData.imageUrl ? (
-                        <span className="text-[#0071e3] font-bold text-sm truncate max-w-[200px]">
-                          {uploadFormData.imageUrl.name}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-[11px] font-black text-[#86868b] mb-3 uppercase tracking-[0.2em] ml-1">
+                        Category
+                      </label>
+                      <select
+                        name="category"
+                        value={uploadFormData.category}
+                        onChange={handleInputChange}
+                        className="w-full h-16 px-6 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none font-bold appearance-none cursor-pointer"
+                        required
+                      >
+                        <option value="">Mission Select</option>
+                        {categories
+                          .filter((c) => c !== "All")
+                          .map((c) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-black text-[#86868b] mb-3 uppercase tracking-[0.2em] ml-1">
+                        Your Name
+                      </label>
+                      <input
+                        type="text"
+                        name="uploadedBy"
+                        value={uploadFormData.uploadedBy}
+                        onChange={handleInputChange}
+                        className="w-full h-16 px-6 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none font-bold placeholder:text-gray-300"
+                        placeholder="Anonymous"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black text-[#86868b] mb-3 uppercase tracking-[0.2em] ml-1">
+                      The Story Behind
+                    </label>
+                    <textarea
+                      name="description"
+                      value={uploadFormData.description}
+                      onChange={handleInputChange}
+                      rows="4"
+                      className="w-full p-6 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none font-bold resize-none placeholder:text-gray-300"
+                      placeholder="Describe the impact of this moment..."
+                      required
+                    ></textarea>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black text-[#86868b] mb-3 uppercase tracking-[0.2em] ml-1">
+                      Visual Evidence
+                    </label>
+                    <div className="relative h-32 rounded-3xl bg-gray-50 border-2 border-dashed border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/10 transition-all flex flex-col items-center justify-center cursor-pointer overflow-hidden group">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        required={!editingItem}
+                      />
+                      <div className="flex flex-col items-center gap-2 group-hover:scale-110 transition-transform">
+                        <ImageIcon
+                          className="text-gray-400 group-hover:text-emerald-500 transition-colors"
+                          size={24}
+                        />
+                        <span className="text-sm font-bold text-gray-500">
+                          {uploadFormData.imageUrl
+                            ? uploadFormData.imageUrl.name
+                            : "Tap to upload high-res image"}
                         </span>
-                      ) : (
-                        <span className="text-sm font-medium">Click to choose image</span>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -448,17 +635,23 @@ const Gallery = () => {
                   <button
                     type="submit"
                     disabled={isUploading}
-                    className="w-full h-12 bg-[#0071e3] text-white rounded-full font-bold hover:bg-[#0077ed] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full h-20 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-3xl font-black text-xl hover:shadow-[0_20px_40px_rgba(16,185,129,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 active:scale-95"
                   >
-                    {isUploading ? <Loader2 size={18} className="animate-spin" /> : "Save to Gallery"}
+                    {isUploading ? (
+                      <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                    ) : editingItem ? (
+                      "Update Chronicle"
+                    ) : (
+                      "Publish to Gallery"
+                    )}
                   </button>
                 </div>
               </form>
-            </Motion.div>
-          </Motion.div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
-    </div >
+    </div>
   );
 };
 
