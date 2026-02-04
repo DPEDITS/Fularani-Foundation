@@ -26,7 +26,8 @@ const Hero = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex-grow flex items-center px-6 md:px-12 lg:px-20 pt-10">
+      <div className="relative z-10 flex-grow flex items-center px-6 md:px-12 lg:px-20 pt-32">
+
         <div className="max-w-3xl">
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.05] mb-6 drop-shadow-lg tracking-tight">
             Empowering Bhadrak. <br />
@@ -48,7 +49,7 @@ const Hero = () => {
               />
             </a>
             <button
-              onClick={() => {}} // Placeholder for video modal
+              onClick={() => { }} // Placeholder for video modal
               className="bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-full text-[17px] font-medium hover:bg-white/20 transition-all flex items-center justify-center transform hover:scale-[1.02] active:scale-[0.98]"
             >
               Watch Video
