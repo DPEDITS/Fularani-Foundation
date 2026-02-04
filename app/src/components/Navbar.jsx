@@ -75,27 +75,27 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             {isLoggedIn ? (
               <>
-                 <a href={userRole === "volunteer" ? "/volunteer-dashboard" : "/donor-dashboard"}>
-                    <NavbarButton variant="ghost" className="!px-3 !py-2">
-                        <User size={18} />
-                        <span className="hidden sm:inline">Dashboard</span>
-                    </NavbarButton>
-                 </a>
-                 <NavbarButton variant="secondary" onClick={handleLogout} className="!px-3 !py-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-100">
-                    <LogOut size={18} />
-                 </NavbarButton>
+                <a href={userRole === "volunteer" ? "/volunteer-dashboard" : "/donor-dashboard"}>
+                  <NavbarButton variant="ghost" className="!px-3 !py-2">
+                    <User size={18} />
+                    <span className="hidden sm:inline">Dashboard</span>
+                  </NavbarButton>
+                </a>
+                <NavbarButton variant="secondary" onClick={handleLogout} className="!px-3 !py-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-100">
+                  <LogOut size={18} />
+                </NavbarButton>
               </>
             ) : (
-                <>
-                    <a href="/volunteer-login">
-                        <NavbarButton variant="ghost">Volunteer</NavbarButton>
-                    </a>
-                    <a href="/donor-register">
-                        <NavbarButton variant="primary">Donate Now</NavbarButton>
-                    </a>
-                </>
+              <>
+                <a href="/donor-register?role=volunteer">
+                  <NavbarButton variant="ghost">Volunteer</NavbarButton>
+                </a>
+                <a href="/donor-register">
+                  <NavbarButton variant="primary">Donate Now</NavbarButton>
+                </a>
+              </>
             )}
-            
+
           </div>
         </NavBody>
 
@@ -105,7 +105,7 @@ const Navbar = () => {
             <NavbarLogo />
             <MobileNavToggle
               isOpen={isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             />
           </MobileNavHeader>
 
@@ -121,39 +121,39 @@ const Navbar = () => {
               </a>
             ))}
             <div className="h-px bg-gray-100 my-2"></div>
-            
-            {isLoggedIn ? (
-                <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-3 px-2 py-2 bg-gray-50 rounded-lg">
-                        {currentUser?.avatar ? (
-                            <img src={currentUser.avatar} alt="Avatar" className="w-10 h-10 rounded-full object-cover" />
-                        ) : (
-                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                                <User size={20} />
-                            </div>
-                        )}
-                        <div>
-                            <p className="text-sm font-semibold text-gray-900">{currentUser?.username || "User"}</p>
-                            <p className="text-xs text-gray-500 capitalize">{userRole}</p>
-                        </div>
-                    </div>
 
-                    <a href={userRole === "volunteer" ? "/volunteer-dashboard" : "/donor-dashboard"}>
-                        <NavbarButton variant="secondary" className="w-full justify-center">Dashboard</NavbarButton>
-                    </a>
-                    <NavbarButton variant="outline" onClick={handleLogout} className="w-full justify-center text-red-600 border-red-200 hover:bg-red-50">
-                        Logout
-                    </NavbarButton>
+            {isLoggedIn ? (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3 px-2 py-2 bg-gray-50 rounded-lg">
+                  {currentUser?.avatar ? (
+                    <img src={currentUser.avatar} alt="Avatar" className="w-10 h-10 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                      <User size={20} />
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{currentUser?.username || "User"}</p>
+                    <p className="text-xs text-gray-500 capitalize">{userRole}</p>
+                  </div>
                 </div>
+
+                <a href={userRole === "volunteer" ? "/volunteer-dashboard" : "/donor-dashboard"}>
+                  <NavbarButton variant="secondary" className="w-full justify-center">Dashboard</NavbarButton>
+                </a>
+                <NavbarButton variant="outline" onClick={handleLogout} className="w-full justify-center text-red-600 border-red-200 hover:bg-red-50">
+                  Logout
+                </NavbarButton>
+              </div>
             ) : (
-                <div className="flex flex-col gap-3">
-                    <a href="/volunteer-login">
-                         <NavbarButton variant="secondary" className="w-full justify-center">Volunteer Login</NavbarButton>
-                    </a>
-                    <a href="/donor-register">
-                        <NavbarButton variant="primary" className="w-full justify-center">Donate Now</NavbarButton>
-                    </a>
-                </div>
+              <div className="flex flex-col gap-3">
+                <a href="/donor-register?role=volunteer">
+                  <NavbarButton variant="secondary" className="w-full justify-center">Join as Volunteer</NavbarButton>
+                </a>
+                <a href="/donor-register">
+                  <NavbarButton variant="primary" className="w-full justify-center">Donate Now</NavbarButton>
+                </a>
+              </div>
             )}
           </MobileNavMenu>
         </MobileNav>

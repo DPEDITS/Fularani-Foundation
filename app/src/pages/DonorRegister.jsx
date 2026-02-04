@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import headerImg from "../assets/logindonor.svg";
 import {
   Mail,
@@ -27,7 +27,10 @@ import { registerVolunteer, isVolunteerAuthenticated } from "../services/volunte
 
 const DonorRegister = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [role, setRole] = useState(() => {
+    const roleParam = searchParams.get("role");
+    if (roleParam) return roleParam;
     return window.location.pathname.includes("volunteer") ? "volunteer" : "donor";
   });
   const [form, setForm] = useState({
@@ -67,6 +70,24 @@ const DonorRegister = () => {
     }
   }, [navigate, role]);
 
+  const handleDateChange = (e) => {
+    let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+    if (value.length > 8) value = value.slice(0, 8);
+
+    let formattedValue = "";
+    if (value.length > 0) {
+      formattedValue = value.slice(0, 2);
+      if (value.length > 2) {
+        formattedValue += "/" + value.slice(2, 4);
+        if (value.length > 4) {
+          formattedValue += "/" + value.slice(4, 8);
+        }
+      }
+    }
+    setForm({ ...form, dateOfBirth: formattedValue });
+    setError("");
+  };
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
@@ -95,11 +116,11 @@ const DonorRegister = () => {
 
     if (role === "volunteer") {
       if (!avatar) {
-        setError("Profile picture is required for volunteers");
+        setError("A profile picture is required for volunteers");
         return;
       }
-      if (!form.phone || !form.gender || !form.dateOfBirth || !form.address) {
-        setError("Please fill in all required personal details");
+      if (!isPhoneValid || !isGenderValid || !isDobValid || !isAddressValid || !isPanValid) {
+        setError("Please fill in all personal and location details correctly");
         return;
       }
     }
@@ -108,16 +129,15 @@ const DonorRegister = () => {
 
     try {
       const formData = new FormData();
-      formData.append("username", form.username);
-      formData.append("email", form.email);
+      formData.append("username", form.username.trim());
+      formData.append("email", form.email.trim());
       formData.append("password", form.password);
-      formData.append("panNumber", form.panNumber);
+      formData.append("panNumber", form.panNumber.trim().toUpperCase());
+      formData.append("idType", form.idType || "PAN");
 
-      if (avatar) {
-        formData.append("avatar", avatar);
-      }
 
       if (role === "donor") {
+        if (avatar) formData.append("avatar", avatar);
         await registerDonor(formData);
         setSuccess(true);
         setTimeout(() => {
@@ -125,32 +145,32 @@ const DonorRegister = () => {
         }, 2000);
       } else {
         // Volunteer specific fields
-        formData.append("phone", form.phone);
+        formData.append("phone", form.phone.trim());
         formData.append("gender", form.gender.toLowerCase());
 
-        // Format date to dd/mm/yyyy for backend regex if needed, 
-        // but backend also handles Date objects if it's matched.
-        // Let's send it in a way the backend likes.
-        const [year, month, day] = form.dateOfBirth.split("-");
-        formData.append("dateOfBirth", `${day}/${month}/${year}`);
+        // Handle Date of Birth formatting
+        if (form.dateOfBirth.includes("-")) {
+          const [year, month, day] = form.dateOfBirth.split("-");
+          formData.append("dateOfBirth", `${day}/${month}/${year}`);
+        } else {
+          formData.append("dateOfBirth", form.dateOfBirth);
+        }
 
-        formData.append("address", form.address);
-        formData.append("idType", form.idType);
+        formData.append("address", form.address.trim());
 
-        // Split strings into arrays for backend
-        form.skills.split(",").forEach(skill => {
-          formData.append("skills", skill.trim());
-        });
+        // Send as comma-separated strings for better compatibility
+        formData.append("skills", form.skills.trim());
+        formData.append("preferredAreas", form.preferredAreas.trim());
 
-        form.preferredAreas.split(",").forEach(area => {
-          formData.append("preferredAreas", area.trim());
-        });
+        formData.append("availabilityHours", String(form.availabilityHours));
+        formData.append("motivation", form.motivation.trim());
 
-        formData.append("availabilityHours", form.availabilityHours);
-        formData.append("motivation", form.motivation);
+        if (avatar) formData.append("avatar", avatar);
 
-        if (avatar) {
-          formData.append("avatar", avatar);
+        // Debug: Log FormData keys (for dev visibility)
+        console.log("Submitting Volunteer FormData:");
+        for (let pair of formData.entries()) {
+          console.log(pair[0] + ': ' + (pair[0] === 'avatar' ? '[File]' : pair[1]));
         }
 
         await registerVolunteer(formData);
@@ -160,9 +180,11 @@ const DonorRegister = () => {
         }, 2000);
       }
     } catch (err) {
-      console.error("Registration error:", err);
+      console.error("Registration error full details:", err);
       const errorMessage =
-        err.response?.data?.message || "Registration failed. Please try again.";
+        err.response?.data?.message ||
+        err.message ||
+        "Registration failed. Please try again.";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -181,7 +203,7 @@ const DonorRegister = () => {
   // Volunteer specific validations
   const isPhoneValid = form.phone.length >= 10;
   const isGenderValid = form.gender !== "";
-  const isDobValid = form.dateOfBirth !== "";
+  const isDobValid = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.test(form.dateOfBirth);
   const isAddressValid = form.address.length >= 5;
   const isPreferredAreasValid = form.preferredAreas.length > 0;
   const isSkillsValid = form.skills.length > 0;
@@ -196,8 +218,8 @@ const DonorRegister = () => {
       }
     }
     if (currentStep === 2 && role === "volunteer") {
-      if (!form.phone || !form.gender || !form.dateOfBirth) {
-        setError("Please fill in your personal details");
+      if (!form.phone || !form.gender || !isDobValid) {
+        setError("Please fill in your personal details and provide a valid date of birth (DD/MM/YYYY)");
         return;
       }
     }
@@ -217,7 +239,8 @@ const DonorRegister = () => {
   };
 
   return (
-    <main className="min-h-screen md:h-screen flex items-start justify-center px-4 md:px-8 lg:px-12 pb-1 overflow-auto md:overflow-hidden">
+    <main className="min-h-screen md:h-screen flex items-center justify-center px-4 md:px-8 lg:px-12 pt-28 pb-10 overflow-auto md:overflow-hidden">
+
       <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid md:grid-cols-2 min-h-[600px] md:max-h-[85vh]">
         {/* LEFT SIDE: Brand & Visuals */}
         <div className="relative bg-gradient-to-br from-emerald-400 to-teal-600 p-10 md:p-12 flex flex-col justify-start gap-4 text-white overflow-hidden">
@@ -313,7 +336,16 @@ const DonorRegister = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form
+              onSubmit={handleSubmit}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && currentStep < totalSteps) {
+                  e.preventDefault();
+                  nextStep();
+                }
+              }}
+              className="space-y-4"
+            >
               {currentStep === 1 && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                   {/* Username Field */}
@@ -420,7 +452,9 @@ const DonorRegister = () => {
                             className="absolute inset-0 opacity-0 cursor-pointer"
                           />
                         </div>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Profile Picture (Optional)</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          Profile Picture {role === "volunteer" ? "(Required)" : "(Optional)"}
+                        </span>
                       </div>
 
                       <label className="text-xs font-bold text-gray-700 ml-1 uppercase tracking-tight">
@@ -459,7 +493,9 @@ const DonorRegister = () => {
                             className="absolute inset-0 opacity-0 cursor-pointer"
                           />
                         </div>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Profile Picture</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          Profile Picture {role === "volunteer" ? "(Required)" : "(Optional)"}
+                        </span>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
@@ -500,11 +536,12 @@ const DonorRegister = () => {
                         <div className="relative">
                           <Calendar className="absolute left-4 top-3.5 w-4 h-4 text-gray-400" />
                           <input
-                            type="date"
+                            type="text"
                             name="dateOfBirth"
                             value={form.dateOfBirth}
-                            onChange={handleChange}
+                            onChange={handleDateChange}
                             required
+                            placeholder="DD/MM/YYYY"
                             className={`w-full pl-10 pr-4 py-3 rounded-xl border outline-none text-sm transition-all duration-300 ${isDobValid ? "border-green-500 bg-green-50/20 focus:ring-4 focus:ring-green-500/10" : "border-red-500 bg-red-50/20 focus:ring-4 focus:ring-red-500/10"}`}
                           />
                         </div>
@@ -661,7 +698,7 @@ const DonorRegister = () => {
               <div className="text-center text-sm text-gray-500">
                 Already have an account?{" "}
                 <a
-                  href={role === "donor" ? "/donor-login" : "/volunteer-login"}
+                  href={role === "donor" ? "/donor-login" : "/donor-login?role=volunteer"}
                   className="text-emerald-600 hover:text-emerald-700 font-bold hover:underline"
                 >
                   Login

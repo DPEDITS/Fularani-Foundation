@@ -86,17 +86,41 @@ const registerVolunteer = asyncHandler(async (req, res) => {
     motivation,
   } = req.body;
 
-  if (
-    [username, email, password, gender, phone, address, idType, panNumber].some(
-      (field) => field?.trim() === "",
-    )
-  ) {
-    throw new ApiError(400, "All fields are required");
+  // Debug logs to see what's arriving
+  console.log("Registration Request Body:", req.body);
+  console.log("Registration Request Files:", req.files);
+
+  if (!username?.trim()) throw new ApiError(400, "Username is required");
+  if (!email?.trim()) throw new ApiError(400, "Email is required");
+  if (!password?.trim()) throw new ApiError(400, "Password is required");
+  if (!gender?.trim()) throw new ApiError(400, "Gender is required");
+  if (!phone?.trim()) throw new ApiError(400, "Phone number is required");
+  if (!address?.trim()) throw new ApiError(400, "Address is required");
+  if (!idType?.trim()) throw new ApiError(400, "ID Type is required");
+  if (!panNumber?.trim()) throw new ApiError(400, "PAN Number is required");
+
+  // Improved skills validation and parsing
+  let skillsArray = [];
+  if (typeof req.body.skills === 'string') {
+    skillsArray = req.body.skills.split(',').map(s => s.trim()).filter(Boolean);
+  } else if (Array.isArray(req.body.skills)) {
+    skillsArray = req.body.skills;
   }
 
-  if (!skills || !availabilityHours || !dateOfBirth) {
-    throw new ApiError(400, "All fields are required");
+  if (skillsArray.length === 0) {
+    throw new ApiError(400, "Skills are required");
   }
+
+  // Improved preferredAreas parsing
+  let areasArray = [];
+  if (typeof req.body.preferredAreas === 'string') {
+    areasArray = req.body.preferredAreas.split(',').map(a => a.trim()).filter(Boolean);
+  } else if (Array.isArray(req.body.preferredAreas)) {
+    areasArray = req.body.preferredAreas;
+  }
+
+  if (!availabilityHours) throw new ApiError(400, "Availability hours are required");
+  if (!dateOfBirth) throw new ApiError(400, "Date of birth is required");
 
   const existedUser = await Volunteer.findOne({
     $or: [{ username }, { email }],
@@ -107,14 +131,18 @@ const registerVolunteer = asyncHandler(async (req, res) => {
   }
 
   const avatarLocalPath = req.files?.avatar?.[0]?.path;
-  let avatar;
+  console.log("Avatar local path:", avatarLocalPath);
 
+  let avatar;
   if (avatarLocalPath) {
     avatar = await uploadOnCloudinary(avatarLocalPath);
   }
+
   if (!avatar) {
-    throw new ApiError(400, "Avatar is required");
+    throw new ApiError(400, "Avatar is required for volunteers. Please ensure you upload a valid image.");
   }
+
+  const avatarUrl = avatar.url;
 
   let parsedDateOfBirth = dateOfBirth;
   const ddmmyyyyRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
@@ -129,17 +157,17 @@ const registerVolunteer = asyncHandler(async (req, res) => {
   const user = await Volunteer.create({
     username: username.toLowerCase(),
     email,
-    password,
-    avatar: avatar?.url,
+    password: password, // Note: Schema handles hashing via pre-save hook
+    avatar: avatarUrl,
     gender,
     phone,
     dateOfBirth: parsedDateOfBirth,
     address,
     idType,
     panNumber,
-    skills,
+    skills: skillsArray,
     availabilityHours,
-    preferredAreas,
+    preferredAreas: areasArray,
     motivation,
   });
   const createdUser = await Volunteer.findById(user._id).select(

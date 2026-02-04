@@ -54,11 +54,7 @@ export const loginVolunteer = async (email, password) => {
 
 export const registerVolunteer = async (formData) => {
     try {
-        const response = await api.post('/api/volunteers/register', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
+        const response = await api.post('/api/volunteers/register', formData);
         return response.data;
     } catch (error) {
         throw error;
