@@ -35,11 +35,10 @@ const registerDonor = asyncHandler(async (req, res) => {
     wants80GReceipt,
   } = req.body;
 
-  if (
-    [username, email, password, panNumber].some((field) => field?.trim() === "")
-  ) {
-    throw new ApiError(400, "All fields are required");
-  }
+  if (!username?.trim()) throw new ApiError(400, "Username is required");
+  if (!email?.trim()) throw new ApiError(400, "Email is required");
+  if (!password?.trim()) throw new ApiError(400, "Password is required");
+  if (!panNumber?.trim()) throw new ApiError(400, "PAN Number is required");
 
   const existedDonor = await Donor.findOne({
     $or: [{ username }, { email }],

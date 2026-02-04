@@ -54,11 +54,7 @@ export const loginDonor = async (email, password) => {
 
 export const registerDonor = async (formData) => {
     try {
-        const response = await api.post('/api/donor/register', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
+        const response = await api.post('/api/donor/register', formData);
         return response.data;
     } catch (error) {
         throw error;
@@ -155,10 +151,7 @@ export const updateDonorProfile = async (data) => {
 export const updateDonorAvatar = async (formData) => {
     try {
         const response = await api.patch('/api/donor/update-avatar', formData, {
-            headers: {
-                ...authHeader(),
-                'Content-Type': 'multipart/form-data',
-            },
+            headers: authHeader()
         });
         const updatedUser = response.data.data;
         setDonorUser(updatedUser);
