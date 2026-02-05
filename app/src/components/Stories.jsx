@@ -1,32 +1,31 @@
 import React, { useRef } from "react";
-import { cn } from "../utils/cn";
-import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
-import storyBg from "../assets/missions1.jpeg"; // Reusing for placeholder
+import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
+import storyBg from "../assets/missions1.jpeg";
 
 const stories = [
   {
     category: "Education",
-    title: "Ranjeeta's Vision",
-    description: "How one scholarship changed an entire family's future.",
+    title: "ranjeeta's vision.",
+    description:
+      "How one scholarship and a digital tablet changed an entire family's economic path in rural Odisha.",
     image: storyBg,
+    author: "Primary Donor: Tech4Impact",
   },
   {
     category: "Sustainability",
-    title: "The Green Village",
-    description: "Transforming barren land into a thriving ecosystem.",
+    title: "the green village.",
+    description:
+      "Transforming 50 acres of barren land into a thriving, income-generating ecosystem for local farmers.",
     image: storyBg,
+    author: "Project Lead: Mission Green",
   },
   {
     category: "Health",
-    title: "Mobility for All",
-    description: "Providing dignity through accessibility.",
+    title: "access to dignity.",
+    description:
+      "Providing specialized wheelchairs and home-care support to 200+ individuals with mobility challenges.",
     image: storyBg,
-  },
-  {
-    category: "Volunteer",
-    title: "A Day in Life",
-    description: "Experience the joy of giving back.",
-    image: storyBg,
+    author: "Foundation Healthcare",
   },
 ];
 
@@ -46,67 +45,80 @@ const Stories = () => {
   };
 
   return (
-    <section className="py-20 bg-[#f5f5f7] overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-end justify-between mb-12">
-          <div>
-            <h2 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] tracking-tight mb-4">
-              Stories of Change
+    <section className="py-24 md:py-32 bg-muted/30 overflow-hidden">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
+          <div className="max-w-xl">
+            <div className="inline-block bg-accent px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
+              Testimonials
+            </div>
+            <h2 className="text-5xl md:text-7xl font-black text-secondary tracking-tighter leading-none lowercase">
+              voice of <br />
+              <span className="text-white bg-primary px-4 py-1 inline-block rotate-1">
+                the field.
+              </span>
             </h2>
-            <p className="text-xl text-gray-500 max-w-2xl">
-              Real people, real impact. See how we are making a difference.
-            </p>
           </div>
-          <div className="hidden md:flex gap-4">
+          <div className="flex gap-4">
             <button
               onClick={() => scroll("left")}
-              className="p-3 rounded-full border border-gray-300 hover:bg-white hover:border-gray-400 transition-all"
+              className="w-14 h-14 rounded-xl border-2 border-secondary/10 flex items-center justify-center hover:bg-primary transition-all group"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft
+                size={24}
+                className="group-active:scale-90 transition-transform"
+              />
             </button>
             <button
               onClick={() => scroll("right")}
-              className="p-3 rounded-full border border-gray-300 hover:bg-white hover:border-gray-400 transition-all"
+              className="w-14 h-14 rounded-xl bg-secondary text-white flex items-center justify-center hover:bg-accent transition-all group shadow-xl shadow-secondary/20"
             >
-              <ArrowRight size={20} />
+              <ArrowRight
+                size={24}
+                className="group-active:scale-95 transition-transform"
+              />
             </button>
           </div>
         </div>
 
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto pb-10 snap-x snap-mandatory scrollbar-hide"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          className="flex gap-8 overflow-x-auto pb-12 snap-x snap-mandatory no-scrollbar"
         >
           {stories.map((story, index) => (
             <div
               key={index}
-              className="min-w-[300px] md:min-w-[400px] snap-start bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group border border-black/5"
+              className="min-w-[320px] md:min-w-[500px] snap-start bg-white shadow-2xl overflow-hidden group border border-secondary/5"
             >
-              <div className="h-64 overflow-hidden relative">
-                <img
-                  src={story.image}
-                  alt={story.title}
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-gray-800">
-                  {story.category}
-                </div>
-              </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold text-[#1d1d1f] mb-2 group-hover:text-blue-600 transition-colors">
-                  {story.title}
-                </h3>
-                <p className="text-gray-500 font-medium leading-relaxed mb-6">
-                  {story.description}
-                </p>
-                <span className="inline-flex items-center text-blue-600 font-semibold text-sm group/link">
-                  Read Story{" "}
-                  <ArrowUpRight
-                    size={16}
-                    className="ml-1 transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
+              <div className="flex flex-col md:flex-row h-full">
+                <div className="w-full md:w-2/5 h-64 md:h-auto overflow-hidden relative">
+                  <img
+                    src={story.image}
+                    alt={story.title}
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-110"
                   />
-                </span>
+                  <div className="absolute top-4 left-4 bg-primary px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-wider text-white">
+                    {story.category}
+                  </div>
+                </div>
+
+                <div className="w-full md:w-3/5 p-8 md:p-10 flex flex-col justify-between">
+                  <div>
+                    <Quote size={40} className="text-primary mb-6 opacity-40" />
+                    <h3 className="text-3xl font-black text-secondary mb-4 tracking-tighter leading-none">
+                      {story.title}
+                    </h3>
+                    <p className="text-muted-foreground font-bold text-lg leading-tight mb-8">
+                      "{story.description}"
+                    </p>
+                  </div>
+
+                  <div className="pt-6 border-t border-muted">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 whitespace-nowrap">
+                      {story.author}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
