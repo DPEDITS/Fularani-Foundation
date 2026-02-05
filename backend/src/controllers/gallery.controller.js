@@ -105,37 +105,50 @@ const updateGalleryItem = asyncHandler(async (req, res) => {
   if (!title || !category || !description) {
     throw new ApiError(400, "All fields are required");
   }
+
+  const galleryItem = await GalleryItem.findById(req.params.id);
+  if (!galleryItem) {
+    throw new ApiError(404, "Gallery item not found");
+  }
+
   const imageUrlLocalPath = req.files?.imageUrl?.[0]?.path;
-  let imageUrl;
+  let imageUrl = galleryItem.imageUrl;
+
   if (imageUrlLocalPath) {
-    imageUrl = await uploadOnCloudinary(imageUrlLocalPath);
+    const uploadedImage = await uploadOnCloudinary(imageUrlLocalPath);
+    if (uploadedImage) {
+      imageUrl = uploadedImage.url;
+    }
   }
-  if (!imageUrl) {
-    throw new ApiError(400, "Image is required");
-  }
-  const galleryItem = await GalleryItem.create({
-    title,
-    category,
-    imageUrl: imageUrl?.url || "",
-    uploadedBy: uploadedBy || "",
-    description,
-  });
-  const createdGalleryItem = await GalleryItem.findById(galleryItem._id).select(
-    "-password -refreshToken",
-  );
-  if (!createdGalleryItem) {
+
+  const updatedGalleryItem = await GalleryItem.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        title,
+        category,
+        imageUrl,
+        uploadedBy: uploadedBy || galleryItem.uploadedBy,
+        description,
+      },
+    },
+    { new: true },
+  ).select("-password -refreshToken");
+
+  if (!updatedGalleryItem) {
     throw new ApiError(
       500,
-      "Something went wrong while creating the gallery item",
+      "Something went wrong while updating the gallery item",
     );
   }
+
   return res
-    .status(201)
+    .status(200)
     .json(
       new ApiResponse(
         200,
-        createdGalleryItem,
-        "Gallery item created Successfully",
+        updatedGalleryItem,
+        "Gallery item updated Successfully",
       ),
     );
 });

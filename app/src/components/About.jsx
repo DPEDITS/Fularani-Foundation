@@ -22,7 +22,11 @@ const About = () => {
   // Animation variants
   const fadeIn = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] },
+    },
   };
 
   const staggerContainer = {
@@ -118,7 +122,6 @@ const About = () => {
 
   return (
     <div className="bg-[#fbfbfd] min-h-screen pt-20">
-
       {/* Hero Section */}
       <div className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
@@ -284,11 +287,17 @@ const About = () => {
               </div>
 
               <div className="mt-10 flex flex-wrap gap-4">
-                <Link to="/volunteer-register" className="bg-gray-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3">
+                <Link
+                  to="/volunteer-register"
+                  className="bg-gray-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3"
+                >
                   <HandHeart size={20} />
                   Join Our Mission
                 </Link>
-                <Link to="/donor-register" className="bg-rose-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-rose-700 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3">
+                <Link
+                  to="/donor-register"
+                  className="bg-rose-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-rose-700 transition-colors shadow-lg hover:shadow-xl flex items-center gap-3"
+                >
                   <Gift size={20} />
                   Donate Now
                 </Link>
@@ -430,7 +439,10 @@ const About = () => {
                   </span>
                 </li>
               </ul>
-              <Link to="/donor-register" className="block w-full bg-white text-rose-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 transition-colors shadow-xl text-center">
+              <Link
+                to="/donor-register"
+                className="block w-full bg-white text-rose-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 transition-colors shadow-xl text-center"
+              >
                 Donate Now
               </Link>
             </motion.div>
@@ -472,7 +484,10 @@ const About = () => {
                   </span>
                 </li>
               </ul>
-              <Link to="/volunteer-register" className="block w-full bg-white text-rose-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 transition-colors shadow-xl text-center">
+              <Link
+                to="/volunteer-register"
+                className="block w-full bg-white text-rose-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-rose-50 transition-colors shadow-xl text-center"
+              >
                 Become a Volunteer
               </Link>
             </motion.div>
@@ -500,7 +515,10 @@ const About = () => {
               it's volunteering, donating, or partnering, we're here to guide
               you.
             </p>
-            <Link to="/contact" className="inline-block bg-rose-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-rose-700 transition-colors shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transform duration-200">
+            <Link
+              to="/contact"
+              className="inline-block bg-rose-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-rose-700 transition-colors shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transform duration-200"
+            >
               Contact Support
             </Link>
           </motion.div>
