@@ -45,6 +45,7 @@ const DonorRegister = () => {
     gender: "",
     dateOfBirth: "",
     address: "",
+    idType: "PAN",
     skills: "",
     availabilityHours: "",
     preferredAreas: "",
@@ -59,8 +60,21 @@ const DonorRegister = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [touched, setTouched] = useState({});
 
   const totalSteps = role === "donor" ? 2 : 4;
+
+  // Sync role state with URL parameters
+  useEffect(() => {
+    const roleParam = searchParams.get("role");
+    const newRole = roleParam === "volunteer" ? "volunteer" : "donor";
+
+    if (newRole !== role) {
+      setRole(newRole);
+      setCurrentStep(1);
+      setError("");
+    }
+  }, [searchParams, role]);
 
   useEffect(() => {
     if (role === "donor" && isAuthenticated()) {
@@ -71,19 +85,81 @@ const DonorRegister = () => {
   }, [navigate, role]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    setTouched({ ...touched, [name]: true });
+    setError("");
+  };
+
+  const handleBlur = (fieldName) => {
+    setTouched({ ...touched, [fieldName]: true });
+  };
+
+  // Validation functions
+  const getFieldValidation = (fieldName, value) => {
+    if (!touched[fieldName]) return null;
+
+    switch (fieldName) {
+      case 'username':
+        return value.length >= 3;
+      case 'email':
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      case 'password':
+        return value.length >= 6;
+      case 'confirmPassword':
+        return value === form.password && value.length >= 6;
+      case 'phone':
+        return value.length >= 10;
+      case 'panNumber':
+        return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(value);
+      case 'skills':
+      case 'availabilityHours':
+      case 'address':
+        return value.trim().length > 0;
+      case 'gender':
+      case 'dateOfBirth':
+        return value !== '';
+      default:
+        return value.length > 0;
+    }
+  };
+
+  const handleDateChange = (e) => {
+    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+
+    if (value.length >= 2) {
+      value = value.slice(0, 2) + '/' + value.slice(2);
+    }
+    if (value.length >= 5) {
+      value = value.slice(0, 5) + '/' + value.slice(5, 9);
+    }
+
+    setForm({ ...form, dateOfBirth: value });
     setError("");
   };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
+    console.log("Avatar file selected - type:", file?.type, "size:", file?.size, "name:", file?.name);
+
+    // Validate file type
+    if (file && !file.type.startsWith('image/')) {
+      alert("Please choose an image file (jpg, png, etc)");
+      return;
+    }
+
     if (file) {
       setAvatar(file);
-      setAvatarPreview(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const nextStep = () => {
+    // Only validate on step 1, not on other steps
     if (currentStep === 1) {
       if (
         !form.username ||
@@ -95,13 +171,14 @@ const DonorRegister = () => {
         return;
       }
     }
-    setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+    // Clear error and move to next step
     setError("");
+    setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
   };
 
   const prevStep = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
-    setError("");
+    setError(""); // Clear any errors when going back
   };
 
   const handleSubmit = async (e) => {
@@ -109,14 +186,36 @@ const DonorRegister = () => {
     setLoading(true);
     setError("");
 
+    if (currentStep < totalSteps) {
+      nextStep();
+      setLoading(false);
+      return;
+    }
+
     try {
+      if (currentStep !== totalSteps) return;
+
       const formData = new FormData();
       Object.keys(form).forEach((key) => formData.append(key, form[key]));
       if (avatar) formData.append("avatar", avatar);
 
       if (role === "donor") {
+        // Double check we are on the final step for donor
+        if (currentStep !== 2) return;
+
+        if (!form.panNumber?.trim()) {
+          setError("PAN Number is required");
+          setLoading(false);
+          return;
+        }
         await registerDonor(formData);
       } else {
+        console.log("Submitting volunteer registration...");
+        console.log("Avatar state:", avatar);
+        console.log("FormData entries:");
+        for (let pair of formData.entries()) {
+          console.log(pair[0] + ', ' + pair[1]);
+        }
         await registerVolunteer(formData);
       }
       setSuccess(true);
@@ -128,7 +227,7 @@ const DonorRegister = () => {
         2000,
       );
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      setError(err.response?.data?.message || err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -222,38 +321,71 @@ const DonorRegister = () => {
                 Step {currentStep} of {totalSteps}
               </span>
             </div>
-
-            <div className="flex p-1 bg-muted/30 rounded-2xl mb-8 relative">
+            {/* Role Switcher */}
+            <div className="relative flex items-center bg-muted/20 p-1.5 rounded-2xl mb-8">
               <div
-                className={`absolute inset-y-1 w-[calc(50%-4px)] bg-white rounded-xl shadow-sm transition-transform duration-500 ease-out ${role === "volunteer" ? "translate-x-[calc(100%+4px)]" : "translate-x-0"}`}
+                className={`absolute h-[calc(100%-12px)] w-[calc(50%-6px)] bg-primary rounded-xl shadow-lg transition-transform duration-300 ${role === "volunteer" ? "translate-x-[calc(100%+12px)]" : ""}`}
               />
               <button
+                type="button"
                 onClick={() => {
                   setRole("donor");
+                  navigate("/donor-register");
                   setCurrentStep(1);
+                  setError("");
                 }}
-                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "donor" ? "text-primary" : "text-secondary/40"}`}
+                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "donor" ? "text-white" : "text-secondary/40"}`}
               >
                 Donor
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setRole("volunteer");
+                  navigate("/donor-register?role=volunteer");
                   setCurrentStep(1);
+                  setError("");
                 }}
-                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "volunteer" ? "text-primary" : "text-secondary/40"}`}
+                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "volunteer" ? "text-white" : "text-secondary/40"}`}
               >
                 Volunteer
               </button>
             </div>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-xs font-bold border border-red-100 lowercase">
-                {error}
-              </div>
+              <Motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 bg-red-50 border-2 border-red-200 rounded-2xl"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white flex-shrink-0 mt-0.5">
+                    !
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-red-700">
+                      {error}
+                    </p>
+                    <p className="text-xs text-red-600 mt-1">
+                      Please check all required fields and try again.
+                    </p>
+                  </div>
+                </div>
+              </Motion.div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-5"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (currentStep < totalSteps) {
+                    nextStep();
+                  }
+                }
+              }}
+            >
               <AnimatePresence mode="wait">
                 {currentStep === 1 && (
                   <Motion.div
@@ -264,31 +396,37 @@ const DonorRegister = () => {
                     className="space-y-5"
                   >
                     <Field
-                      label="Full Name"
+                      label="Username"
                       icon={<User size={18} />}
                       name="username"
                       value={form.username}
                       onChange={handleChange}
-                      placeholder="John Doe"
+                      onBlur={() => handleBlur('username')}
+                      isValid={getFieldValidation('username', form.username)}
+                      placeholder="your_username"
                     />
                     <Field
                       label="Email"
                       icon={<Mail size={18} />}
-                      type="email"
                       name="email"
+                      type="email"
                       value={form.email}
                       onChange={handleChange}
-                      placeholder="you@mission.org"
+                      onBlur={() => handleBlur('email')}
+                      isValid={getFieldValidation('email', form.email)}
+                      placeholder="you@example.com"
                     />
                     <div className="grid grid-cols-2 gap-4">
                       <Field
                         label="Password"
                         icon={<Lock size={18} />}
-                        type={showPassword ? "text" : "password"}
                         name="password"
+                        type={showPassword ? "text" : "password"}
                         value={form.password}
                         onChange={handleChange}
-                        placeholder="••••"
+                        onBlur={() => handleBlur('password')}
+                        isValid={getFieldValidation('password', form.password)}
+                        placeholder="••••••••"
                         toggleShow={() => setShowPassword(!showPassword)}
                         isShowing={showPassword}
                       />
@@ -323,6 +461,7 @@ const DonorRegister = () => {
                       name="panNumber"
                       value={form.panNumber}
                       onChange={handleChange}
+                      isValid={getFieldValidation('panNumber', form.panNumber)}
                       placeholder="ABCDE1234F"
                     />
                     <div className="flex flex-col items-center justify-center border-2 border-dashed border-muted rounded-3xl p-8 transition-colors hover:border-primary/20 group">
@@ -365,14 +504,23 @@ const DonorRegister = () => {
                       onChange={handleChange}
                       placeholder="+91 0000000000"
                     />
-                    <Field
-                      label="Date of Birth"
-                      icon={<Calendar size={18} />}
-                      name="dateOfBirth"
-                      value={form.dateOfBirth}
-                      onChange={handleChange}
-                      placeholder="YYYY-MM-DD"
-                    />
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
+                        Date of Birth (DD/MM/YYYY)
+                      </label>
+                      <div className="relative">
+                        <Calendar size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary/20" />
+                        <input
+                          type="text"
+                          name="dateOfBirth"
+                          value={form.dateOfBirth}
+                          onChange={handleDateChange}
+                          placeholder="DD/MM/YYYY"
+                          maxLength="10"
+                          className="w-full h-14 pl-14 pr-5 rounded-2xl bg-muted/20 border-none outline-none font-black text-base placeholder:text-gray-300 transition-all focus:ring-2 focus:ring-primary/10"
+                        />
+                      </div>
+                    </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
                         Gender
@@ -384,9 +532,9 @@ const DonorRegister = () => {
                         className="w-full h-14 px-4 rounded-2xl bg-muted/20 border-none outline-none font-black text-base appearance-none cursor-pointer"
                       >
                         <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
                       </select>
                     </div>
                   </Motion.div>
@@ -415,6 +563,25 @@ const DonorRegister = () => {
                       value={form.panNumber}
                       onChange={handleChange}
                       placeholder="ABCDE1234F"
+                    />
+                    <Field
+                      label="Skills (comma-separated)"
+                      icon={<Target size={18} />}
+                      name="skills"
+                      value={form.skills}
+                      onChange={handleChange}
+                      placeholder="Teaching, Cooking, IT, etc"
+                      required
+                    />
+                    <Field
+                      label="Availability (hours/week)"
+                      icon={<Target size={18} />}
+                      name="availabilityHours"
+                      value={form.availabilityHours}
+                      onChange={handleChange}
+                      placeholder="10"
+                      type="number"
+                      required
                     />
                     <Field
                       label="Preferred Areas"
@@ -448,24 +615,34 @@ const DonorRegister = () => {
                         placeholder="What drives you to join us?"
                       />
                     </div>
-                    <div className="flex flex-col items-center justify-center border-2 border-dashed border-muted rounded-2xl p-6">
-                      {avatarPreview ? (
-                        <img
-                          src={avatarPreview}
-                          className="w-16 h-16 rounded-full object-cover mb-4"
-                        />
-                      ) : (
-                        <Camera size={28} className="text-muted mb-4" />
-                      )}
-                      <label className="text-[10px] font-black text-primary uppercase tracking-widest cursor-pointer">
-                        Add Photo
-                        <input
-                          type="file"
-                          className="hidden"
-                          onChange={handleAvatarChange}
-                          accept="image/*"
-                        />
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-primary uppercase tracking-[0.2em] ml-2">
+                        Profile Picture *
                       </label>
+                      <div className="flex flex-col items-center justify-center border-2 border-dashed border-primary/30 rounded-2xl p-6 bg-muted/10 transition-all hover:border-primary group">
+                        {avatarPreview ? (
+                          <img
+                            src={avatarPreview}
+                            alt="Avatar preview"
+                            className="w-20 h-20 rounded-full object-cover mb-3 border-2 border-primary shadow-lg"
+                          />
+                        ) : (
+                          <Camera size={32} className="text-secondary/30 mb-3 group-hover:text-primary transition-colors" />
+                        )}
+                        <label className="cursor-pointer">
+                          <span className="text-[11px] font-black text-primary uppercase tracking-widest hover:underline">
+                            {avatarPreview ? 'Change Photo' : 'Upload Photo'}
+                          </span>
+                          <input
+                            type="file"
+                            className="hidden"
+                            onChange={handleAvatarChange}
+                            accept="image/*"
+                            required
+                          />
+                        </label>
+                        <p className="text-[9px] text-secondary/40 mt-2 uppercase tracking-wider">Required • JPG/PNG</p>
+                      </div>
                     </div>
                   </Motion.div>
                 )}
@@ -511,7 +688,11 @@ const DonorRegister = () => {
               <p className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">
                 Already registered?{" "}
                 <Link
-                  to="/donor-login"
+                  to={
+                    role === "donor"
+                      ? "/donor-login"
+                      : "/donor-login?role=volunteer"
+                  }
                   className="text-primary hover:underline underline-offset-4 decoration-2"
                 >
                   Sign in
@@ -525,31 +706,38 @@ const DonorRegister = () => {
   );
 };
 
-const Field = ({ label, icon, toggleShow, isShowing, ...props }) => (
-  <div className="space-y-1.5">
-    <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
-      {label}
-    </label>
-    <div className="relative">
-      <div className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary/20 flex items-center">
-        {icon}
+const Field = ({ label, icon, toggleShow, isShowing, isValid, ...props }) => {
+  const getBorderColor = () => {
+    if (isValid === null || isValid === undefined) return 'border-transparent';
+    return isValid ? 'border-green-500' : 'border-red-500';
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
+        {label}
+      </label>
+      <div className="relative">
+        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary/20 flex items-center">
+          {icon}
+        </div>
+        <input
+          {...props}
+          className={`w-full h-14 pl-14 ${toggleShow ? "pr-14" : "pr-5"} rounded-2xl bg-muted/20 border-2 ${getBorderColor()} outline-none font-black text-base placeholder:text-gray-300 transition-all duration-300 focus:ring-2 focus:ring-primary/10`}
+        />
+        {toggleShow && (
+          <button
+            type="button"
+            onClick={toggleShow}
+            className="absolute right-5 top-1/2 -translate-y-1/2 text-secondary/30"
+          >
+            {isShowing ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
       </div>
-      <input
-        {...props}
-        className={`w-full h-14 pl-14 ${toggleShow ? "pr-14" : "pr-5"} rounded-2xl bg-muted/20 border-none outline-none font-black text-base placeholder:text-gray-300 transition-all focus:ring-2 focus:ring-primary/10`}
-      />
-      {toggleShow && (
-        <button
-          type="button"
-          onClick={toggleShow}
-          className="absolute right-5 top-1/2 -translate-y-1/2 text-secondary/40 hover:text-secondary transition-colors"
-        >
-          {isShowing ? <EyeOff size={20} /> : <Eye size={20} />}
-        </button>
-      )}
     </div>
-  </div>
-);
+  );
+};
 
 const FileText = ({ size, className }) => (
   <svg
