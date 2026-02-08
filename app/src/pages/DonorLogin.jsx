@@ -124,19 +124,30 @@ const DonorLogin = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-white p-8 md:p-10 rounded-[48px] shadow-2xl border border-secondary/5 relative overflow-hidden max-w-[500px] mx-auto lg:mr-0 lg:ml-auto"
           >
-            <div className="flex p-1 bg-muted/30 rounded-2xl mb-8 relative">
+            {/* Role Switcher */}
+            <div className="relative flex items-center bg-muted/20 p-1.5 rounded-2xl mb-8">
               <div
-                className={`absolute inset-y-1 w-[calc(50%-4px)] bg-white rounded-xl shadow-sm transition-transform duration-500 ease-out ${role === "volunteer" ? "translate-x-[calc(100%+4px)]" : "translate-x-0"}`}
+                className={`absolute h-[calc(100%-12px)] w-[calc(50%-6px)] bg-primary rounded-xl shadow-lg transition-transform duration-300 ${role === "volunteer" ? "translate-x-[calc(100%+12px)]" : ""}`}
               />
               <button
-                onClick={() => setRole("donor")}
-                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors duration-300 ${role === "donor" ? "text-primary" : "text-secondary/40"}`}
+                type="button"
+                onClick={() => {
+                  setRole("donor");
+                  navigate("/donor-login");
+                  setError("");
+                }}
+                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "donor" ? "text-white" : "text-secondary/40"}`}
               >
                 Donor
               </button>
               <button
-                onClick={() => setRole("volunteer")}
-                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors duration-300 ${role === "volunteer" ? "text-primary" : "text-secondary/40"}`}
+                type="button"
+                onClick={() => {
+                  setRole("volunteer");
+                  navigate("/donor-login?role=volunteer");
+                  setError("");
+                }}
+                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "volunteer" ? "text-white" : "text-secondary/40"}`}
               >
                 Volunteer
               </button>
