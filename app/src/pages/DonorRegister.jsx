@@ -140,6 +140,14 @@ const DonorRegister = () => {
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
+    console.log("Avatar file selected - type:", file?.type, "size:", file?.size, "name:", file?.name);
+
+    // Validate file type
+    if (file && !file.type.startsWith('image/')) {
+      alert("Please choose an image file (jpg, png, etc)");
+      return;
+    }
+
     if (file) {
       setAvatar(file);
       const reader = new FileReader();
@@ -178,16 +186,36 @@ const DonorRegister = () => {
     setLoading(true);
     setError("");
 
+    if (currentStep < totalSteps) {
+      nextStep();
+      setLoading(false);
+      return;
+    }
+
     try {
+      if (currentStep !== totalSteps) return;
+
       const formData = new FormData();
       Object.keys(form).forEach((key) => formData.append(key, form[key]));
       if (avatar) formData.append("avatar", avatar);
 
-
-
       if (role === "donor") {
+        // Double check we are on the final step for donor
+        if (currentStep !== 2) return;
+
+        if (!form.panNumber?.trim()) {
+          setError("PAN Number is required");
+          setLoading(false);
+          return;
+        }
         await registerDonor(formData);
       } else {
+        console.log("Submitting volunteer registration...");
+        console.log("Avatar state:", avatar);
+        console.log("FormData entries:");
+        for (let pair of formData.entries()) {
+          console.log(pair[0] + ', ' + pair[1]);
+        }
         await registerVolunteer(formData);
       }
       setSuccess(true);
@@ -199,7 +227,7 @@ const DonorRegister = () => {
         2000,
       );
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      setError(err.response?.data?.message || err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -346,7 +374,18 @@ const DonorRegister = () => {
               </Motion.div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-5"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (currentStep < totalSteps) {
+                    nextStep();
+                  }
+                }
+              }}
+            >
               <AnimatePresence mode="wait">
                 {currentStep === 1 && (
                   <Motion.div
@@ -422,6 +461,7 @@ const DonorRegister = () => {
                       name="panNumber"
                       value={form.panNumber}
                       onChange={handleChange}
+                      isValid={getFieldValidation('panNumber', form.panNumber)}
                       placeholder="ABCDE1234F"
                     />
                     <div className="flex flex-col items-center justify-center border-2 border-dashed border-muted rounded-3xl p-8 transition-colors hover:border-primary/20 group">
@@ -648,7 +688,11 @@ const DonorRegister = () => {
               <p className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">
                 Already registered?{" "}
                 <Link
-                  to="/donor-login"
+                  to={
+                    role === "donor"
+                      ? "/donor-login"
+                      : "/donor-login?role=volunteer"
+                  }
                   className="text-primary hover:underline underline-offset-4 decoration-2"
                 >
                   Sign in
