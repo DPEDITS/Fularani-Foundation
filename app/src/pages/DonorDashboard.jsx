@@ -37,7 +37,24 @@ import {
   updateDonorProfile,
   updateDonorAvatar,
   createDonation,
+  getRazorpayKey,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
 } from "../services/donorService";
+
+const loadScript = (src) => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
+};
 
 const DonorDashboard = () => {
   const navigate = useNavigate();
@@ -92,31 +109,91 @@ const DonorDashboard = () => {
     }
   };
 
-  const handleSimulateDonation = async (amount, isRecurring) => {
+  const handleRazorpayPayment = async (amount, isRecurring) => {
     try {
       setIsUpdating(true);
-      const donor = getDonorUser();
-      const donationData = {
-        donorId: donor._id,
-        amount: parseInt(amount),
+      const res = await loadScript(
+        "https://checkout.razorpay.com/v1/checkout.js",
+      );
+
+      if (!res) {
+        alert("Razorpay SDK failed to load. Are you online?");
+        return;
+      }
+
+      const orderData = await createRazorpayOrder(amount);
+      const { id: order_id, currency } = orderData.data;
+
+      const keyData = await getRazorpayKey();
+      const key = keyData.data.key;
+
+      const donor = getDonorUser(); // Ensure donor info is current
+
+      const options = {
+        key,
+        amount: orderData.data.amount,
         currency: "INR",
-        paymentGateway: "Simulation",
-        paymentId: `sim_${Math.random().toString(36).substr(2, 9)}`,
-        isRecurring: isRecurring,
-        recurringInterval: isRecurring ? "monthly" : "once",
-        recurringId: isRecurring ? `rec_${Math.random().toString(36).substr(2, 9)}` : "na",
-        receiptNumber: `FF-${Date.now()}`,
-        receiptUrl: "https://example.com/receipt.pdf",
-        receiptGeneratedAt: new Date().toISOString(),
-        donatedAt: new Date().toISOString(),
+        name: "Fularani Foundation",
+        description: "Donation Transaction",
+        // image: "https://example.com/logo.png",
+        order_id,
+        handler: async function (response) {
+          try {
+            const verificationData = {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            };
+
+            await verifyRazorpayPayment(verificationData);
+
+            const donationData = {
+              donorId: donor._id,
+              amount: parseInt(amount),
+              currency: "INR",
+              paymentGateway: "Razorpay",
+              paymentId: response.razorpay_payment_id,
+              isRecurring: isRecurring,
+              recurringInterval: isRecurring ? "monthly" : "once",
+              recurringId: isRecurring
+                ? `rec_${Math.random().toString(36).substr(2, 9)}`
+                : "na",
+              receiptNumber: `FF-${Date.now()}`,
+              receiptUrl: "https://example.com/receipt.pdf",
+              receiptGeneratedAt: new Date().toISOString(),
+              donatedAt: new Date().toISOString(),
+            };
+
+            await createDonation(donationData);
+            await fetchDashboardData();
+            setShowDonationModal(false);
+            alert("Donation Successful!");
+          } catch (verifyError) {
+            console.error("Verification failed:", verifyError);
+            alert("Payment verification failed. Please contact support.");
+          }
+        },
+        prefill: {
+          name: donor?.username,
+          contact: donor?.phone,
+          email: donor?.email || "donor@example.com",
+        },
+        notes: {
+          address: "Fularani Foundation Office",
+        },
+        theme: {
+          color: "#F43F5E",
+        },
       };
 
-      await createDonation(donationData);
-      await fetchDashboardData();
-      setShowDonationModal(false);
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
     } catch (err) {
-      console.error("Donation simulation failed:", err);
-      alert("Donation failed. Please try again.");
+      console.error("Payment initiation failed:", err);
+      const errorMessage =
+        err.response?.data?.message ||
+        "Payment initiation failed. Please try again.";
+      alert(errorMessage);
     } finally {
       setIsUpdating(false);
     }
@@ -177,7 +254,9 @@ const DonorDashboard = () => {
             <div className="w-16 h-16 border-4 border-rose-500/10 rounded-full animate-spin border-t-rose-500"></div>
             <Heart className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-rose-500" />
           </div>
-          <p className="text-[#1d1d1f]/60 font-medium">Preparing your insights...</p>
+          <p className="text-[#1d1d1f]/60 font-medium">
+            Preparing your insights...
+          </p>
         </div>
       </main>
     );
@@ -190,7 +269,9 @@ const DonorDashboard = () => {
           <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <ShieldCheck className="w-8 h-8 text-red-500" />
           </div>
-          <p className="text-[#1d1d1f] text-lg font-bold mb-2">Something went wrong</p>
+          <p className="text-[#1d1d1f] text-lg font-bold mb-2">
+            Something went wrong
+          </p>
           <p className="text-[#86868b] mb-8">{error}</p>
           <button
             onClick={fetchDashboardData}
@@ -211,10 +292,17 @@ const DonorDashboard = () => {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
           <div className="flex items-center gap-6">
-            <div className="relative group cursor-pointer" onClick={() => fileInputRef.current.click()}>
+            <div
+              className="relative group cursor-pointer"
+              onClick={() => fileInputRef.current.click()}
+            >
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-[32px] overflow-hidden bg-white shadow-sm border border-black/5 flex items-center justify-center">
                 {user?.avatar ? (
-                  <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+                  <img
+                    src={user.avatar}
+                    alt={user.username}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white text-3xl font-bold">
                     {user?.username?.[0]?.toUpperCase() || "D"}
@@ -237,7 +325,9 @@ const DonorDashboard = () => {
               </div>
             </div>
             <div>
-              <p className="text-[#86868b] font-bold text-xs uppercase tracking-[0.2em] mb-1">Donor Dashboard</p>
+              <p className="text-[#86868b] font-bold text-xs uppercase tracking-[0.2em] mb-1">
+                Donor Dashboard
+              </p>
               <h1 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] tracking-tight">
                 Welcome, {user?.username || "Donor"}
               </h1>
@@ -245,7 +335,9 @@ const DonorDashboard = () => {
                 <span className="px-2.5 py-1 bg-rose-50 text-rose-600 text-[11px] font-bold rounded-lg uppercase tracking-wider flex items-center gap-1">
                   <Award size={12} /> Elite Supporter
                 </span>
-                <span className="text-[#86868b] text-sm font-medium">• Making an Impact</span>
+                <span className="text-[#86868b] text-sm font-medium">
+                  • Making an Impact
+                </span>
               </div>
             </div>
           </div>
@@ -270,10 +362,30 @@ const DonorDashboard = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
-          <StatCard icon={DollarSign} label="Total Given" value={formatCurrency(stats?.totalDonatedAmount || 0)} accent="text-rose-500" />
-          <StatCard icon={Heart} label="Donations" value={stats?.donationCount || 0} accent="text-pink-500" />
-          <StatCard icon={Calendar} label="This Year" value={formatCurrency(stats?.thisYearTotal || 0)} accent="text-blue-500" />
-          <StatCard icon={RefreshCcw} label="Recurring" value={stats?.recurringCount || 0} accent="text-purple-500" />
+          <StatCard
+            icon={DollarSign}
+            label="Total Given"
+            value={formatCurrency(stats?.totalDonatedAmount || 0)}
+            accent="text-rose-500"
+          />
+          <StatCard
+            icon={Heart}
+            label="Donations"
+            value={stats?.donationCount || 0}
+            accent="text-pink-500"
+          />
+          <StatCard
+            icon={Calendar}
+            label="This Year"
+            value={formatCurrency(stats?.thisYearTotal || 0)}
+            accent="text-blue-500"
+          />
+          <StatCard
+            icon={RefreshCcw}
+            label="Recurring"
+            value={stats?.recurringCount || 0}
+            accent="text-purple-500"
+          />
         </div>
 
         {/* Apple Style Tab Switcher */}
@@ -287,10 +399,11 @@ const DonorDashboard = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2.5 px-6 py-2.5 rounded-[14px] text-sm font-bold transition-all duration-300 ${activeTab === tab.id
-                  ? "bg-white text-[#1d1d1f] shadow-md"
-                  : "text-[#86868b] hover:text-[#1d1d1f]"
-                  }`}
+                className={`flex items-center gap-2.5 px-6 py-2.5 rounded-[14px] text-sm font-bold transition-all duration-300 ${
+                  activeTab === tab.id
+                    ? "bg-white text-[#1d1d1f] shadow-md"
+                    : "text-[#86868b] hover:text-[#1d1d1f]"
+                }`}
               >
                 <tab.icon size={16} />
                 {tab.label}
@@ -333,20 +446,27 @@ const DonorDashboard = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-[#1d1d1f]">Make a Donation</h2>
-              <button onClick={() => setShowDonationModal(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <h2 className="text-2xl font-bold text-[#1d1d1f]">
+                Make a Donation
+              </h2>
+              <button
+                onClick={() => setShowDonationModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
                 <X size={20} />
               </button>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="text-xs font-bold text-[#86868b] uppercase tracking-wider mb-2 block">Amount (INR)</label>
+                <label className="text-xs font-bold text-[#86868b] uppercase tracking-wider mb-2 block">
+                  Amount (INR)
+                </label>
                 <div className="grid grid-cols-3 gap-3">
                   {[500, 1000, 2000, 5000, 10000].map((amt) => (
                     <button
                       key={amt}
-                      onClick={() => handleSimulateDonation(amt, false)}
+                      onClick={() => handleRazorpayPayment(amt, false)}
                       className="py-3 px-2 rounded-xl border border-black/5 bg-[#f5f5f7] hover:bg-rose-50 hover:border-rose-200 text-[#1d1d1f] font-bold text-sm transition-all"
                     >
                       ₹{amt}
@@ -358,7 +478,8 @@ const DonorDashboard = () => {
                       placeholder="Custom"
                       className="w-full py-3 px-3 rounded-xl border border-black/5 bg-[#f5f5f7] font-bold text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20"
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleSimulateDonation(e.target.value, false);
+                        if (e.key === "Enter")
+                          handleRazorpayPayment(e.target.value, false);
                       }}
                     />
                   </div>
@@ -369,10 +490,14 @@ const DonorDashboard = () => {
                 <div className="flex gap-3">
                   <RefreshCcw className="text-blue-500 shrink-0" size={20} />
                   <div>
-                    <p className="text-blue-900 font-bold text-sm">Monthly Giving</p>
-                    <p className="text-blue-700/70 text-xs mt-1">Become a recurring donor to provide consistent support.</p>
+                    <p className="text-blue-900 font-bold text-sm">
+                      Monthly Giving
+                    </p>
+                    <p className="text-blue-700/70 text-xs mt-1">
+                      Become a recurring donor to provide consistent support.
+                    </p>
                     <button
-                      onClick={() => handleSimulateDonation(1000, true)}
+                      onClick={() => handleRazorpayPayment(1000, true)}
                       className="mt-3 text-blue-600 font-bold text-xs hover:underline"
                     >
                       Start Monthly ₹1,000 →
@@ -382,7 +507,8 @@ const DonorDashboard = () => {
               </div>
 
               <p className="text-[11px] text-[#86868b] text-center leading-relaxed">
-                This is a simulation. In a production environment, this would redirect you to a secure payment gateway like Razorpay or Stripe.
+                Your contribution goes directly towards our mission.
+                Transactions are secured by Razorpay.
               </p>
             </div>
           </div>
@@ -394,15 +520,25 @@ const DonorDashboard = () => {
 
 const StatCard = ({ icon: Icon, label, value, accent }) => (
   <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5 hover:shadow-md transition-shadow duration-300">
-    <div className={`w-12 h-12 rounded-2xl bg-[#f5f5f7] flex items-center justify-center mb-6`}>
+    <div
+      className={`w-12 h-12 rounded-2xl bg-[#f5f5f7] flex items-center justify-center mb-6`}
+    >
       <Icon size={24} className={accent} />
     </div>
-    <p className="text-[#86868b] text-[13px] font-bold uppercase tracking-widest mb-2">{label}</p>
+    <p className="text-[#86868b] text-[13px] font-bold uppercase tracking-widest mb-2">
+      {label}
+    </p>
     <p className="text-3xl font-bold text-[#1d1d1f] tracking-tight">{value}</p>
   </div>
 );
 
-const OverviewTab = ({ stats, donations, formatCurrency, formatDate, setActiveTab }) => {
+const OverviewTab = ({
+  stats,
+  donations,
+  formatCurrency,
+  formatDate,
+  setActiveTab,
+}) => {
   const recentDonations = donations?.slice(0, 3) || [];
 
   return (
@@ -410,53 +546,80 @@ const OverviewTab = ({ stats, donations, formatCurrency, formatDate, setActiveTa
       {/* Giving Insight */}
       <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5 flex flex-col justify-between">
         <div>
-          <h3 className="text-xl font-bold text-[#1d1d1f] mb-8">Giving Insight</h3>
+          <h3 className="text-xl font-bold text-[#1d1d1f] mb-8">
+            Giving Insight
+          </h3>
           <div className="space-y-8">
             <div className="flex justify-between items-end">
               <div>
-                <p className="text-[#86868b] text-sm font-medium mb-1">Average Donation</p>
-                <p className="text-3xl font-bold text-[#1d1d1f]">{formatCurrency(stats?.averageDonation || 0)}</p>
+                <p className="text-[#86868b] text-sm font-medium mb-1">
+                  Average Donation
+                </p>
+                <p className="text-3xl font-bold text-[#1d1d1f]">
+                  {formatCurrency(stats?.averageDonation || 0)}
+                </p>
               </div>
               <div className="text-right">
-                <span className="text-xs font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded-lg uppercase tracking-tight">Consistent</span>
+                <span className="text-xs font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded-lg uppercase tracking-tight">
+                  Consistent
+                </span>
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-[#86868b]">
                 <span>Donation Frequency</span>
-                <span className="text-[#1d1d1f]">{stats?.avgFrequency || "Monthly"}</span>
+                <span className="text-[#1d1d1f]">
+                  {stats?.avgFrequency || "Monthly"}
+                </span>
               </div>
               <div className="w-full bg-[#f5f5f7] rounded-full h-3 overflow-hidden">
-                <div className="bg-rose-500 h-full rounded-full transition-all duration-1000" style={{ width: '75%' }} />
+                <div
+                  className="bg-rose-500 h-full rounded-full transition-all duration-1000"
+                  style={{ width: "75%" }}
+                />
               </div>
             </div>
           </div>
         </div>
         <p className="text-[#86868b] text-xs leading-relaxed mt-8">
-          Your regular contributions help us maintain long-term community projects. Thank you for your unwavering support.
+          Your regular contributions help us maintain long-term community
+          projects. Thank you for your unwavering support.
         </p>
       </div>
 
       {/* Recent Activity List */}
       <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5">
-        <h3 className="text-xl font-bold text-[#1d1d1f] mb-8">Recent Contributions</h3>
+        <h3 className="text-xl font-bold text-[#1d1d1f] mb-8">
+          Recent Contributions
+        </h3>
         <div className="space-y-4">
-          {recentDonations.length > 0 ? recentDonations.map((donation, i) => (
-            <div key={i} className="flex items-center justify-between p-4 bg-[#f5f5f7] rounded-2xl hover:bg-[#efeff2] transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0">
-                  <Heart size={18} className="text-rose-500" />
+          {recentDonations.length > 0 ? (
+            recentDonations.map((donation, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between p-4 bg-[#f5f5f7] rounded-2xl hover:bg-[#efeff2] transition-colors"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0">
+                    <Heart size={18} className="text-rose-500" />
+                  </div>
+                  <div>
+                    <p className="text-[#1d1d1f] font-bold">
+                      {formatCurrency(donation.amount)}
+                    </p>
+                    <p className="text-[#86868b] text-xs font-medium">
+                      {formatDate(donation.donatedAt)}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[#1d1d1f] font-bold">{formatCurrency(donation.amount)}</p>
-                  <p className="text-[#86868b] text-xs font-medium">{formatDate(donation.donatedAt)}</p>
-                </div>
+                <ArrowUpRight size={18} className="text-[#86868b]" />
               </div>
-              <ArrowUpRight size={18} className="text-[#86868b]" />
-            </div>
-          )) : (
-            <p className="text-[#86868b] text-center py-10 italic">No recent donations yet.</p>
+            ))
+          ) : (
+            <p className="text-[#86868b] text-center py-10 italic">
+              No recent donations yet.
+            </p>
           )}
           {recentDonations.length > 0 && (
             <button
@@ -472,7 +635,12 @@ const OverviewTab = ({ stats, donations, formatCurrency, formatDate, setActiveTa
   );
 };
 
-const DonationsTab = ({ donations, formatCurrency, formatDate, setShowDonationModal }) => (
+const DonationsTab = ({
+  donations,
+  formatCurrency,
+  formatDate,
+  setShowDonationModal,
+}) => (
   <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-black/5">
     <div className="flex items-center justify-between mb-10">
       <h3 className="text-2xl font-bold text-[#1d1d1f]">Donation History</h3>
@@ -486,29 +654,48 @@ const DonationsTab = ({ donations, formatCurrency, formatDate, setShowDonationMo
         <table className="w-full text-left min-w-[600px]">
           <thead>
             <tr className="border-b border-black/5">
-              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest">Date</th>
-              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest">Amount</th>
-              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest">Plan</th>
-              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest text-right">Receipt</th>
+              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest">
+                Date
+              </th>
+              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest">
+                Amount
+              </th>
+              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest">
+                Plan
+              </th>
+              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest text-right">
+                Receipt
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-black/5">
             {donations.map((donation, i) => (
-              <tr key={i} className="group hover:bg-[#fbfbfd] transition-colors">
-                <td className="py-6 px-4 font-bold text-[#1d1d1f]">{formatDate(donation.donatedAt)}</td>
+              <tr
+                key={i}
+                className="group hover:bg-[#fbfbfd] transition-colors"
+              >
+                <td className="py-6 px-4 font-bold text-[#1d1d1f]">
+                  {formatDate(donation.donatedAt)}
+                </td>
                 <td className="py-6 px-4">
-                  <span className="text-xl font-bold text-[#1d1d1f]">{formatCurrency(donation.amount)}</span>
+                  <span className="text-xl font-bold text-[#1d1d1f]">
+                    {formatCurrency(donation.amount)}
+                  </span>
                 </td>
                 <td className="py-6 px-4">
                   {donation.isRecurring ? (
-                    <span className="px-3 py-1 bg-purple-50 text-purple-600 text-[10px] font-black rounded-lg uppercase tracking-tighter">Recurring</span>
+                    <span className="px-3 py-1 bg-purple-50 text-purple-600 text-[10px] font-black rounded-lg uppercase tracking-tighter">
+                      Recurring
+                    </span>
                   ) : (
-                    <span className="px-3 py-1 bg-[#f5f5f7] text-[#86868b] text-[10px] font-black rounded-lg uppercase tracking-tighter">One-time</span>
+                    <span className="px-3 py-1 bg-[#f5f5f7] text-[#86868b] text-[10px] font-black rounded-lg uppercase tracking-tighter">
+                      One-time
+                    </span>
                   )}
                 </td>
                 <td className="py-6 px-4 text-right">
                   <button
-                    onClick={() => window.open(donation.receiptUrl, '_blank')}
+                    onClick={() => window.open(donation.receiptUrl, "_blank")}
                     className="inline-flex items-center gap-1.5 text-rose-500 font-bold text-sm hover:underline"
                   >
                     <Download size={14} /> Download
@@ -521,8 +708,13 @@ const DonationsTab = ({ donations, formatCurrency, formatDate, setShowDonationMo
       </div>
     ) : (
       <div className="text-center py-20 bg-[#fbfbfd] rounded-3xl border border-dashed border-black/10">
-        <DollarSign size={40} className="mx-auto text-[#86868b] mb-4 opacity-30" />
-        <p className="text-[#86868b] font-medium">Your donation history is currently empty.</p>
+        <DollarSign
+          size={40}
+          className="mx-auto text-[#86868b] mb-4 opacity-30"
+        />
+        <p className="text-[#86868b] font-medium">
+          Your donation history is currently empty.
+        </p>
         <button
           onClick={() => setShowDonationModal(true)}
           className="mt-6 text-rose-500 font-bold text-sm hover:underline"
@@ -568,7 +760,9 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
     } catch (err) {
       console.error("Update error:", err);
       // Show error from backend if available
-      const errorMessage = err.response?.data?.message || "Failed to update profile. Please try again.";
+      const errorMessage =
+        err.response?.data?.message ||
+        "Failed to update profile. Please try again.";
       alert(errorMessage);
     }
   };
@@ -577,7 +771,9 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
     <div className="space-y-8 relative">
       {showSuccess && (
         <div className="fixed top-24 right-8 z-[110] bg-green-500 text-white px-6 py-3 rounded-2xl shadow-lg shadow-green-500/20 flex items-center gap-3 animate-in slide-in-from-right duration-500">
-          <div className="bg-white/20 p-1 rounded-full"><Check size={16} /></div>
+          <div className="bg-white/20 p-1 rounded-full">
+            <Check size={16} />
+          </div>
           <p className="font-bold text-sm">Profile updated successfully!</p>
         </div>
       )}
@@ -588,8 +784,12 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
             <User size={28} className="text-[#86868b]" />
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-[#1d1d1f] tracking-tight">Identity Settings</h3>
-            <p className="text-[#86868b] text-sm font-medium">Manage your personal information and preferences</p>
+            <h3 className="text-2xl font-bold text-[#1d1d1f] tracking-tight">
+              Identity Settings
+            </h3>
+            <p className="text-[#86868b] text-sm font-medium">
+              Manage your personal information and preferences
+            </p>
           </div>
         </div>
         {!isEditing ? (
@@ -612,7 +812,13 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
               disabled={isUpdating}
               className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#1d1d1f] text-white font-bold text-sm hover:bg-black transition-all disabled:opacity-50"
             >
-              {isUpdating ? "Saving..." : <><Check size={16} /> Save Changes</>}
+              {isUpdating ? (
+                "Saving..."
+              ) : (
+                <>
+                  <Check size={16} /> Save Changes
+                </>
+              )}
             </button>
           </div>
         )}
@@ -620,7 +826,9 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
 
       <div className="grid md:grid-cols-2 gap-8">
         <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5">
-          <h3 className="text-lg font-bold text-[#1d1d1f] mb-8">Contact Information</h3>
+          <h3 className="text-lg font-bold text-[#1d1d1f] mb-8">
+            Contact Information
+          </h3>
           <div className="space-y-6">
             <ProfileField
               icon={User}
@@ -651,7 +859,9 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
         </div>
 
         <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5">
-          <h3 className="text-lg font-bold text-[#1d1d1f] mb-8">Fiscal Identity</h3>
+          <h3 className="text-lg font-bold text-[#1d1d1f] mb-8">
+            Fiscal Identity
+          </h3>
           <div className="space-y-6">
             <ProfileField
               icon={FileText}
@@ -671,16 +881,31 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
                     type="checkbox"
                     className="peer hidden"
                     checked={formData.wants80GReceipt}
-                    onChange={(e) => isEditing && setFormData({ ...formData, wants80GReceipt: e.target.checked })}
+                    onChange={(e) =>
+                      isEditing &&
+                      setFormData({
+                        ...formData,
+                        wants80GReceipt: e.target.checked,
+                      })
+                    }
                     disabled={!isEditing}
                   />
-                  <div className={`w-5 h-5 rounded border-2 transition-all flex items-center justify-center ${formData.wants80GReceipt ? 'bg-rose-500 border-rose-500' : 'bg-transparent border-gray-300'}`}>
-                    {formData.wants80GReceipt && <Check size={14} className="text-white" />}
+                  <div
+                    className={`w-5 h-5 rounded border-2 transition-all flex items-center justify-center ${formData.wants80GReceipt ? "bg-rose-500 border-rose-500" : "bg-transparent border-gray-300"}`}
+                  >
+                    {formData.wants80GReceipt && (
+                      <Check size={14} className="text-white" />
+                    )}
                   </div>
                 </div>
                 <div>
-                  <p className="text-[#1d1d1f] font-bold text-sm">Automated 80G Receipts</p>
-                  <p className="text-[#86868b] text-[11px] leading-relaxed mt-1">Receive tax exemption certificates automatically in your email after every donation.</p>
+                  <p className="text-[#1d1d1f] font-bold text-sm">
+                    Automated 80G Receipts
+                  </p>
+                  <p className="text-[#86868b] text-[11px] leading-relaxed mt-1">
+                    Receive tax exemption certificates automatically in your
+                    email after every donation.
+                  </p>
                 </div>
               </label>
             </div>
@@ -695,12 +920,19 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
             <ShieldCheck size={32} className="text-rose-500" />
           </div>
           <div className="flex-1">
-            <h4 className="text-xl font-bold text-rose-900 mb-1">Tax Benefits (Sec 80G)</h4>
+            <h4 className="text-xl font-bold text-rose-900 mb-1">
+              Tax Benefits (Sec 80G)
+            </h4>
             <p className="text-rose-700/70 text-sm leading-relaxed max-w-2xl">
-              All your donations to Fularani Foundation are 50% tax-exempt under Section 80G of the Income Tax Act. Ensure your PAN is updated to receive accurate receipts.
+              All your donations to Fularani Foundation are 50% tax-exempt under
+              Section 80G of the Income Tax Act. Ensure your PAN is updated to
+              receive accurate receipts.
             </p>
           </div>
-          <a href="/about" className="px-6 py-3 bg-white text-rose-500 rounded-2xl font-bold text-sm shadow-sm hover:shadow-md transition-all">
+          <a
+            href="/about"
+            className="px-6 py-3 bg-white text-rose-500 rounded-2xl font-bold text-sm shadow-sm hover:shadow-md transition-all"
+          >
             Learn More
           </a>
         </div>
@@ -709,13 +941,24 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
   );
 };
 
-const ProfileField = ({ icon: Icon, label, value, isEditing, onChange, type = "text", placeholder, isReadOnly = false }) => (
+const ProfileField = ({
+  icon: Icon,
+  label,
+  value,
+  isEditing,
+  onChange,
+  type = "text",
+  placeholder,
+  isReadOnly = false,
+}) => (
   <div className="flex items-start gap-5">
     <div className="w-10 h-10 rounded-xl bg-[#f5f5f7] flex items-center justify-center shrink-0">
       <Icon size={18} className="text-[#86868b]" />
     </div>
     <div className="flex-1">
-      <p className="text-[#86868b] text-[11px] font-bold uppercase tracking-wider mb-0.5">{label}</p>
+      <p className="text-[#86868b] text-[11px] font-bold uppercase tracking-wider mb-0.5">
+        {label}
+      </p>
       {isEditing && !isReadOnly ? (
         <input
           type={type}
@@ -726,11 +969,17 @@ const ProfileField = ({ icon: Icon, label, value, isEditing, onChange, type = "t
         />
       ) : (
         <div className="flex items-center gap-2">
-          <p className={`text-[#1d1d1f] font-bold text-[15px] min-h-[22.5px] ${isReadOnly && isEditing ? "opacity-50" : ""}`}>
+          <p
+            className={`text-[#1d1d1f] font-bold text-[15px] min-h-[22.5px] ${isReadOnly && isEditing ? "opacity-50" : ""}`}
+          >
             {value || "—"}
           </p>
           {isReadOnly && isEditing && (
-            <ShieldCheck size={14} className="text-[#86868b]" title="Verified & Immutable" />
+            <ShieldCheck
+              size={14}
+              className="text-[#86868b]"
+              title="Verified & Immutable"
+            />
           )}
         </div>
       )}

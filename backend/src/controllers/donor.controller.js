@@ -242,14 +242,16 @@ const getDonorStats = asyncHandler(async (req, res) => {
 
   const recurringDonations = donations.filter(d => d.isRecurring);
 
+  const calculatedTotal = donations.reduce((sum, d) => sum + d.amount, 0);
+
   const stats = {
-    totalDonatedAmount: donor?.totalDonatedAmount || 0,
-    donationCount: donor?.donationCount || donations.length,
+    totalDonatedAmount: calculatedTotal,
+    donationCount: donations.length,
     thisYearTotal,
     thisYearCount: thisYearDonations.length,
     recurringCount: recurringDonations.length,
     averageDonation: donations.length > 0
-      ? Math.round(donations.reduce((sum, d) => sum + d.amount, 0) / donations.length)
+      ? Math.round(calculatedTotal / donations.length)
       : 0
   };
 

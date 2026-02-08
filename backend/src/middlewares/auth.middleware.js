@@ -15,6 +15,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
       throw new ApiError(401, "Unauthorized request");
     }
 
+    // console.log("Verifying token:", token);
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
     // Check both Volunteer and Donor models for the user
@@ -35,6 +36,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     req.user = user;
     next();
   } catch (error) {
+    console.error("JWT Verification Error:", error);
     throw new ApiError(401, error?.message || "Invalid access token");
   }
 });
