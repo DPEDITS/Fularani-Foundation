@@ -33,6 +33,7 @@ const volunteerSchema = new Schema(
     },
     avatar: {
       type: String, // cloudinary url
+      default: "",
     },
     password: {
       type: String,

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, CheckCircle2 } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle2, MessageSquare, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import emailjs from "@emailjs/browser";
 

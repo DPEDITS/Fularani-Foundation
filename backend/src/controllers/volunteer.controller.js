@@ -96,8 +96,13 @@ const registerVolunteer = asyncHandler(async (req, res) => {
   if (!gender?.trim()) throw new ApiError(400, "Gender is required");
   if (!phone?.trim()) throw new ApiError(400, "Phone number is required");
   if (!address?.trim()) throw new ApiError(400, "Address is required");
-  if (!idType?.trim()) throw new ApiError(400, "ID Type is required");
   if (!panNumber?.trim()) throw new ApiError(400, "PAN Number is required");
+
+  // Normalize gender to lowercase for enum compatibility
+  const normalizedGender = gender.toLowerCase();
+
+  // Default idType to "PAN" if not provided
+  const normalizedIdType = idType?.trim() || "PAN";
 
   // Improved skills validation and parsing
   let skillsArray = [];
@@ -130,27 +135,34 @@ const registerVolunteer = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with email or username already exists");
   }
 
-  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  const avatarLocalPath = req.file?.path;
   console.log("Avatar local path:", avatarLocalPath);
 
-  let avatar;
-  if (avatarLocalPath) {
-    avatar = await uploadOnCloudinary(avatarLocalPath);
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar is required for volunteer registration");
   }
 
-  if (!avatar) {
-    throw new ApiError(400, "Avatar is required for volunteers. Please ensure you upload a valid image.");
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  if (!avatar || !avatar.url) {
+    throw new ApiError(400, "Error uploading avatar. Please try again.");
   }
 
   const avatarUrl = avatar.url;
 
   let parsedDateOfBirth = dateOfBirth;
+
+  // Handle dd/mm/yyyy format from frontend
   const ddmmyyyyRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
   if (typeof dateOfBirth === "string") {
     const match = dateOfBirth.match(ddmmyyyyRegex);
     if (match) {
       const [_, day, month, year] = match;
+      // Create date object: month is 0-indexed in JavaScript
       parsedDateOfBirth = new Date(year, month - 1, day);
+    } else {
+      // Try parsing as ISO format (fallback)
+      parsedDateOfBirth = new Date(dateOfBirth);
     }
   }
 
@@ -159,11 +171,11 @@ const registerVolunteer = asyncHandler(async (req, res) => {
     email,
     password: password, // Note: Schema handles hashing via pre-save hook
     avatar: avatarUrl,
-    gender,
+    gender: normalizedGender,
     phone,
     dateOfBirth: parsedDateOfBirth,
     address,
-    idType,
+    idType: normalizedIdType,
     panNumber,
     skills: skillsArray,
     availabilityHours,
