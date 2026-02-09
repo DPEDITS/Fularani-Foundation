@@ -9,7 +9,7 @@ const TrustStrip = () => {
   ];
 
   return (
-    <section className="bg-secondary text-white py-12 md:py-16 relative overflow-hidden">
+    <section className="bg-secondary text-white py-8 md:py-16 relative overflow-hidden">
       {/* Decorative pulse element */}
       <div className="absolute top-0 right-1/4 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
 

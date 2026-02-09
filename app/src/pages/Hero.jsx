@@ -28,32 +28,32 @@ const Hero = () => {
       {/* Main Content Area */}
       <div className="relative z-10 flex-grow flex flex-col lg:flex-row items-center pt-13">
         {/* Left Side: Impact Text */}
-        <div className="w-full lg:w-1/2 px-6 md:px-12 lg:px-20 py-12 lg:py-0 pt-32 lg:pt-0">
+        <div className="w-full lg:w-1/2 px-6 md:px-12 lg:px-20 py-8 lg:py-0 pt-20 lg:pt-0">
           <Motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-5xl md:text-7xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-8 ">
+            <h1 className="text-4xl md:text-7xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-4 lg:mb-8 ">
               Empowering Dreams <br />
-              <span className="text-accent underline decoration-primary decoration-8 underline-offset-8">
+              <span className="text-accent underline decoration-primary decoration-4 lg:decoration-8 underline-offset-4 lg:underline-offset-8">
                 inspiring
               </span>{" "}
               <br />{" "}
-              <span className="text-white bg-primary px-4 py-1 inline-block -rotate-1">
+              <span className="text-white bg-primary px-2 lg:px-4 py-1 inline-block -rotate-1">
                 humanity.
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground max-w-xl mb-12 font-bold leading-tight">
+            <p className="text-base md:text-xl text-muted-foreground max-w-xl mb-6 lg:mb-12 font-bold leading-tight">
               A systemic approach to Education, Sustainability, and Healthcare
               in Bhadrak. Join the Fularani movement today.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <a
                 href="/donor-register"
-                className="bg-accent hover:bg-accent/80 text-secondary px-10 py-5 rounded-xl text-lg font-black uppercase tracking-tight transition-all shadow-2xl shadow-accent/30 hover:translate-y-[-4px] flex items-center justify-center gap-3 group"
+                className="bg-accent hover:bg-accent/80 text-secondary px-8 py-4 lg:px-10 lg:py-5 rounded-xl text-base lg:text-lg font-black uppercase tracking-tight transition-all shadow-2xl shadow-accent/30 hover:translate-y-[-4px] flex items-center justify-center gap-3 group"
               >
                 Donate Now
                 <Heart
@@ -63,7 +63,7 @@ const Hero = () => {
               </a>
               <a
                 href="/missions"
-                className="bg-secondary hover:bg-black text-white px-10 py-5 rounded-xl text-lg font-black uppercase tracking-tight transition-all flex items-center justify-center gap-3 group"
+                className="bg-secondary hover:bg-black text-white px-8 py-4 lg:px-10 lg:py-5 rounded-xl text-base lg:text-lg font-black uppercase tracking-tight transition-all flex items-center justify-center gap-3 group"
               >
                 Our Work
                 <ArrowRight
@@ -132,12 +132,17 @@ const Hero = () => {
             transition={{ duration: 1.5, ease: "easeOut" }}
             className="w-full h-full"
           >
+            <img
+              src={heroBg}
+              alt="Fularani Foundation Impact"
+              className="absolute inset-0 w-full h-full object-cover grayscale md:hidden"
+            />
             <video
               autoPlay
               muted
               loop
               playsInline
-              className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+              className="hidden md:block absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
             >
               <source src="/PXL_20230110_133736033.mp4" type="video/mp4" />
             </video>
