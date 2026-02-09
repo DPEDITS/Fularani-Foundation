@@ -87,7 +87,8 @@ const DonorRegister = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-    setTouched({ ...touched, [name]: true });
+    // Remove immediate touched marking to prevent red borders while typing
+    // setTouched({ ...touched, [name]: true });
     setError("");
   };
 
@@ -461,7 +462,6 @@ const DonorRegister = () => {
                       name="panNumber"
                       value={form.panNumber}
                       onChange={handleChange}
-                      isValid={getFieldValidation('panNumber', form.panNumber)}
                       placeholder="ABCDE1234F"
                     />
                     <div className="flex flex-col items-center justify-center border-2 border-dashed border-muted rounded-3xl p-8 transition-colors hover:border-primary/20 group">
