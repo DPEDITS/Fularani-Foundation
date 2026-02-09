@@ -3,7 +3,7 @@ import { motion as Motion, AnimatePresence } from "motion/react";
 import { ArrowRight, Play, Heart, ShieldCheck } from "lucide-react";
 import heroBg from "../assets/missions1.jpeg";
 
-const cHero = () => {
+const Hero = () => {
   const impactBadges = [
     { text: "Urgent: Support Education", color: "#ffc20e" }, // accent
     { text: "Help: Mission Thalassemia", color: "#e11d48" }, // rose-600
@@ -35,7 +35,7 @@ const cHero = () => {
       <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/10 -skew-x-12 translate-x-1/2 z-0 hidden lg:block"></div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex-grow flex flex-col-reverse lg:flex-row items-center pt-13">
+      <div className="relative z-10 flex-grow flex flex-col-reverse lg:flex-row items-center pt-1">
         {/* Left Side: Impact Text */}
         <div className="w-full lg:w-1/2 px-6 py-2 md:px-12 lg:px-20 lg:py-0 lg:pt-0">
           <Motion.div
@@ -43,7 +43,7 @@ const cHero = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-5xl md:text-7xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-4 lg:mb-8 ">
+            <h1 className="text-5xl md:text-7xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-3 lg:mb-8 ">
               Empowering Dreams <br />
               <span className="text-accent underline decoration-primary decoration-4 lg:decoration-8 underline-offset-4 lg:underline-offset-8">
                 inspiring
@@ -83,7 +83,7 @@ const cHero = () => {
             </div>
 
             {/* Trust Badges */}
-            <div className="mt-8 lg:mt-14 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-muted pt-4 lg:pt-8">
+            <div className="mt-6 lg:mt-14 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-muted pt-4 lg:pt-8">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={24} className="text-primary" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-secondary/60">
@@ -113,7 +113,7 @@ const cHero = () => {
         {/* Right Side: Impact Imagery (Now Video) */}
         <div className="block w-full lg:w-1/2 h-[50vh] lg:h-screen relative overflow-hidden bg-secondary">
           {/* Floating Badge */}
-          <div className="absolute top-10 right-10 z-[40] inline-flex items-center gap-2 bg-white/90 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-2xl shadow-black/10 border border-white/20 overflow-hidden">
+          <div className="hidden md:inline-flex absolute top-10 right-10 z-[40] items-center gap-2 bg-white/90 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-2xl shadow-black/10 border border-white/20 overflow-hidden">
             <Motion.span
               animate={{ backgroundColor: impactBadges[currentBadge].color }}
               transition={{ duration: 0.8 }}
@@ -164,18 +164,18 @@ const cHero = () => {
           </Motion.div>
 
           {/* Floating Impact Card */}
-          <div className="absolute bottom-10 right-10 z-30 hidden md:block">
-            <div className="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-white/20 max-w-[280px]">
-              <div className="flex -space-x-3 mb-4">
+          <div className="absolute bottom-2 right-2 md:bottom-10 md:right-10 z-30 block">
+            <div className="bg-white/90 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-white/20 max-w-[280px]">
+              <div className="flex -space-x-3 mb-1">
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
-                    className={`w-10 h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[10px] font-black text-white`}
+                    className={`w-8 h-8 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[8px] font-black text-white`}
                   >
                     FF
                   </div>
                 ))}
-                <div className="w-10 h-10 rounded-full border-2 border-white bg-accent flex items-center justify-center text-[10px] font-black text-secondary">
+                <div className="w-8 h-8 rounded-full border-2 border-white bg-accent flex items-center justify-center text-[8px] font-black text-secondary">
                   +5k
                 </div>
               </div>
