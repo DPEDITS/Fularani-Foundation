@@ -3,7 +3,7 @@ import { motion as Motion, AnimatePresence } from "motion/react";
 import { ArrowRight, Play, Heart, ShieldCheck } from "lucide-react";
 import heroBg from "../assets/missions1.jpeg";
 
-const Hero = () => {
+const cHero = () => {
   const impactBadges = [
     { text: "Urgent: Support Education", color: "#ffc20e" }, // accent
     { text: "Help: Mission Thalassemia", color: "#e11d48" }, // rose-600
