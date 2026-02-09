@@ -15,11 +15,39 @@ const Hero = () => {
   const videoRef = React.useRef(null);
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch((error) => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const playVideo = async () => {
+      try {
+        video.muted = true; // Ensure muted for autoplay
+        await video.play();
+      } catch (error) {
         console.log("Video autoplay failed:", error);
-      });
-    }
+      }
+    };
+
+    // Try to play when video can play
+    video.addEventListener("canplay", playVideo);
+
+    // Also try immediately
+    playVideo();
+
+    // Fallback: play on first user interaction (touch/click)
+    const handleInteraction = () => {
+      playVideo();
+      document.removeEventListener("touchstart", handleInteraction);
+      document.removeEventListener("click", handleInteraction);
+    };
+
+    document.addEventListener("touchstart", handleInteraction, { once: true });
+    document.addEventListener("click", handleInteraction, { once: true });
+
+    return () => {
+      video.removeEventListener("canplay", playVideo);
+      document.removeEventListener("touchstart", handleInteraction);
+      document.removeEventListener("click", handleInteraction);
+    };
   }, []);
 
   useEffect(() => {
@@ -35,7 +63,7 @@ const Hero = () => {
       <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/10 -skew-x-12 translate-x-1/2 z-0 hidden lg:block"></div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex-grow flex flex-col-reverse lg:flex-row items-center pt-1">
+      <div className="relative z-10 flex-grow flex flex-col-reverse lg:flex-row items-center pt-9">
         {/* Left Side: Impact Text */}
         <div className="w-full lg:w-1/2 px-6 py-2 md:px-12 lg:px-20 lg:py-0 lg:pt-0">
           <Motion.div
@@ -135,25 +163,16 @@ const Hero = () => {
             </div>
           </div>
 
-          <Motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            className="w-full h-full"
-          >
-            <img
-              src={heroBg}
-              alt="Fularani Foundation Impact"
-              className="absolute inset-0 w-full h-full object-cover grayscale hidden"
-            />
+          <div className="w-full h-full">
             <video
               ref={videoRef}
               autoPlay
               muted
               loop
               playsInline
-              webkit-playsinline="true"
-              className="block absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+              preload="auto"
+              poster={heroBg}
+              className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
             >
               <source src="/PXL_20230110_133736033.mp4" type="video/mp4" />
             </video>
@@ -161,7 +180,7 @@ const Hero = () => {
             {/* Mask/Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-white via-white/20 to-transparent z-10 transition-opacity"></div>
             <div className="absolute inset-0 bg-secondary/20 z-0"></div>
-          </Motion.div>
+          </div>
 
           {/* Floating Impact Card */}
           <div className="absolute bottom-2 right-2 md:bottom-10 md:right-10 z-30 block">
