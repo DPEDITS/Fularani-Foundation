@@ -44,22 +44,22 @@ const BentoGrid = () => {
   ];
 
   return (
-    <section className="py-24 md:py-32 bg-white">
+    <section className="py-12 md:py-32 bg-white">
       <div className="max-w-[1200px] mx-auto px-6">
-        <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="mb-10 md:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
           <div className="max-w-2xl">
             <div className="inline-block bg-primary px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
               What We Do
             </div>
-            <h2 className="text-5xl md:text-7xl font-black text-secondary tracking-tighter leading-none lowercase">
+            <h2 className="text-3xl md:text-7xl font-black text-secondary tracking-tighter leading-none lowercase">
               our core <br />
-              <span className="text-accent underline decoration-primary decoration-8 underline-offset-4">
+              <span className="text-accent underline decoration-primary decoration-4 md:decoration-8 underline-offset-4">
                 missions
               </span>
               .
             </h2>
           </div>
-          <p className="text-lg font-bold text-muted-foreground max-w-sm leading-tight">
+          <p className="text-base md:text-lg font-bold text-muted-foreground max-w-sm leading-tight">
             Systemic solutions for community resilience, driven by transparency
             and local leadership.
           </p>
@@ -80,11 +80,11 @@ const BentoGrid = () => {
               </div>
             </div>
 
-            <div className="absolute bottom-0 left-0 p-10 md:p-12 w-full">
+            <div className="absolute bottom-0 left-0 p-6 md:p-12 w-full">
               <span className="text-primary font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">
                 Mission Education
               </span>
-              <h3 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter leading-[1] lowercase">
+              <h3 className="text-2xl md:text-6xl font-black text-white mb-4 md:mb-6 tracking-tighter leading-[1] lowercase">
                 breaking the cycle <br /> through{" "}
                 <span className="text-primary">learning.</span>
               </h3>
@@ -102,7 +102,7 @@ const BentoGrid = () => {
           </div>
 
           {/* Secondary Cards */}
-          <div className="relative group overflow-hidden bg-primary p-10 shadow-2xl flex flex-col justify-between">
+          <div className="relative group overflow-hidden bg-primary p-6 md:p-10 shadow-2xl flex flex-col justify-between">
             <div className="space-y-4">
               <Leaf size={40} className="text-white" />
               <h3 className="text-3xl font-black text-white tracking-tighter leading-none lowercase">
@@ -117,7 +117,7 @@ const BentoGrid = () => {
             </a>
           </div>
 
-          <div className="relative group overflow-hidden bg-muted p-10 shadow-2xl flex flex-col justify-between border border-secondary/5">
+          <div className="relative group overflow-hidden bg-muted p-6 md:p-10 shadow-2xl flex flex-col justify-between border border-secondary/5">
             <div className="space-y-4">
               <HeartPulse size={40} className="text-accent" />
               <h3 className="text-3xl font-black text-secondary tracking-tighter leading-none lowercase">
