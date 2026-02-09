@@ -48,10 +48,10 @@ const BentoGrid = () => {
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="mb-10 md:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
           <div className="max-w-2xl">
-            <div className="inline-block bg-primary px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
+            <div className="inline-block bg-primary px-4 py-1 rounded-sm text-[15px] font-bold text-white uppercase tracking-widest text-secondary mb-4">
               What We Do
             </div>
-            <h2 className="text-3xl md:text-7xl font-black text-secondary tracking-tighter leading-none lowercase">
+            <h2 className="text-5xl md:text-7xl font-black text-secondary tracking-tighter leading-none lowercase">
               our core <br />
               <span className="text-accent underline decoration-primary decoration-4 md:decoration-8 underline-offset-4">
                 missions
@@ -67,7 +67,7 @@ const BentoGrid = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-8 h-auto md:h-[700px]">
           {/* Main Card (Large) */}
-          <div className="md:col-span-2 md:row-span-2 relative group overflow-hidden bg-secondary shadow-2xl">
+          <div className="md:col-span-2 md:row-span-2 relative group overflow-hidden bg-secondary shadow-2xl min-h-[600px] md:min-h-0">
             <div
               className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105 opacity-40 grayscale hover:grayscale-0 transition-all"
               style={{ backgroundImage: `url(${missionsBg})` }}
@@ -80,7 +80,7 @@ const BentoGrid = () => {
               </div>
             </div>
 
-            <div className="absolute bottom-0 left-0 p-6 md:p-12 w-full">
+            <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full">
               <span className="text-primary font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">
                 Mission Education
               </span>
