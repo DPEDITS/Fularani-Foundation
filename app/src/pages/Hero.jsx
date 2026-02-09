@@ -12,6 +12,15 @@ const Hero = () => {
     { text: "Pride: Mission Period Pride", color: "#db2777" }, // pink-600
   ];
   const [currentBadge, setCurrentBadge] = useState(0);
+  const videoRef = React.useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch((error) => {
+        console.log("Video autoplay failed:", error);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -26,15 +35,15 @@ const Hero = () => {
       <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/10 -skew-x-12 translate-x-1/2 z-0 hidden lg:block"></div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex-grow flex flex-col lg:flex-row items-center pt-13">
+      <div className="relative z-10 flex-grow flex flex-col-reverse lg:flex-row items-center pt-13">
         {/* Left Side: Impact Text */}
-        <div className="w-full lg:w-1/2 px-6 md:px-12 lg:px-20 py-8 lg:py-0 pt-20 lg:pt-0">
+        <div className="w-full lg:w-1/2 px-6 py-2 md:px-12 lg:px-20 lg:py-0 lg:pt-0">
           <Motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-4xl md:text-7xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-4 lg:mb-8 ">
+            <h1 className="text-5xl md:text-7xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-4 lg:mb-8 ">
               Empowering Dreams <br />
               <span className="text-accent underline decoration-primary decoration-4 lg:decoration-8 underline-offset-4 lg:underline-offset-8">
                 inspiring
@@ -74,7 +83,7 @@ const Hero = () => {
             </div>
 
             {/* Trust Badges */}
-            <div className="mt-16 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-muted pt-8">
+            <div className="mt-8 lg:mt-14 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-muted pt-4 lg:pt-8">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={24} className="text-primary" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-secondary/60">
@@ -102,7 +111,7 @@ const Hero = () => {
         </div>
 
         {/* Right Side: Impact Imagery (Now Video) */}
-        <div className="hidden lg:block w-full lg:w-1/2 h-[50vh] lg:h-screen relative overflow-hidden bg-secondary">
+        <div className="block w-full lg:w-1/2 h-[50vh] lg:h-screen relative overflow-hidden bg-secondary">
           {/* Floating Badge */}
           <div className="absolute top-10 right-10 z-[40] inline-flex items-center gap-2 bg-white/90 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-2xl shadow-black/10 border border-white/20 overflow-hidden">
             <Motion.span
@@ -135,20 +144,22 @@ const Hero = () => {
             <img
               src={heroBg}
               alt="Fularani Foundation Impact"
-              className="absolute inset-0 w-full h-full object-cover grayscale md:hidden"
+              className="absolute inset-0 w-full h-full object-cover grayscale hidden"
             />
             <video
+              ref={videoRef}
               autoPlay
               muted
               loop
               playsInline
-              className="hidden md:block absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+              webkit-playsinline="true"
+              className="block absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
             >
               <source src="/PXL_20230110_133736033.mp4" type="video/mp4" />
             </video>
 
             {/* Mask/Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white via-white/20 to-transparent z-10 transition-opacity"></div>
+            <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-white via-white/20 to-transparent z-10 transition-opacity"></div>
             <div className="absolute inset-0 bg-secondary/20 z-0"></div>
           </Motion.div>
 
