@@ -102,7 +102,7 @@ const Hero = () => {
         </div>
 
         {/* Right Side: Impact Imagery (Now Video) */}
-        <div className="w-full lg:w-1/2 h-[50vh] lg:h-screen relative overflow-hidden bg-secondary">
+        <div className="hidden lg:block w-full lg:w-1/2 h-[50vh] lg:h-screen relative overflow-hidden bg-secondary">
           {/* Floating Badge */}
           <div className="absolute top-10 right-10 z-[40] inline-flex items-center gap-2 bg-white/90 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-2xl shadow-black/10 border border-white/20 overflow-hidden">
             <Motion.span

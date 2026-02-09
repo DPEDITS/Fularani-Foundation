@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://fularani-frontend.onrender.com"
+  "https://fularani-foundation-1.onrender.com"
 ];
 
 app.use(

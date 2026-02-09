@@ -76,11 +76,10 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 border-b ${
-          scrolled
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 border-b ${scrolled
             ? "bg-white/95 backdrop-blur-md border-secondary/10 shadow-sm py-2"
             : "bg-white border-transparent py-3"
-        }`}
+          }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between">
           {/* Logo Section */}
@@ -190,7 +189,7 @@ const Navbar = () => {
                 >
                   Join Us
                 </Link>
-                <Link to="/donor-register">
+                <Link to="/donor-register" className="hidden lg:block">
                   <button className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-tight shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:translate-y-0">
                     Donate Now
                   </button>
