@@ -71,6 +71,7 @@ const Navbar = () => {
     { name: "Our Missions", link: "/missions" },
     { name: "CSR Partnership", link: "/csr-partnership" },
     { name: "Our Works", link: "/gallery" },
+    { name: "Contact", link: "/contact" },
   ];
 
   return (
