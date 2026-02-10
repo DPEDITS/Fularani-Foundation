@@ -37,7 +37,24 @@ import {
   updateDonorProfile,
   updateDonorAvatar,
   createDonation,
+  getRazorpayKey,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
 } from "../services/donorService";
+
+const loadScript = (src) => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
+};
 
 const DonorDashboard = () => {
   const navigate = useNavigate();
@@ -51,6 +68,9 @@ const DonorDashboard = () => {
   const [error, setError] = useState(null);
   const [showDonationModal, setShowDonationModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successAmount, setSuccessAmount] = useState(0);
+  const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -92,31 +112,97 @@ const DonorDashboard = () => {
     }
   };
 
-  const handleSimulateDonation = async (amount, isRecurring) => {
+  const handleRazorpayPayment = async (amount, isRecurring) => {
     try {
       setIsUpdating(true);
-      const donor = getDonorUser();
-      const donationData = {
-        donorId: donor._id,
-        amount: parseInt(amount),
+      const res = await loadScript(
+        "https://checkout.razorpay.com/v1/checkout.js",
+      );
+
+      if (!res) {
+        alert("Razorpay SDK failed to load. Are you online?");
+        return;
+      }
+
+      const orderData = await createRazorpayOrder(amount);
+      const { id: order_id, currency } = orderData.data;
+
+      const keyData = await getRazorpayKey();
+      const key = keyData.data.key;
+
+      const donor = getDonorUser(); // Ensure donor info is current
+
+      const options = {
+        key,
+        amount: orderData.data.amount,
         currency: "INR",
-        paymentGateway: "Simulation",
-        paymentId: `sim_${Math.random().toString(36).substr(2, 9)}`,
-        isRecurring: isRecurring,
-        recurringInterval: isRecurring ? "monthly" : "once",
-        recurringId: isRecurring ? `rec_${Math.random().toString(36).substr(2, 9)}` : "na",
-        receiptNumber: `FF-${Date.now()}`,
-        receiptUrl: "https://example.com/receipt.pdf",
-        receiptGeneratedAt: new Date().toISOString(),
-        donatedAt: new Date().toISOString(),
+        name: "Fularani Foundation",
+        description: "Donation Transaction",
+        // image: "https://example.com/logo.png",
+        order_id,
+        handler: async function (response) {
+          try {
+            const verificationData = {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            };
+
+            await verifyRazorpayPayment(verificationData);
+
+            const donationData = {
+              donorId: donor._id,
+              amount: parseInt(amount),
+              currency: "INR",
+              paymentGateway: "Razorpay",
+              paymentId: response.razorpay_payment_id,
+              isRecurring: isRecurring,
+              recurringInterval: isRecurring ? "monthly" : "once",
+              recurringId: isRecurring
+                ? `rec_${Math.random().toString(36).substr(2, 9)}`
+                : "na",
+              receiptNumber: `FF-${Date.now()}`,
+              receiptUrl: "https://example.com/receipt.pdf",
+              receiptGeneratedAt: new Date().toISOString(),
+              donatedAt: new Date().toISOString(),
+            };
+
+            await createDonation(donationData);
+            await fetchDashboardData();
+            setShowDonationModal(false);
+            setSuccessAmount(parseInt(amount));
+            setShowSuccessModal(true);
+          } catch (verifyError) {
+            console.error("Verification failed:", verifyError);
+            setToastMessage({
+              type: "error",
+              text: "Payment verification failed. Please contact support.",
+            });
+            setTimeout(() => setToastMessage(null), 5000);
+          }
+        },
+        prefill: {
+          name: donor?.username,
+          contact: donor?.phone,
+          email: donor?.email || "donor@example.com",
+        },
+        notes: {
+          address: "Fularani Foundation Office",
+        },
+        theme: {
+          color: "#F43F5E",
+        },
       };
 
-      await createDonation(donationData);
-      await fetchDashboardData();
-      setShowDonationModal(false);
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
     } catch (err) {
-      console.error("Donation simulation failed:", err);
-      alert("Donation failed. Please try again.");
+      console.error("Payment initiation failed:", err);
+      const errorMessage =
+        err.response?.data?.message ||
+        "Payment initiation failed. Please try again.";
+      setToastMessage({ type: "error", text: errorMessage });
+      setTimeout(() => setToastMessage(null), 5000);
     } finally {
       setIsUpdating(false);
     }
@@ -177,7 +263,9 @@ const DonorDashboard = () => {
             <div className="w-16 h-16 border-4 border-rose-500/10 rounded-full animate-spin border-t-rose-500"></div>
             <Heart className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-rose-500" />
           </div>
-          <p className="text-[#1d1d1f]/60 font-medium">Preparing your insights...</p>
+          <p className="text-[#1d1d1f]/60 font-medium">
+            Preparing your insights...
+          </p>
         </div>
       </main>
     );
@@ -190,7 +278,9 @@ const DonorDashboard = () => {
           <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <ShieldCheck className="w-8 h-8 text-red-500" />
           </div>
-          <p className="text-[#1d1d1f] text-lg font-bold mb-2">Something went wrong</p>
+          <p className="text-[#1d1d1f] text-lg font-bold mb-2">
+            Something went wrong
+          </p>
           <p className="text-[#86868b] mb-8">{error}</p>
           <button
             onClick={fetchDashboardData}
@@ -215,7 +305,11 @@ const DonorDashboard = () => {
             <div className="relative group cursor-pointer" onClick={() => fileInputRef.current.click()}>
               <div className="w-36 h-36 md:w-48 md:h-48 rounded-[2.5rem] overflow-hidden border-4 border-white shadow-2xl transition-transform group-hover:scale-105 bg-accent">
                 {user?.avatar ? (
-                  <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+                  <img
+                    src={user.avatar}
+                    alt={user.username}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full bg-secondary flex items-center justify-center text-white text-6xl font-black uppercase">
                     {user?.username?.[0] || "D"}
@@ -385,20 +479,27 @@ const DonorDashboard = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-[#1d1d1f]">Make a Donation</h2>
-              <button onClick={() => setShowDonationModal(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <h2 className="text-2xl font-bold text-[#1d1d1f]">
+                Make a Donation
+              </h2>
+              <button
+                onClick={() => setShowDonationModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
                 <X size={20} />
               </button>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="text-xs font-bold text-[#86868b] uppercase tracking-wider mb-2 block">Amount (INR)</label>
+                <label className="text-xs font-bold text-[#86868b] uppercase tracking-wider mb-2 block">
+                  Amount (INR)
+                </label>
                 <div className="grid grid-cols-3 gap-3">
                   {[500, 1000, 2000, 5000, 10000].map((amt) => (
                     <button
                       key={amt}
-                      onClick={() => handleSimulateDonation(amt, false)}
+                      onClick={() => handleRazorpayPayment(amt, false)}
                       className="py-3 px-2 rounded-xl border border-black/5 bg-[#f5f5f7] hover:bg-rose-50 hover:border-rose-200 text-[#1d1d1f] font-bold text-sm transition-all"
                     >
                       ₹{amt}
@@ -410,7 +511,8 @@ const DonorDashboard = () => {
                       placeholder="Custom"
                       className="w-full py-3 px-3 rounded-xl border border-black/5 bg-[#f5f5f7] font-bold text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20"
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleSimulateDonation(e.target.value, false);
+                        if (e.key === "Enter")
+                          handleRazorpayPayment(e.target.value, false);
                       }}
                     />
                   </div>
@@ -421,10 +523,14 @@ const DonorDashboard = () => {
                 <div className="flex gap-3">
                   <RefreshCcw className="text-blue-500 shrink-0" size={20} />
                   <div>
-                    <p className="text-blue-900 font-bold text-sm">Monthly Giving</p>
-                    <p className="text-blue-700/70 text-xs mt-1">Become a recurring donor to provide consistent support.</p>
+                    <p className="text-blue-900 font-bold text-sm">
+                      Monthly Giving
+                    </p>
+                    <p className="text-blue-700/70 text-xs mt-1">
+                      Become a recurring donor to provide consistent support.
+                    </p>
                     <button
-                      onClick={() => handleSimulateDonation(1000, true)}
+                      onClick={() => handleRazorpayPayment(1000, true)}
                       className="mt-3 text-blue-600 font-bold text-xs hover:underline"
                     >
                       Start Monthly ₹1,000 →
@@ -434,17 +540,104 @@ const DonorDashboard = () => {
               </div>
 
               <p className="text-[11px] text-[#86868b] text-center leading-relaxed">
-                This is a simulation. In a production environment, this would redirect you to a secure payment gateway like Razorpay or Stripe.
+                Your contribution goes directly towards our mission.
+                Transactions are secured by Razorpay.
               </p>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-md rounded-[32px] p-10 shadow-2xl animate-in zoom-in-95 duration-300 text-center relative overflow-hidden">
+            {/* Animated background decoration */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute -top-20 -left-20 w-40 h-40 bg-rose-100 rounded-full blur-3xl opacity-50 animate-pulse"></div>
+              <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-pink-100 rounded-full blur-3xl opacity-50 animate-pulse delay-500"></div>
+            </div>
+
+            <div className="relative z-10">
+              {/* Success Icon with Animation */}
+              <div className="relative mx-auto w-20 h-20 mb-6">
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full animate-ping opacity-20"></div>
+                <div className="relative w-20 h-20 bg-gradient-to-br from-rose-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg shadow-rose-500/30">
+                  <Check size={36} className="text-white" strokeWidth={3} />
+                </div>
+                {/* Sparkles */}
+                <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-yellow-400 animate-bounce" />
+                <Sparkles className="absolute -bottom-1 -left-2 w-5 h-5 text-yellow-400 animate-bounce delay-100" />
+              </div>
+
+              <h2 className="text-2xl font-bold text-[#1d1d1f] mb-2">
+                Thank You! 🎉
+              </h2>
+              <p className="text-[#86868b] mb-6">
+                Your donation was successful
+              </p>
+
+              <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-6 mb-6 border border-rose-100">
+                <p className="text-xs font-bold text-rose-500 uppercase tracking-wider mb-1">
+                  Amount Donated
+                </p>
+                <p className="text-4xl font-bold text-[#1d1d1f]">
+                  {formatCurrency(successAmount)}
+                </p>
+              </div>
+
+              <p className="text-sm text-[#86868b] mb-8 leading-relaxed">
+                Your generosity will make a real difference in someone's life. A
+                receipt has been sent to your email.
+              </p>
+
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="w-full py-4 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white rounded-2xl font-bold text-base transition-all shadow-lg shadow-rose-500/20 active:scale-95"
+              >
+                Continue to Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div
+          className={`fixed top-24 right-8 z-[110] px-6 py-4 rounded-2xl shadow-lg flex items-center gap-3 animate-in slide-in-from-right duration-500 max-w-sm ${
+            toastMessage.type === "error"
+              ? "bg-red-500 text-white shadow-red-500/20"
+              : "bg-green-500 text-white shadow-green-500/20"
+          }`}
+        >
+          <div className="bg-white/20 p-1.5 rounded-full shrink-0">
+            {toastMessage.type === "error" ? (
+              <X size={16} />
+            ) : (
+              <Check size={16} />
+            )}
+          </div>
+          <p className="font-medium text-sm">{toastMessage.text}</p>
+          <button
+            onClick={() => setToastMessage(null)}
+            className="ml-2 hover:bg-white/20 p-1 rounded-full transition-colors shrink-0"
+          >
+            <X size={14} />
+          </button>
         </div>
       )}
     </main>
   );
 };
 
-const OverviewTab = ({ stats, donations, formatCurrency, formatDate, setActiveTab }) => {
+const OverviewTab = ({
+  stats,
+  donations,
+  formatCurrency,
+  formatDate,
+  setActiveTab,
+}) => {
   const recentDonations = donations?.slice(0, 3) || [];
 
   return (
@@ -723,7 +916,13 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
                     type="checkbox"
                     className="peer hidden"
                     checked={formData.wants80GReceipt}
-                    onChange={(e) => isEditing && setFormData({ ...formData, wants80GReceipt: e.target.checked })}
+                    onChange={(e) =>
+                      isEditing &&
+                      setFormData({
+                        ...formData,
+                        wants80GReceipt: e.target.checked,
+                      })
+                    }
                     disabled={!isEditing}
                   />
                   <div className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${formData.wants80GReceipt ? 'bg-primary border-primary' : 'bg-transparent border-secondary/20 group-hover:border-primary'}`}>
@@ -761,7 +960,16 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
   );
 };
 
-const ProfileField = ({ icon: Icon, label, value, isEditing, onChange, type = "text", placeholder, isReadOnly = false }) => (
+const ProfileField = ({
+  icon: Icon,
+  label,
+  value,
+  isEditing,
+  onChange,
+  type = "text",
+  placeholder,
+  isReadOnly = false,
+}) => (
   <div className="flex items-start gap-5">
     <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center shrink-0">
       <Icon size={20} className="text-secondary/60" />

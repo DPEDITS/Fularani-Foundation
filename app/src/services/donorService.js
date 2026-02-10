@@ -162,9 +162,43 @@ export const updateDonorAvatar = async (formData) => {
     }
 };
 
+// Razorpay Payment Service
+export const getRazorpayKey = async () => {
+    try {
+        const response = await api.get('/api/payment/getkey', {
+             headers: authHeader()
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createRazorpayOrder = async (amount) => {
+    try {
+        const response = await api.post('/api/payment/checkout', { amount }, {
+            headers: authHeader()
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const verifyRazorpayPayment = async (paymentData) => {
+    try {
+        const response = await api.post('/api/payment/paymentverification', paymentData, {
+             headers: authHeader()
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const createDonation = async (donationData) => {
     try {
-        const response = await api.post('/api/donation/create', donationData, {
+        const response = await api.post('/api/donations/create', donationData, {
             headers: authHeader()
         });
         return response.data;
