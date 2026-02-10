@@ -1,4 +1,5 @@
 import { ArrowRight, School } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const MissionEducation = () => (
   <section className="apple-card group overflow-hidden">
@@ -17,16 +18,21 @@ const MissionEducation = () => (
         </h3>
 
         <p className="text-[17px] text-[#86868b] leading-relaxed max-w-md font-medium">
-          Empowering the next generation in rural Odisha by providing essential learning
-          materials, dedicated mentorship, and safe educational environments.
+          Empowering the next generation in rural Odisha by providing essential
+          learning materials, dedicated mentorship, and safe educational
+          environments.
         </p>
 
-        <a
-          href="/missions/education"
+        <Link
+          to="/missions/education"
           className="inline-flex items-center gap-1.5 mt-8 text-[#0066cc] hover:underline font-medium text-[17px] group"
         >
-          Explore program <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-        </a>
+          Explore program{" "}
+          <ArrowRight
+            size={18}
+            className="group-hover:translate-x-1 transition-transform"
+          />
+        </Link>
       </div>
 
       {/* VISUAL */}

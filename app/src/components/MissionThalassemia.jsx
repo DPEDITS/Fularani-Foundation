@@ -1,4 +1,5 @@
 import { ArrowRight, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const MissionThalassemia = () => (
   <section className="apple-card group overflow-hidden border-2 border-red-100 shadow-2xl shadow-red-500/5">
@@ -40,8 +41,8 @@ const MissionThalassemia = () => (
         </div>
 
         <div className="mt-10 flex flex-wrap gap-4">
-          <a
-            href="/donor-register"
+          <Link
+            to="/donor-register"
             className="inline-flex items-center gap-2 px-8 py-4 bg-[#ff3b30] text-white rounded-2xl font-black text-[16px] uppercase tracking-wider hover:bg-[#d73128] transition-all shadow-lg shadow-red-500/20 group hover:-translate-y-1"
           >
             Emergency Donate{" "}
@@ -49,7 +50,7 @@ const MissionThalassemia = () => (
               size={20}
               className="group-hover:translate-x-1 transition-transform"
             />
-          </a>
+          </Link>
         </div>
       </div>
 
