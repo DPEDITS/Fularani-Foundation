@@ -87,7 +87,7 @@ const Hero = () => {
               in Bhadrak. Join the Fularani movement today.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="hidden sm:flex sm:flex-row gap-3 sm:gap-4">
               <a
                 href="/donor-register"
                 className="bg-accent hover:bg-accent/80 text-secondary px-8 py-4 lg:px-10 lg:py-5 rounded-xl text-base lg:text-lg font-black uppercase tracking-tight transition-all shadow-2xl shadow-accent/30 hover:translate-y-[-4px] flex items-center justify-center gap-3 group"
