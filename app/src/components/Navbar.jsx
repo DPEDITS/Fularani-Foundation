@@ -71,14 +71,15 @@ const Navbar = () => {
     { name: "Our Missions", link: "/missions" },
     { name: "CSR Partnership", link: "/csr-partnership" },
     { name: "Our Works", link: "/gallery" },
+    { name: "Contact", link: "/contact" },
   ];
 
   return (
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 border-b ${scrolled
-            ? "bg-white/95 backdrop-blur-md border-secondary/10 shadow-sm py-2"
-            : "bg-white border-transparent py-3"
+          ? "bg-white/95 backdrop-blur-md border-secondary/10 shadow-sm py-2"
+          : "bg-white border-transparent py-3"
           }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between">
@@ -166,8 +167,12 @@ const Navbar = () => {
                   }
                   className="flex items-center gap-3 pl-2 pr-4 py-1.5 bg-muted rounded-full hover:bg-primary/10 transition-all border border-secondary/5"
                 >
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-black text-xs shadow-sm">
-                    {currentUser?.username?.charAt(0).toUpperCase() || "U"}
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-black text-xs shadow-sm overflow-hidden">
+                    {currentUser?.avatar ? (
+                      <img src={currentUser.avatar} alt={currentUser.username} className="w-full h-full object-cover" />
+                    ) : (
+                      currentUser?.username?.charAt(0).toUpperCase() || "U"
+                    )}
                   </div>
                   <span className="hidden md:block text-xs font-black text-secondary uppercase tracking-tight">
                     Dashboard

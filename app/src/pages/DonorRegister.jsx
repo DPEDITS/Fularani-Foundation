@@ -360,15 +360,12 @@ const DonorRegister = () => {
                 className="p-4 bg-red-50 border-2 border-red-200 rounded-2xl"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white flex-shrink-0 mt-0.5">
+                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white flex-shrink-0 mt-0.6">
                     !
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 mt-0.6">
                     <p className="text-sm font-bold text-red-700">
                       {error}
-                    </p>
-                    <p className="text-xs text-red-600 mt-1">
-                      Please check all required fields and try again.
                     </p>
                   </div>
                 </div>

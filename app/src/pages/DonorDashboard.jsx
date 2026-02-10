@@ -296,16 +296,14 @@ const DonorDashboard = () => {
   const user = profile || getDonorUser();
 
   return (
-    <main className="min-h-screen bg-[#fbfbfd] pt-24 pb-20 px-4 md:px-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
-          <div className="flex items-center gap-6">
-            <div
-              className="relative group cursor-pointer"
-              onClick={() => fileInputRef.current.click()}
-            >
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-[32px] overflow-hidden bg-white shadow-sm border border-black/5 flex items-center justify-center">
+    <main className="min-h-screen bg-white pt-32 pb-20 px-6 md:px-10">
+      <div className="max-w-[1440px] mx-auto">
+        {/* Hero Header Section */}
+        {/* Hero Header Section */}
+        <div className="flex flex-col lg:flex-row items-end justify-between gap-8 mb-12">
+          <div className="flex flex-col md:flex-row md:items-end gap-6">
+            <div className="relative group cursor-pointer" onClick={() => fileInputRef.current.click()}>
+              <div className="w-36 h-36 md:w-48 md:h-48 rounded-[2.5rem] overflow-hidden border-4 border-white shadow-2xl transition-transform group-hover:scale-105 bg-accent">
                 {user?.avatar ? (
                   <img
                     src={user.avatar}
@@ -313,12 +311,12 @@ const DonorDashboard = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white text-3xl font-bold">
-                    {user?.username?.[0]?.toUpperCase() || "D"}
+                  <div className="w-full h-full bg-secondary flex items-center justify-center text-white text-6xl font-black uppercase">
+                    {user?.username?.[0] || "D"}
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-[32px]">
-                  <Camera className="text-white" size={24} />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Camera className="text-white" size={40} />
                 </div>
               </div>
               <input
@@ -329,100 +327,125 @@ const DonorDashboard = () => {
                 onChange={handleAvatarChange}
                 disabled={isUpdating}
               />
-              <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center border border-black/5">
-                <Sparkles className="w-4 h-4 text-rose-500" />
-              </div>
             </div>
+
             <div>
-              <p className="text-[#86868b] font-bold text-xs uppercase tracking-[0.2em] mb-1">
+              <div className="inline-block bg-accent px-3 py-1 rounded-sm text-xs font-black uppercase tracking-widest text-secondary mb-3 shadow-lg shadow-accent/20">
                 Donor Dashboard
-              </p>
-              <h1 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] tracking-tight">
-                Welcome, {user?.username || "Donor"}
-              </h1>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="px-2.5 py-1 bg-rose-50 text-rose-600 text-[11px] font-bold rounded-lg uppercase tracking-wider flex items-center gap-1">
-                  <Award size={12} /> Elite Supporter
-                </span>
-                <span className="text-[#86868b] text-sm font-medium">
-                  • Making an Impact
-                </span>
               </div>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-secondary tracking-tighter leading-[0.9] lowercase">
+                welcome, <br />
+                <span className="text-white bg-primary px-4 py-2 inline-block -rotate-2 shadow-xl shadow-primary/30 mt-2">
+                  {user?.username || "changemaker"}.
+                </span>
+              </h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div>
             <button
               onClick={() => setShowDonationModal(true)}
-              className="px-6 py-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-rose-500/20 active:scale-95"
+              className="group relative px-6 py-4 bg-secondary text-white rounded-xl font-black uppercase tracking-tight text-sm overflow-hidden hover:bg-black transition-all shadow-xl shadow-secondary/30 hover:-translate-y-1 active:translate-y-0"
             >
-              <Gift size={18} />
-              Donate Now
-            </button>
-            <button
-              onClick={handleLogout}
-              className="p-3 rounded-2xl bg-white border border-black/5 hover:bg-red-50 text-red-500 transition-all shadow-sm"
-              title="Logout"
-            >
-              <LogOut size={20} />
+              <span className="relative z-10 flex items-center gap-2">
+                Make Impact <Heart size={18} className="fill-accent text-accent animate-pulse" />
+              </span>
             </button>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
-          <StatCard
-            icon={DollarSign}
-            label="Total Given"
-            value={formatCurrency(stats?.totalDonatedAmount || 0)}
-            accent="text-rose-500"
-          />
-          <StatCard
-            icon={Heart}
-            label="Donations"
-            value={stats?.donationCount || 0}
-            accent="text-pink-500"
-          />
-          <StatCard
-            icon={Calendar}
-            label="This Year"
-            value={formatCurrency(stats?.thisYearTotal || 0)}
-            accent="text-blue-500"
-          />
-          <StatCard
-            icon={RefreshCcw}
-            label="Recurring"
-            value={stats?.recurringCount || 0}
-            accent="text-purple-500"
-          />
+        {/* Bento Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-16">
+
+          {/* Main Stat - Total Given */}
+          <div className="md:col-span-2 bg-secondary p-6 md:p-10 rounded-[32px] relative overflow-hidden group shadow-2xl">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/20 transition-all duration-700"></div>
+
+            <div className="relative z-10 flex flex-col justify-between h-full min-h-[180px]">
+              <div className="flex items-start justify-between">
+                <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full backdrop-blur-md border border-white/10">
+                  <Sparkles size={12} className="text-accent" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/80">Total Impact</span>
+                </div>
+                <ArrowUpRight className="text-white/40 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" size={28} />
+              </div>
+
+              <div>
+                <h3 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-2">
+                  {formatCurrency(stats?.totalDonatedAmount || 0)}
+                </h3>
+                <p className="text-white/60 font-bold text-base">Invested in changing lives.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Donation Count */}
+          <div className="bg-primary p-6 md:p-10 rounded-[32px] relative overflow-hidden group shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all duration-300">
+            <div className="absolute -bottom-10 -right-10 text-white/10 group-hover:scale-110 transition-transform duration-500">
+              <Heart size={120} fill="currentColor" />
+            </div>
+
+            <div className="relative z-10">
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-10">
+                <Heart size={24} className="text-primary fill-primary" />
+              </div>
+              <h3 className="text-5xl font-black text-white tracking-tighter mb-1">
+                {stats?.donationCount || 0}
+              </h3>
+              <p className="text-[11px] font-black uppercase tracking-widest text-white/80">
+                Contributions
+              </p>
+            </div>
+          </div>
+
+          {/* Recurring / Year Stats */}
+          <div className="flex flex-col gap-4">
+            <div className="flex-1 bg-muted/50 p-5 rounded-[24px] border border-secondary/5 flex items-center justify-between group hover:bg-white hover:shadow-xl transition-all">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 mb-1">This Year</p>
+                <p className="text-2xl font-black text-secondary tracking-tight">{formatCurrency(stats?.thisYearTotal || 0)}</p>
+              </div>
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-secondary/5 group-hover:scale-110 transition-transform">
+                <Calendar size={18} className="text-secondary" />
+              </div>
+            </div>
+
+            <div className="flex-1 bg-muted/50 p-5 rounded-[24px] border border-secondary/5 flex items-center justify-between group hover:bg-white hover:shadow-xl transition-all">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 mb-1">Active Plans</p>
+                <p className="text-2xl font-black text-secondary tracking-tight">{stats?.recurringCount || 0}</p>
+              </div>
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-secondary/5 group-hover:scale-110 transition-transform">
+                <RefreshCcw size={18} className="text-secondary" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Apple Style Tab Switcher */}
-        <div className="flex justify-center mb-10">
-          <div className="inline-flex p-1.5 bg-[#f5f5f7] rounded-[20px] shadow-inner">
+        {/* Navigation Tabs - MongoDB Style */}
+        <div className="mb-12 border-b-2 border-muted sticky top-24 bg-white/95 backdrop-blur-xl z-40 py-4 -mx-6 px-6 md:mx-0 md:px-0">
+          <div className="flex gap-8 overflow-x-auto no-scrollbar">
             {[
-              { id: "overview", label: "Overview", icon: TrendingUp },
-              { id: "donations", label: "History", icon: CreditCard },
-              { id: "profile", label: "Profile", icon: User },
+              { id: "overview", label: "Overview" },
+              { id: "donations", label: "History" },
+              { id: "profile", label: "Settings" },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2.5 px-6 py-2.5 rounded-[14px] text-sm font-bold transition-all duration-300 ${
-                  activeTab === tab.id
-                    ? "bg-white text-[#1d1d1f] shadow-md"
-                    : "text-[#86868b] hover:text-[#1d1d1f]"
-                }`}
+                className={`text-sm font-black uppercase tracking-widest whitespace-nowrap pb-4 border-b-4 transition-all ${activeTab === tab.id
+                  ? "border-primary text-secondary"
+                  : "border-transparent text-secondary/30 hover:text-secondary/60"
+                  }`}
               >
-                <tab.icon size={16} />
                 {tab.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Content Container */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+        {/* Content Area */}
+        <div className="min-h-[400px]">
           {activeTab === "overview" && (
             <OverviewTab
               stats={stats}
@@ -449,6 +472,7 @@ const DonorDashboard = () => {
           )}
         </div>
       </div>
+
 
       {/* Donation Simulation Modal */}
       {showDonationModal && (
@@ -607,20 +631,6 @@ const DonorDashboard = () => {
   );
 };
 
-const StatCard = ({ icon: Icon, label, value, accent }) => (
-  <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5 hover:shadow-md transition-shadow duration-300">
-    <div
-      className={`w-12 h-12 rounded-2xl bg-[#f5f5f7] flex items-center justify-center mb-6`}
-    >
-      <Icon size={24} className={accent} />
-    </div>
-    <p className="text-[#86868b] text-[13px] font-bold uppercase tracking-widest mb-2">
-      {label}
-    </p>
-    <p className="text-3xl font-bold text-[#1d1d1f] tracking-tight">{value}</p>
-  </div>
-);
-
 const OverviewTab = ({
   stats,
   donations,
@@ -631,161 +641,117 @@ const OverviewTab = ({
   const recentDonations = donations?.slice(0, 3) || [];
 
   return (
-    <div className="grid md:grid-cols-2 gap-8">
+    <div className="grid md:grid-cols-2 gap-4 md:gap-6">
       {/* Giving Insight */}
-      <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5 flex flex-col justify-between">
+      <div className="bg-white p-6 md:p-10 rounded-[32px] shadow-xl border border-secondary/10 flex flex-col justify-between group hover:border-secondary/20 transition-all">
         <div>
-          <h3 className="text-xl font-bold text-[#1d1d1f] mb-8">
-            Giving Insight
-          </h3>
+          <h3 className="text-xl md:text-2xl font-black text-secondary mb-6 lowercase tracking-tighter">giving insight.</h3>
           <div className="space-y-8">
-            <div className="flex justify-between items-end">
+            <div className="flex justify-between items-end border-b border-muted pb-5">
               <div>
-                <p className="text-[#86868b] text-sm font-medium mb-1">
-                  Average Donation
-                </p>
-                <p className="text-3xl font-bold text-[#1d1d1f]">
-                  {formatCurrency(stats?.averageDonation || 0)}
-                </p>
+                <p className="text-secondary/40 text-[10px] font-black uppercase tracking-widest mb-1">Average Donation</p>
+                <p className="text-3xl font-black text-secondary tracking-tight">{formatCurrency(stats?.averageDonation || 0)}</p>
               </div>
               <div className="text-right">
-                <span className="text-xs font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded-lg uppercase tracking-tight">
-                  Consistent
-                </span>
+                <span className="text-[9px] font-black text-white bg-green-600 px-2 py-1 rounded-sm uppercase tracking-widest">Consistent</span>
               </div>
             </div>
 
             <div className="space-y-3">
-              <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-[#86868b]">
-                <span>Donation Frequency</span>
-                <span className="text-[#1d1d1f]">
-                  {stats?.avgFrequency || "Monthly"}
-                </span>
+              <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-secondary/60">
+                <span>Frequency</span>
+                <span className="text-secondary">{stats?.avgFrequency || "Monthly"}</span>
               </div>
-              <div className="w-full bg-[#f5f5f7] rounded-full h-3 overflow-hidden">
-                <div
-                  className="bg-rose-500 h-full rounded-full transition-all duration-1000"
-                  style={{ width: "75%" }}
-                />
+              <div className="w-full bg-muted rounded-sm h-3 overflow-hidden">
+                <div className="bg-accent h-full rounded-sm transition-all duration-1000" style={{ width: '75%' }} />
               </div>
             </div>
           </div>
         </div>
-        <p className="text-[#86868b] text-xs leading-relaxed mt-8">
-          Your regular contributions help us maintain long-term community
-          projects. Thank you for your unwavering support.
+        <p className="text-secondary/60 text-xs font-bold leading-relaxed mt-8">
+          Your regular contributions are building a legacy. Thank you for being a pillar of support.
         </p>
       </div>
 
       {/* Recent Activity List */}
-      <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5">
-        <h3 className="text-xl font-bold text-[#1d1d1f] mb-8">
-          Recent Contributions
-        </h3>
-        <div className="space-y-4">
-          {recentDonations.length > 0 ? (
-            recentDonations.map((donation, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-4 bg-[#f5f5f7] rounded-2xl hover:bg-[#efeff2] transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0">
-                    <Heart size={18} className="text-rose-500" />
-                  </div>
-                  <div>
-                    <p className="text-[#1d1d1f] font-bold">
-                      {formatCurrency(donation.amount)}
-                    </p>
-                    <p className="text-[#86868b] text-xs font-medium">
-                      {formatDate(donation.donatedAt)}
-                    </p>
-                  </div>
+      <div className="bg-secondary p-6 md:p-10 rounded-[32px] shadow-2xl flex flex-col">
+        <h3 className="text-xl md:text-2xl font-black text-white mb-6 lowercase tracking-tighter">recent contributions.</h3>
+        <div className="space-y-3 flex-1">
+          {recentDonations.length > 0 ? recentDonations.map((donation, i) => (
+            <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors border border-white/5">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shrink-0 shadow-lg shadow-accent/20">
+                  <Heart size={16} className="text-secondary fill-secondary" />
                 </div>
-                <ArrowUpRight size={18} className="text-[#86868b]" />
+                <div>
+                  <p className="text-white font-black text-lg">{formatCurrency(donation.amount)}</p>
+                  <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">{formatDate(donation.donatedAt)}</p>
+                </div>
               </div>
-            ))
-          ) : (
-            <p className="text-[#86868b] text-center py-10 italic">
-              No recent donations yet.
-            </p>
-          )}
-          {recentDonations.length > 0 && (
-            <button
-              onClick={() => setActiveTab("donations")}
-              className="w-full py-3 mt-4 text-[#86868b] text-sm font-bold hover:text-[#1d1d1f] transition-colors"
-            >
-              View All History
-            </button>
+              <ArrowUpRight size={18} className="text-white/40" />
+            </div>
+          )) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-center py-10 opacity-40">
+              <Sparkles size={32} className="text-white mb-3" />
+              <p className="text-white font-bold text-sm">No recent donations yet.</p>
+            </div>
           )}
         </div>
+        {recentDonations.length > 0 && (
+          <button
+            onClick={() => setActiveTab("donations")}
+            className="w-full py-4 mt-6 bg-white/10 text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-secondary transition-all rounded-xl"
+          >
+            View Full History
+          </button>
+        )}
       </div>
     </div>
   );
 };
 
-const DonationsTab = ({
-  donations,
-  formatCurrency,
-  formatDate,
-  setShowDonationModal,
-}) => (
-  <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-black/5">
-    <div className="flex items-center justify-between mb-10">
-      <h3 className="text-2xl font-bold text-[#1d1d1f]">Donation History</h3>
-      <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#f5f5f7] text-[#1d1d1f] font-bold text-sm hover:bg-[#efeff2] transition-all">
-        <Download size={16} /> Export PDF
+const DonationsTab = ({ donations, formatCurrency, formatDate, setShowDonationModal }) => (
+  <div className="bg-white p-6 md:p-10 rounded-[32px] shadow-xl border border-secondary/10">
+    <div className="flex items-center justify-between mb-8">
+      <h3 className="text-2xl md:text-3xl font-black text-secondary tracking-tighter lowercase">donation history.</h3>
+      <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-secondary text-white font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-secondary/20">
+        <Download size={14} /> Export PDF
       </button>
     </div>
 
     {donations.length > 0 ? (
       <div className="overflow-x-auto -mx-4 md:-mx-0">
-        <table className="w-full text-left min-w-[600px]">
+        <table className="w-full text-left min-w-[700px] border-collapse">
           <thead>
-            <tr className="border-b border-black/5">
-              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest">
-                Date
-              </th>
-              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest">
-                Amount
-              </th>
-              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest">
-                Plan
-              </th>
-              <th className="pb-6 px-4 text-[#86868b] text-xs font-bold uppercase tracking-widest text-right">
-                Receipt
-              </th>
+            <tr className="border-b-2 border-secondary/10">
+              <th className="pb-4 pl-4 text-secondary/40 text-[10px] font-black uppercase tracking-widest">Date</th>
+              <th className="pb-4 px-4 text-secondary/40 text-[10px] font-black uppercase tracking-widest">Amount</th>
+              <th className="pb-4 px-4 text-secondary/40 text-[10px] font-black uppercase tracking-widest">Plan</th>
+              <th className="pb-4 pr-4 text-secondary/40 text-[10px] font-black uppercase tracking-widest text-right">Receipt</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-black/5">
+          <tbody className="divide-y divide-secondary/5">
             {donations.map((donation, i) => (
-              <tr
-                key={i}
-                className="group hover:bg-[#fbfbfd] transition-colors"
-              >
-                <td className="py-6 px-4 font-bold text-[#1d1d1f]">
-                  {formatDate(donation.donatedAt)}
+              <tr key={i} className="group hover:bg-muted/30 transition-colors">
+                <td className="py-4 pl-4 font-black text-secondary text-sm">{formatDate(donation.donatedAt)}</td>
+                <td className="py-4 px-4">
+                  <span className="text-lg font-black text-secondary">{formatCurrency(donation.amount)}</span>
                 </td>
-                <td className="py-6 px-4">
-                  <span className="text-xl font-bold text-[#1d1d1f]">
-                    {formatCurrency(donation.amount)}
-                  </span>
-                </td>
-                <td className="py-6 px-4">
+                <td className="py-4 px-4">
                   {donation.isRecurring ? (
-                    <span className="px-3 py-1 bg-purple-50 text-purple-600 text-[10px] font-black rounded-lg uppercase tracking-tighter">
-                      Recurring
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 text-[9px] font-black rounded-sm uppercase tracking-widest">
+                      <RefreshCcw size={10} /> Recurring
                     </span>
                   ) : (
-                    <span className="px-3 py-1 bg-[#f5f5f7] text-[#86868b] text-[10px] font-black rounded-lg uppercase tracking-tighter">
+                    <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-secondary/60 text-[9px] font-black rounded-sm uppercase tracking-widest">
                       One-time
                     </span>
                   )}
                 </td>
-                <td className="py-6 px-4 text-right">
+                <td className="py-4 pr-4 text-right">
                   <button
-                    onClick={() => window.open(donation.receiptUrl, "_blank")}
-                    className="inline-flex items-center gap-1.5 text-rose-500 font-bold text-sm hover:underline"
+                    onClick={() => window.open(donation.receiptUrl, '_blank')}
+                    className="inline-flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-wider hover:underline underline-offset-4 decoration-2"
                   >
                     <Download size={14} /> Download
                   </button>
@@ -796,17 +762,14 @@ const DonationsTab = ({
         </table>
       </div>
     ) : (
-      <div className="text-center py-20 bg-[#fbfbfd] rounded-3xl border border-dashed border-black/10">
-        <DollarSign
-          size={40}
-          className="mx-auto text-[#86868b] mb-4 opacity-30"
-        />
-        <p className="text-[#86868b] font-medium">
-          Your donation history is currently empty.
-        </p>
+      <div className="text-center py-16 bg-muted/20 rounded-2xl border-2 border-dashed border-secondary/5">
+        <div className="w-14 h-14 bg-secondary/5 rounded-full flex items-center justify-center mx-auto mb-4">
+          <DollarSign size={20} className="text-secondary/40" />
+        </div>
+        <p className="text-secondary/60 font-bold mb-4 text-sm">Your donation history is waiting to be written.</p>
         <button
           onClick={() => setShowDonationModal(true)}
-          className="mt-6 text-rose-500 font-bold text-sm hover:underline"
+          className="text-accent font-black text-xs uppercase tracking-widest hover:underline underline-offset-4 decoration-2"
         >
           Make your first donation
         </button>
@@ -848,76 +811,61 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (err) {
       console.error("Update error:", err);
-      // Show error from backend if available
-      const errorMessage =
-        err.response?.data?.message ||
-        "Failed to update profile. Please try again.";
+      const errorMessage = err.response?.data?.message || "Failed to update profile. Please try again.";
       alert(errorMessage);
     }
   };
 
   return (
-    <div className="space-y-8 relative">
+    <div className="space-y-6 relative">
       {showSuccess && (
-        <div className="fixed top-24 right-8 z-[110] bg-green-500 text-white px-6 py-3 rounded-2xl shadow-lg shadow-green-500/20 flex items-center gap-3 animate-in slide-in-from-right duration-500">
-          <div className="bg-white/20 p-1 rounded-full">
-            <Check size={16} />
-          </div>
-          <p className="font-bold text-sm">Profile updated successfully!</p>
+        <div className="fixed top-32 right-10 z-[110] bg-secondary text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 animate-in slide-in-from-right duration-500 border border-white/20">
+          <div className="bg-green-500 rounded-full p-1"><Check size={14} className="text-white" /></div>
+          <p className="font-black text-xs uppercase tracking-widest">Profile updated</p>
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 p-8 bg-white rounded-[32px] shadow-sm border border-black/5">
-        <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl overflow-hidden bg-[#f5f5f7] border border-black/5 shrink-0 flex items-center justify-center">
-            <User size={28} className="text-[#86868b]" />
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 p-6 md:p-8 bg-secondary rounded-[32px] shadow-xl overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+
+        <div className="flex items-center gap-5 relative z-10">
+          <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/10 shrink-0 flex items-center justify-center backdrop-blur-sm">
+            <User size={24} className="text-white/80" />
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-[#1d1d1f] tracking-tight">
-              Identity Settings
-            </h3>
-            <p className="text-[#86868b] text-sm font-medium">
-              Manage your personal information and preferences
-            </p>
+            <h3 className="text-2xl font-black text-white tracking-tighter mb-1">identity settings.</h3>
+            <p className="text-white/60 text-xs font-bold">Manage your personal information and preferences.</p>
           </div>
         </div>
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#f5f5f7] text-[#1d1d1f] font-bold text-sm hover:bg-[#efeff2] transition-all"
+            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-secondary font-black text-[10px] uppercase tracking-widest hover:bg-accent transition-all relative z-10"
           >
-            <Edit2 size={16} /> Edit Profile
+            <Edit2 size={14} /> Edit Profile
           </button>
         ) : (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 relative z-10">
             <button
               onClick={() => setIsEditing(false)}
-              className="px-6 py-3 rounded-2xl bg-gray-100 text-[#1d1d1f] font-bold text-sm hover:bg-gray-200 transition-all"
+              className="px-5 py-3 rounded-xl bg-white/10 text-white font-black text-[10px] uppercase tracking-widest hover:bg-white/20 transition-all backdrop-blur-sm"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
               disabled={isUpdating}
-              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#1d1d1f] text-white font-bold text-sm hover:bg-black transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-secondary font-black text-[10px] uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50 shadow-xl shadow-accent/20"
             >
-              {isUpdating ? (
-                "Saving..."
-              ) : (
-                <>
-                  <Check size={16} /> Save Changes
-                </>
-              )}
+              {isUpdating ? "Saving..." : <><Check size={14} /> Save</>}
             </button>
           </div>
         )}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5">
-          <h3 className="text-lg font-bold text-[#1d1d1f] mb-8">
-            Contact Information
-          </h3>
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-xl border border-secondary/10">
+          <h3 className="text-xl font-black text-secondary mb-6 lowercase tracking-tighter">contact information.</h3>
           <div className="space-y-6">
             <ProfileField
               icon={User}
@@ -947,10 +895,8 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
           </div>
         </div>
 
-        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-black/5">
-          <h3 className="text-lg font-bold text-[#1d1d1f] mb-8">
-            Fiscal Identity
-          </h3>
+        <div className="bg-white rounded-[32px] p-6 md:p-8 shadow-xl border border-secondary/10">
+          <h3 className="text-xl font-black text-secondary mb-6 lowercase tracking-tighter">fiscal identity.</h3>
           <div className="space-y-6">
             <ProfileField
               icon={FileText}
@@ -963,8 +909,8 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
               onChange={(val) => setFormData({ ...formData, panNumber: val })}
             />
 
-            <div className="pt-4 mt-4 border-t border-black/5">
-              <label className="flex items-start gap-4 cursor-pointer group">
+            <div className="pt-4 mt-2 border-t border-secondary/10">
+              <label className="flex items-start gap-4 cursor-pointer group select-none">
                 <div className="relative flex items-center pt-1">
                   <input
                     type="checkbox"
@@ -979,22 +925,13 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
                     }
                     disabled={!isEditing}
                   />
-                  <div
-                    className={`w-5 h-5 rounded border-2 transition-all flex items-center justify-center ${formData.wants80GReceipt ? "bg-rose-500 border-rose-500" : "bg-transparent border-gray-300"}`}
-                  >
-                    {formData.wants80GReceipt && (
-                      <Check size={14} className="text-white" />
-                    )}
+                  <div className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${formData.wants80GReceipt ? 'bg-primary border-primary' : 'bg-transparent border-secondary/20 group-hover:border-primary'}`}>
+                    {formData.wants80GReceipt && <Check size={14} className="text-white" />}
                   </div>
                 </div>
                 <div>
-                  <p className="text-[#1d1d1f] font-bold text-sm">
-                    Automated 80G Receipts
-                  </p>
-                  <p className="text-[#86868b] text-[11px] leading-relaxed mt-1">
-                    Receive tax exemption certificates automatically in your
-                    email after every donation.
-                  </p>
+                  <p className="text-secondary font-black text-xs uppercase tracking-tight">Automated 80G Receipts</p>
+                  <p className="text-secondary/60 text-[10px] font-bold leading-relaxed mt-1">Receive tax exemption certificates automatically in your email after every donation.</p>
                 </div>
               </label>
             </div>
@@ -1003,25 +940,18 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
       </div>
 
       {/* Fiscal Benefit Card */}
-      <div className="p-8 bg-rose-50 rounded-[32px] border border-rose-100">
+      <div className="p-6 md:p-8 bg-primary/10 rounded-[32px] border border-primary/20">
         <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-          <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
-            <ShieldCheck size={32} className="text-rose-500" />
+          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/30">
+            <ShieldCheck size={24} className="text-white" />
           </div>
           <div className="flex-1">
-            <h4 className="text-xl font-bold text-rose-900 mb-1">
-              Tax Benefits (Sec 80G)
-            </h4>
-            <p className="text-rose-700/70 text-sm leading-relaxed max-w-2xl">
-              All your donations to Fularani Foundation are 50% tax-exempt under
-              Section 80G of the Income Tax Act. Ensure your PAN is updated to
-              receive accurate receipts.
+            <h4 className="text-lg font-black text-secondary mb-1 uppercase tracking-tight">Tax Benefits (Sec 80G)</h4>
+            <p className="text-secondary/70 text-xs font-bold leading-relaxed max-w-3xl">
+              All your donations to Fularani Foundation are 50% tax-exempt under Section 80G of the Income Tax Act. Ensure your PAN is updated to receive accurate receipts.
             </p>
           </div>
-          <a
-            href="/about"
-            className="px-6 py-3 bg-white text-rose-500 rounded-2xl font-bold text-sm shadow-sm hover:shadow-md transition-all"
-          >
+          <a href="/about" className="px-6 py-3 bg-white text-primary rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/10 hover:-translate-y-1 transition-transform">
             Learn More
           </a>
         </div>
@@ -1041,34 +971,26 @@ const ProfileField = ({
   isReadOnly = false,
 }) => (
   <div className="flex items-start gap-5">
-    <div className="w-10 h-10 rounded-xl bg-[#f5f5f7] flex items-center justify-center shrink-0">
-      <Icon size={18} className="text-[#86868b]" />
+    <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center shrink-0">
+      <Icon size={20} className="text-secondary/60" />
     </div>
     <div className="flex-1">
-      <p className="text-[#86868b] text-[11px] font-bold uppercase tracking-wider mb-0.5">
-        {label}
-      </p>
+      <p className="text-secondary/40 text-[10px] font-black uppercase tracking-widest mb-2">{label}</p>
       {isEditing && !isReadOnly ? (
         <input
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full bg-[#f5f5f7] border-none rounded-lg px-3 py-1.5 text-[15px] font-medium text-[#1d1d1f] focus:ring-2 focus:ring-rose-500/20"
+          className="w-full bg-muted/50 border-2 border-transparent focus:border-primary rounded-lg px-4 py-2 text-base font-bold text-secondary focus:outline-none transition-colors"
         />
       ) : (
         <div className="flex items-center gap-2">
-          <p
-            className={`text-[#1d1d1f] font-bold text-[15px] min-h-[22.5px] ${isReadOnly && isEditing ? "opacity-50" : ""}`}
-          >
+          <p className={`text-secondary font-black text-lg min-h-[28px] ${isReadOnly && isEditing ? "opacity-50" : ""}`}>
             {value || "—"}
           </p>
           {isReadOnly && isEditing && (
-            <ShieldCheck
-              size={14}
-              className="text-[#86868b]"
-              title="Verified & Immutable"
-            />
+            <ShieldCheck size={16} className="text-green-500" title="Verified & Immutable" />
           )}
         </div>
       )}
