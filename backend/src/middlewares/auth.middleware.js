@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
 import { Volunteer } from "../models/volunteer.model.js";
 import { Donor } from "../models/donor.model.js";
+import { Admin } from "../models/admin.model.js";
 
 export const verifyJWT = asyncHandler(async (req, _, next) => {
   try {
@@ -24,6 +25,12 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
 
     if (!user) {
       user = await Donor.findById(decodedToken?._id).select(
+        "-password -refreshToken",
+      );
+    }
+
+    if (!user) {
+      user = await Admin.findById(decodedToken?._id).select(
         "-password -refreshToken",
       );
     }

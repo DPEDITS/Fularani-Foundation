@@ -1,0 +1,115 @@
+import api from './api';
+
+const TOKEN_KEY = 'admin_access_token';
+const REFRESH_TOKEN_KEY = 'admin_refresh_token';
+const USER_KEY = 'admin_user';
+
+export const setAuthTokens = (accessToken, refreshToken) => {
+    localStorage.setItem(TOKEN_KEY, accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+};
+
+export const getAccessToken = () => localStorage.getItem(TOKEN_KEY);
+export const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);
+
+export const setAdminUser = (user) => {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+};
+
+export const getAdminUser = () => {
+    const user = localStorage.getItem(USER_KEY);
+    return user ? JSON.parse(user) : null;
+};
+
+export const clearAuthData = () => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+};
+
+export const isAdminAuthenticated = () => {
+    return !!getAccessToken();
+};
+
+const authHeader = () => {
+    const token = getAccessToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+export const loginAdmin = async (email, password) => {
+    try {
+        const response = await api.post('/api/admin/login', { email, password });
+        const { admin, accessToken, refreshToken } = response.data.data;
+        setAuthTokens(accessToken, refreshToken);
+        setAdminUser(admin);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const logoutAdmin = async () => {
+    try {
+        // Mocking logout as there might not be a dedicated endpoint or it might use the same pattern
+        clearAuthData();
+    } catch (error) {
+        clearAuthData();
+        throw error;
+    }
+};
+
+export const getAdminStats = async () => {
+    try {
+        const response = await api.get('/api/admin/stats', {
+            headers: authHeader()
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getVolunteersList = async () => {
+    try {
+        const response = await api.get('/api/admin/volunteers', { headers: authHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getDonorsList = async () => {
+    try {
+        const response = await api.get('/api/admin/donors', { headers: authHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getMissionsList = async () => {
+    try {
+        const response = await api.get('/api/admin/missions', { headers: authHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateVolunteerStatus = async (volunteerId, status) => {
+    try {
+        const response = await api.post('/api/admin/update-volunteer-status', { volunteerId, status }, { headers: authHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const assignTask = async (data) => {
+    try {
+        const response = await api.post('/api/admin/assign-task', data, { headers: authHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

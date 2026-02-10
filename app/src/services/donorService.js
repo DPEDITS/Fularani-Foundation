@@ -237,3 +237,12 @@ export const cancelSubscription = async (subscriptionId) => {
         throw error;
     }
 };
+
+export const getRecentDonors = async () => {
+    try {
+        const response = await api.get('/api/donor/recent-donors');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

@@ -350,6 +350,21 @@ const forgotPasswordDonor = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password reset successfully"));
 });
 
+const getRecentDonors = asyncHandler(async (req, res) => {
+  const donors = await Donor.find({
+    avatar: { $exists: true, $ne: "" }
+  })
+    .sort({ createdAt: -1 })
+    .limit(4)
+    .select("avatar username");
+
+  const totalDonors = await Donor.countDocuments();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { donors, totalDonors }, "Recent donors fetched successfully"));
+});
+
 export {
   registerDonor,
   loginDonor,
@@ -361,5 +376,6 @@ export {
   getDonorStats,
   updateDonorProfile,
   updateDonorAvatar,
-  forgotPasswordDonor
+  forgotPasswordDonor,
+  getRecentDonors
 };
