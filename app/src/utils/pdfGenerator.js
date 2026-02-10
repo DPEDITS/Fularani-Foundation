@@ -22,26 +22,40 @@ const numberToWords = (num) => {
 
 const loadImage = (url) => {
     return new Promise((resolve) => {
+        if (!url) {
+            console.error("No URL provided to loadImage");
+            resolve(null);
+            return;
+        }
+
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.src = url;
+
         img.onload = () => {
-            // If it's an SVG, we need to draw it to a canvas to get a PNG-like format that jsPDF understands better
-            if (url.endsWith('.svg') || url.startsWith('data:image/svg+xml')) {
+            try {
                 const canvas = document.createElement("canvas");
                 // Use a higher scale for better quality
-                const scale = 4;
-                canvas.width = img.width * scale || 200 * scale;
-                canvas.height = img.height * scale || 200 * scale;
+                const scale = 2; // Reduced from 4 to avoid massive memory usage but still high quality
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
                 const ctx = canvas.getContext("2d");
+
+                // Clear background for PNGs
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                // Return as PNG for best compatibility with jsPDF
                 resolve(canvas.toDataURL("image/png"));
-            } else {
+            } catch (err) {
+                console.error("Canvas conversion error:", err);
+                // Fallback to the image object if canvas fails
                 resolve(img);
             }
         };
+
         img.onerror = (err) => {
-            console.error("Image load error:", err);
+            console.error("Image load error for URL:", url, err);
             resolve(null);
         };
     });
@@ -59,6 +73,8 @@ export const generateDonationReceipt = async (donation, user) => {
             loadImage(authSig)
         ]);
 
+        console.log("Images loaded:", { logo: !!logoImg, signature: !!sigImg });
+
         const doc = new (jsPDF.jsPDF || jsPDF)();
         const pageWidth = doc.internal.pageSize.getWidth();
         const leftMargin = 20;
@@ -71,9 +87,7 @@ export const generateDonationReceipt = async (donation, user) => {
 
         // Logo Section
         if (logoImg) {
-            // Using "JPEG" or "PNG" as hint. Since user changed to logo.jpg, "JPEG" is appropriate.
-            const ext = reactLogo.split('.').pop().toUpperCase();
-            doc.addImage(logoImg, ext === 'JPG' ? 'JPEG' : ext, 15, 12, 40, 40);
+            doc.addImage(logoImg, "PNG", 15, 12, 40, 40);
         } else {
             // Fallback to placeholder box if image fails
             doc.setDrawColor(200);
@@ -200,8 +214,7 @@ export const generateDonationReceipt = async (donation, user) => {
 
         // Stamp Image (logo.jpg) - Positioned above Foundation Name
         if (logoImg) {
-            const ext = reactLogo.split('.').pop().toUpperCase();
-            doc.addImage(logoImg, ext === 'JPG' ? 'JPEG' : ext, sigX + 10, sigY - 35, 25, 25);
+            doc.addImage(logoImg, "PNG", sigX + 10, sigY - 35, 25, 25);
         }
 
         doc.setFontSize(10);

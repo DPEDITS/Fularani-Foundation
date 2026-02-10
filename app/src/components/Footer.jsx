@@ -13,6 +13,7 @@ import {
   Globe,
   Award,
 } from "lucide-react";
+import logo from "../assets/image copy.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -49,18 +50,8 @@ const Footer = () => {
         <div className="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-0 md:gap-y-8 mb-6 md:mb-8">
           {/* Brand & Manifesto */}
           <div className="col-span-2 lg:col-span-1 space-y-3 pb-6 border-b md:border-none border-white/10">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-xl flex items-center justify-center font-black text-lg md:text-xl text-white">
-                F
-              </div>
-              <div className="flex flex-col">
-                <span className="text-lg md:text-xl font-black uppercase tracking-tight leading-none">
-                  Fularani
-                </span>
-                <span className="text-[9px] md:text-[10px] font-bold text-white/50 uppercase tracking-[0.3em] leading-none">
-                  Foundation
-                </span>
-              </div>
+            <div className="flex items-center gap-3 bg-white p-3 rounded-2xl w-fit">
+              <img src={logo} alt="Fularani Foundation" className="h-10 md:h-12 w-auto object-contain" />
             </div>
 
             <p className="text-[11px] md:text-xs font-bold text-white/60 leading-relaxed max-w-xs">
