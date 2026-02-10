@@ -1,9 +1,11 @@
 import React, { useRef } from "react";
-import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
+import { ArrowLeft, ArrowRight, Quote, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import storyBg from "../assets/missions1.jpeg";
 
 const stories = [
   {
+    id: "ranjeetas-vision",
     category: "Education",
     title: "ranjeeta's vision.",
     description:
@@ -12,6 +14,7 @@ const stories = [
     author: "Primary Donor: Tech4Impact",
   },
   {
+    id: "the-green-village",
     category: "Sustainability",
     title: "the green village.",
     description:
@@ -20,6 +23,7 @@ const stories = [
     author: "Project Lead: Mission Green",
   },
   {
+    id: "access-to-dignity",
     category: "Health",
     title: "access to dignity.",
     description:
@@ -86,9 +90,10 @@ const Stories = () => {
           className="flex gap-8 overflow-x-auto pb-12 snap-x snap-mandatory no-scrollbar"
         >
           {stories.map((story, index) => (
-            <div
+            <Link
               key={index}
-              className="min-w-[280px] md:min-w-[500px] snap-start bg-white shadow-2xl overflow-hidden group border border-secondary/5"
+              to={`/stories/${story.id}`}
+              className="min-w-[280px] md:min-w-[500px] snap-start bg-white shadow-2xl overflow-hidden group border border-secondary/5 cursor-pointer hover:shadow-3xl transition-shadow"
             >
               <div className="flex flex-col md:flex-row h-full">
                 <div className="w-full md:w-2/5 h-48 md:h-auto overflow-hidden relative">
@@ -117,13 +122,17 @@ const Stories = () => {
                   </div>
 
                   <div className="pt-6 border-t border-muted">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 whitespace-nowrap">
+                    <button className="font-bold text-secondary/70 hover:text-blue-800 transition-colors">
+                      Tap to read more
+                    </button>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/70 whitespace-nowrap">
+                      <br />
                       {story.author}
                     </p>
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

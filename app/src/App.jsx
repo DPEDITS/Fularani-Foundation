@@ -2,6 +2,8 @@ import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import Missions from "./pages/Missions";
+import MissionInfo from "./pages/MissionInfo";
+import StoryInfo from "./pages/StoryInfo";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Gallery from "./pages/Gallery";
@@ -35,6 +37,8 @@ const App = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/missions" element={<Missions />} />
+          <Route path="/missions/:id" element={<MissionInfo />} />
+          <Route path="/stories/:id" element={<StoryInfo />} />
           <Route path="/csr-partnership" element={<CSRPartnership />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/donor-login" element={<DonorLogin />} />

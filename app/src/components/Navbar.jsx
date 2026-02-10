@@ -218,11 +218,11 @@ const Navbar = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-secondary/10 shadow-2xl py-8 px-6 overflow-y-auto max-h-[80vh]"
+              className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-secondary/10 shadow-2xl py-4 px-5 overflow-y-auto max-h-[80vh]"
             >
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {navItems.map((item) => (
-                  <div key={item.name} className="space-y-4">
+                  <div key={item.name} className="space-y-2">
                     <Link
                       to={item.link}
                       className="text-2xl font-black text-secondary block uppercase tracking-tight"
@@ -231,7 +231,7 @@ const Navbar = () => {
                       {item.name}
                     </Link>
                     {item.dropdown && (
-                      <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-primary/20">
+                      <div className="grid grid-cols-1 gap-3 pl-4 border-l-2 border-primary/20">
                         {item.dropdown.map((drop, idx) => (
                           <Link
                             key={idx}
@@ -239,7 +239,7 @@ const Navbar = () => {
                             className="flex items-center gap-3"
                             onClick={() => setIsMobileMenuOpen(false)}
                           >
-                            <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center text-primary">
+                            <div className="w-7 h-7 bg-muted rounded-lg flex items-center justify-center text-primary">
                               {drop.icon}
                             </div>
                             <span className="text-sm font-bold text-secondary/70">
@@ -252,19 +252,19 @@ const Navbar = () => {
                   </div>
                 ))}
 
-                <div className="pt-8 border-t border-secondary/10 space-y-4">
+                <div className="pt-6 border-t border-secondary/10 space-y-3">
                   {!isLoggedIn && (
                     <>
                       <Link
                         to="/donor-register?role=volunteer"
-                        className="block text-center py-4 bg-muted text-secondary rounded-xl font-black uppercase tracking-tight"
+                        className="block text-center py-3 bg-muted text-secondary rounded-xl font-black uppercase tracking-tight text-sm"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         Join Us
                       </Link>
                       <Link
                         to="/donor-register"
-                        className="block text-center py-4 bg-accent text-secondary rounded-xl font-black uppercase tracking-tight"
+                        className="block text-center py-3 bg-accent text-secondary rounded-xl font-black uppercase tracking-tight text-sm"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         Donate Now
@@ -274,7 +274,7 @@ const Navbar = () => {
                   {isLoggedIn && (
                     <button
                       onClick={handleLogout}
-                      className="w-full py-4 border-2 border-accent/10 text-accent rounded-xl font-black uppercase tracking-tight"
+                      className="w-full py-3 border-2 border-accent/10 text-accent rounded-xl font-black uppercase tracking-tight text-sm"
                     >
                       Sign Out
                     </button>

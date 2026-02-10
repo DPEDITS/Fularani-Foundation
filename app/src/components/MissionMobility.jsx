@@ -1,4 +1,5 @@
 import { ArrowRight, Accessibility } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const MissionMobility = () => (
   <section className="apple-card group overflow-hidden">
@@ -21,12 +22,16 @@ const MissionMobility = () => (
           physical challenges, restoring independence and dignity.
         </p>
 
-        <a
-          href="/missions/mobility"
+        <Link
+          to="/missions/mobility"
           className="inline-flex items-center gap-1.5 mt-8 text-[#0066cc] hover:underline font-medium text-[17px] group"
         >
-          Explore program <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-        </a>
+          Explore program{" "}
+          <ArrowRight
+            size={18}
+            className="group-hover:translate-x-1 transition-transform"
+          />
+        </Link>
       </div>
 
       {/* VISUAL */}
