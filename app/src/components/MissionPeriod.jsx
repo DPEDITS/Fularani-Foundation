@@ -1,4 +1,5 @@
 import { ArrowRight, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const MissionPeriod = () => (
   <section className="apple-card group overflow-hidden">
@@ -21,12 +22,16 @@ const MissionPeriod = () => (
           resource distribution, and supportive community initiatives.
         </p>
 
-        <a
-          href="/missions/period-pride"
+        <Link
+          to="/missions/period-pride"
           className="inline-flex items-center gap-1.5 mt-8 text-[#0066cc] hover:underline font-medium text-[17px] group"
         >
-          Explore program <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-        </a>
+          Explore program{" "}
+          <ArrowRight
+            size={18}
+            className="group-hover:translate-x-1 transition-transform"
+          />
+        </Link>
       </div>
 
       {/* VISUAL */}
