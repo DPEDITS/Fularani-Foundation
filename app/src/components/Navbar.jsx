@@ -225,7 +225,7 @@ const Navbar = () => {
                   <div key={item.name} className="space-y-2">
                     <Link
                       to={item.link}
-                      className="text-lg font-black text-secondary block lowercase"
+                      className="text-lg font-black text-secondary block"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.name}
