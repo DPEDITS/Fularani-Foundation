@@ -38,7 +38,7 @@ const donationSchema = new Schema(
     },
     recurringInterval: {
       type: String,
-      enum: ["monthly", "quarterly", "yearly"],
+      enum: ["once", "monthly", "quarterly", "yearly"],
     },
     recurringId: {
       type: String,
