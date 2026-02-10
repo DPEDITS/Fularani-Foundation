@@ -26,7 +26,7 @@ const createDonation = asyncHandler(async (req, res) => {
     !currency ||
     !paymentGateway ||
     !paymentId ||
-    !isRecurring ||
+    isRecurring === undefined ||
     !recurringInterval ||
     !recurringId ||
     !receiptNumber ||
@@ -50,7 +50,16 @@ const createDonation = asyncHandler(async (req, res) => {
     receiptUrl,
     receiptGeneratedAt,
     donatedAt,
+    donatedAt,
   });
+
+  await Donor.findByIdAndUpdate(donorId, {
+    $inc: {
+      totalDonatedAmount: amount,
+      donationCount: 1,
+    }
+  });
+
   return res
     .status(201)
     .json(new ApiResponse(201, donation, "Donation created successfully"));
