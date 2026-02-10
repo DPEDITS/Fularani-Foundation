@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, Quote, X } from "lucide-react";
 import storyBg from "../assets/missions1.jpeg";
 
 const stories = [
@@ -31,6 +31,7 @@ const stories = [
 
 const Stories = () => {
   const scrollContainerRef = useRef(null);
+  const [selectedStory, setSelectedStory] = useState(null);
 
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
@@ -42,6 +43,16 @@ const Stories = () => {
         current.scrollBy({ left: scrollAmount, behavior: "smooth" });
       }
     }
+  };
+
+  const openStory = (story) => {
+    setSelectedStory(story);
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeStory = () => {
+    setSelectedStory(null);
+    document.body.style.overflow = "auto";
   };
 
   return (
@@ -88,7 +99,8 @@ const Stories = () => {
           {stories.map((story, index) => (
             <div
               key={index}
-              className="min-w-[280px] md:min-w-[500px] snap-start bg-white shadow-2xl overflow-hidden group border border-secondary/5"
+              onClick={() => openStory(story)}
+              className="min-w-[280px] md:min-w-[500px] snap-start bg-white shadow-2xl overflow-hidden group border border-secondary/5 cursor-pointer hover:shadow-3xl transition-shadow"
             >
               <div className="flex flex-col md:flex-row h-full">
                 <div className="w-full md:w-2/5 h-48 md:h-auto overflow-hidden relative">
@@ -99,6 +111,7 @@ const Stories = () => {
                   />
                   <div className="absolute top-4 left-4 bg-primary px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-wider text-white">
                     {story.category}
+                    
                   </div>
                 </div>
 
@@ -117,7 +130,9 @@ const Stories = () => {
                   </div>
 
                   <div className="pt-6 border-t border-muted">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 whitespace-nowrap">
+                    <h4 className="font-bold text-secondary/70">Tap to read more</h4>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/70 whitespace-nowrap">
+                    <br />
                       {story.author}
                     </p>
                   </div>
@@ -127,6 +142,58 @@ const Stories = () => {
           ))}
         </div>
       </div>
+
+      {/* Story Modal Overlay */}
+      {selectedStory && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-8"
+          onClick={closeStory}
+        >
+          <div
+            className="relative bg-white rounded-2xl overflow-hidden max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={closeStory}
+              className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-primary transition-colors"
+            >
+              <X size={24} className="text-secondary" />
+            </button>
+
+            {/* Modal Content */}
+            <div className="flex flex-col md:flex-row">
+              {/* Image */}
+              <div className="w-full md:w-1/2 h-64 md:h-auto md:min-h-[500px] relative">
+                <img
+                  src={selectedStory.image}
+                  alt={selectedStory.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-4 left-4 bg-primary px-4 py-2 rounded-sm text-xs font-black uppercase tracking-wider text-white">
+                  {selectedStory.category}
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                <Quote size={48} className="text-primary mb-6 opacity-40" />
+                <h3 className="text-3xl md:text-5xl font-black text-secondary mb-6 tracking-tighter leading-none lowercase">
+                  {selectedStory.title}
+                </h3>
+                <p className="text-lg md:text-xl text-muted-foreground font-bold leading-relaxed mb-8">
+                  "{selectedStory.description}"
+                </p>
+                <div className="pt-6 border-t border-muted">
+                  <p className="text-xs font-black uppercase tracking-widest text-secondary/60">
+                    {selectedStory.author}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
