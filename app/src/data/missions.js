@@ -28,6 +28,7 @@ export const missions = [
       accent: "bg-emerald-50",
       gradient: "from-green-50 to-emerald-50",
       iconColor: "text-[#34c759]",
+      color: "#34c759",
     },
   },
   {
@@ -50,6 +51,7 @@ export const missions = [
       accent: "bg-indigo-50",
       gradient: "from-blue-50 to-indigo-50",
       iconColor: "text-[#0071e3]",
+      color: "#0071e3",
     },
   },
   {
@@ -76,6 +78,7 @@ export const missions = [
       accent: "bg-sky-50",
       gradient: "from-blue-50 to-sky-50",
       iconColor: "text-[#0071e3]",
+      color: "#0071e3",
     },
   },
   {
@@ -98,6 +101,7 @@ export const missions = [
       accent: "bg-rose-50",
       gradient: "from-red-50 to-rose-50",
       iconColor: "text-[#ff3b30]",
+      color: "#ff3b30",
     },
   },
   {
@@ -120,6 +124,7 @@ export const missions = [
       accent: "bg-orange-50",
       gradient: "from-red-100 via-white to-orange-50",
       iconColor: "text-[#ff3b30]",
+      color: "#ff3b30",
     },
   },
 ];

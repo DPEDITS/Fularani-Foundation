@@ -222,7 +222,8 @@ const MissionInfo = () => {
 
                 <a
                   href="/donor-register"
-                  className={`flex items-center justify-center gap-2 w-full py-4 rounded-xl font-bold text-white mb-3 transition-transform hover:scale-[1.02] active:scale-[0.98] ${id === "thalassemia" ? "bg-[#ff3b30]" : "bg-primary"}`}
+                  className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-bold text-white mb-3 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                  style={{ backgroundColor: theme.color }}
                 >
                   <Heart size={18} fill="currentColor" />
                   Donate Now
