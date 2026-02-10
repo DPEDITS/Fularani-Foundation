@@ -20,6 +20,7 @@ import {
   isVolunteerAuthenticated,
   forgotPasswordVolunteer,
 } from "../services/volunteerService";
+import { loginAdmin } from "../services/adminService";
 
 const DonorLogin = () => {
   const navigate = useNavigate();
@@ -67,6 +68,16 @@ const DonorLogin = () => {
     setLoading(true);
 
     try {
+      // Admin Redirection Logic
+      const isSystemAdmin = form.email.trim().toLowerCase() === "admin@gmail.com";
+      if (isSystemAdmin) {
+        const response = await loginAdmin(form.email.trim().toLowerCase(), form.password);
+        if (response.success) {
+          navigate("/admin-dashboard");
+          return;
+        }
+      }
+
       if (role === "donor") {
         await loginDonor(form.email, form.password);
         navigate("/donor-dashboard");

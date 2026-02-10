@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion as Motion, AnimatePresence } from "motion/react";
 import { ArrowRight, Play, Heart, ShieldCheck } from "lucide-react";
 import heroBg from "../assets/missions1.jpeg";
+import { getRecentDonors } from "../services/donorService";
 
 const Hero = () => {
   const impactBadges = [
@@ -12,7 +13,24 @@ const Hero = () => {
     { text: "Pride: Mission Period Pride", color: "#db2777" }, // pink-600
   ];
   const [currentBadge, setCurrentBadge] = useState(0);
+  const [recentDonors, setRecentDonors] = useState([]);
+  const [totalDonorsCount, setTotalDonorsCount] = useState(5000);
   const videoRef = React.useRef(null);
+
+  useEffect(() => {
+    const fetchDonors = async () => {
+      try {
+        const response = await getRecentDonors();
+        if (response.success) {
+          setRecentDonors(response.data.donors);
+          setTotalDonorsCount(response.data.totalDonors);
+        }
+      } catch (error) {
+        console.error("Error fetching recent donors:", error);
+      }
+    };
+    fetchDonors();
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -186,20 +204,35 @@ const Hero = () => {
           <div className="absolute bottom-2 right-2 md:bottom-10 md:right-10 z-30 block">
             <div className="bg-white/90 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-white/20 max-w-[280px]">
               <div className="flex -space-x-3 mb-1">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className={`w-8 h-8 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[8px] font-black text-white`}
-                  >
-                    FF
-                  </div>
-                ))}
-                <div className="w-8 h-8 rounded-full border-2 border-white bg-accent flex items-center justify-center text-[8px] font-black text-secondary">
-                  +5k
+                {recentDonors.length > 0 ? (
+                  recentDonors.map((donor, i) => (
+                    <div
+                      key={donor._id || i}
+                      className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-primary"
+                    >
+                      <img
+                        src={donor.avatar}
+                        alt={donor.username}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))
+                ) : (
+                  [1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className={`w-10 h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[8px] font-black text-white`}
+                    >
+                      FF
+                    </div>
+                  ))
+                )}
+                <div className="w-10 h-10 rounded-full border-2 border-white bg-accent flex items-center justify-center text-[10px] font-black text-secondary">
+                  +{totalDonorsCount > 5000 ? totalDonorsCount : "5k"}
                 </div>
               </div>
-              <p className="text-sm font-black text-secondary leading-tight">
-                Join 5,000+ donors making a real difference in Bhadrak.
+              <p className="text-sm font-black text-secondary leading-tight mt-2">
+                Join {totalDonorsCount > 5000 ? totalDonorsCount.toLocaleString() : "5,000"}+ donors making a real difference in Bhadrak.
               </p>
             </div>
           </div>

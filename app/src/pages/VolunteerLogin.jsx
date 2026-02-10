@@ -1,17 +1,46 @@
-"use client";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Mail, Lock, ArrowRight, Eye, EyeOff, Users, ShieldCheck } from "lucide-react";
+import { loginVolunteer } from "../services/volunteerService";
+import { loginAdmin } from "../services/adminService";
 
 const VolunteerLogin = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Volunteer Login Data:", form);
+    setLoading(true);
+    setError("");
+
+    try {
+      const isSystemAdmin = form.email.trim().toLowerCase() === "admin@gmail.com";
+
+      if (isSystemAdmin) {
+        const response = await loginAdmin(form.email.trim().toLowerCase(), form.password);
+        if (response.success) {
+          navigate("/admin-dashboard");
+          return;
+        }
+      } else {
+        const response = await loginVolunteer(form.email, form.password);
+        if (response.success) {
+          navigate("/volunteer-dashboard");
+          return;
+        }
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isEmailValid = form.email.includes("@") && form.email.includes(".");
@@ -29,6 +58,11 @@ const VolunteerLogin = () => {
         </div>
 
         <div className="apple-card p-8 md:p-10">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-bold border border-red-100 animate-in fade-in slide-in-from-top-2">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Email</label>
@@ -76,10 +110,11 @@ const VolunteerLogin = () => {
 
             <button
               type="submit"
-              className="w-full h-14 bg-[#1d1d1f] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 group"
+              disabled={loading}
+              className="w-full h-14 bg-[#1d1d1f] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
             >
-              Sign In
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              {loading ? "Signing In..." : "Sign In"}
+              {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
             </button>
 
             <div className="relative flex items-center justify-center py-2">

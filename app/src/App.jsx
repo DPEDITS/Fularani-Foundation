@@ -17,6 +17,8 @@ import VolunteerRegister from "./pages/VolunteerRegister";
 import VolunteerDashboard from "./pages/VolunteerDashboard";
 import Footer from "./components/Footer";
 import CSRPartnership from "./pages/CSRPartnership";
+import ScrollProgress from "./components/ui/ScrollProgress";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const App = () => {
   const location = useLocation();
@@ -31,6 +33,7 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <ScrollProgress />
       <Navbar />
       <main>
         <Routes>
@@ -48,6 +51,7 @@ const App = () => {
           <Route path="/volunteer-register" element={<DonorRegister />} />
           <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
           <Route path="/donor-dashboard" element={<DonorDashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
         </Routes>
       </main>
       {!shouldHideFooter && <Footer />}

@@ -13,6 +13,12 @@ import {
   getVolunteerUser,
   logoutVolunteer,
 } from "../services/volunteerService";
+import {
+  isAdminAuthenticated,
+  getAdminUser,
+  logoutAdmin,
+} from "../services/adminService";
+import { useInterval } from "usehooks-ts";
 import logo from "../assets/image copy.png";
 
 const Navbar = () => {
@@ -23,26 +29,35 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
 
+  const checkAuth = () => {
+    const isDonor = isDonorAuthenticated();
+    const isVolunteer = isVolunteerAuthenticated();
+    const isAdmin = isAdminAuthenticated();
+
+    setIsLoggedIn(isDonor || isVolunteer || isAdmin);
+    if (isAdmin) {
+      setUserRole("admin");
+      setCurrentUser(getAdminUser());
+    } else if (isVolunteer) {
+      setUserRole("volunteer");
+      setCurrentUser(getVolunteerUser());
+    } else if (isDonor) {
+      setUserRole("donor");
+      setCurrentUser(getDonorUser());
+    } else {
+      setUserRole(null);
+      setCurrentUser(null);
+    }
+  };
+
+  // Poll for changes every 2 seconds to handle login/logout without refresh
+  useInterval(() => {
+    checkAuth();
+  }, 2000);
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
-    };
-
-    const checkAuth = () => {
-      const isDonor = isDonorAuthenticated();
-      const isVolunteer = isVolunteerAuthenticated();
-
-      setIsLoggedIn(isDonor || isVolunteer);
-      if (isVolunteer) {
-        setUserRole("volunteer");
-        setCurrentUser(getVolunteerUser());
-      } else if (isDonor) {
-        setUserRole("donor");
-        setCurrentUser(getDonorUser());
-      } else {
-        setUserRole(null);
-        setCurrentUser(null);
-      }
     };
 
     checkAuth();
@@ -56,7 +71,9 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      if (userRole === "volunteer") {
+      if (userRole === "admin") {
+        await logoutAdmin();
+      } else if (userRole === "volunteer") {
         await logoutVolunteer();
       } else {
         await logoutDonor();
@@ -92,7 +109,7 @@ const Navbar = () => {
             <img
               src={logo}
               alt="Fularani Foundation"
-              className="h-10 md:h-12 w-auto object-contain transition-transform group-hover:scale-105"
+              className="h-10 md:h-12 w-auto object-contain transition-transform"
             />
           </Link>
 
@@ -156,9 +173,11 @@ const Navbar = () => {
               <div className="flex items-center gap-3">
                 <Link
                   to={
-                    userRole === "volunteer"
-                      ? "/volunteer-dashboard"
-                      : "/donor-dashboard"
+                    userRole === "admin"
+                      ? "/admin-dashboard"
+                      : userRole === "volunteer"
+                        ? "/volunteer-dashboard"
+                        : "/donor-dashboard"
                   }
                   className="flex items-center gap-3 pl-2 pr-4 py-1.5 bg-muted rounded-full hover:bg-primary/10 transition-all border border-secondary/5"
                 >

@@ -17,6 +17,7 @@ import {
   Camera,
   CheckCircle2,
   Target,
+  ChevronDown,
 } from "lucide-react";
 import { registerDonor, isAuthenticated } from "../services/donorService";
 import {
@@ -61,6 +62,7 @@ const DonorRegister = () => {
   const [success, setSuccess] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [touched, setTouched] = useState({});
+  const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
 
   const totalSteps = role === "donor" ? 2 : 4;
 
@@ -518,21 +520,41 @@ const DonorRegister = () => {
                         />
                       </div>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative">
                       <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
                         Gender
                       </label>
-                      <select
-                        name="gender"
-                        value={form.gender}
-                        onChange={handleChange}
-                        className="w-full h-14 px-4 rounded-2xl bg-muted/20 border-none outline-none font-black text-base appearance-none cursor-pointer"
-                      >
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                      </select>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setIsGenderDropdownOpen(!isGenderDropdownOpen)}
+                          className={`w-full h-14 px-6 rounded-2xl bg-muted/20 border-2 transition-all flex items-center justify-between font-black text-base ${isGenderDropdownOpen ? 'border-primary ring-2 ring-primary/5' : 'border-transparent text-secondary'}`}
+                        >
+                          <span className={form.gender ? 'text-secondary' : 'text-gray-300'}>
+                            {form.gender ? form.gender.charAt(0).toUpperCase() + form.gender.slice(1) : "Select Gender"}
+                          </span>
+                          <ChevronDown size={20} className={`text-secondary/20 transition-transform duration-300 ${isGenderDropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {isGenderDropdownOpen && (
+                          <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white border border-secondary/5 rounded-3xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                            {['male', 'female', 'other'].map((option) => (
+                              <button
+                                key={option}
+                                type="button"
+                                onClick={() => {
+                                  setForm({ ...form, gender: option });
+                                  setIsGenderDropdownOpen(false);
+                                  setError("");
+                                }}
+                                className={`w-full px-6 py-4 text-left text-sm font-black transition-all hover:bg-primary hover:text-white lowercase tracking-tight ${form.gender === option ? 'bg-primary/5 text-primary' : 'text-secondary/70'}`}
+                              >
+                                {option}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </Motion.div>
                 )}

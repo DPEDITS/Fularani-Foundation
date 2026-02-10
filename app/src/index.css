@@ -38,13 +38,16 @@
   --card-foreground: #1a1a1a;
   --popover: #ffffff;
   --popover-foreground: #1a1a1a;
-  --primary: #0066cc; /* NGO Blue */
+  --primary: #0066cc;
+  /* NGO Blue */
   --primary-foreground: #ffffff;
-  --secondary: #1a1a1a; /* Charcoal */
+  --secondary: #1a1a1a;
+  /* Charcoal */
   --secondary-foreground: #ffffff;
   --muted: #f4f4f4;
   --muted-foreground: #666666;
-  --accent: #ffc20e; /* Impact Yellow */
+  --accent: #ffc20e;
+  /* Impact Yellow */
   --accent-foreground: #1a1a1a;
   --destructive: #ff3b30;
   --border: #e2e2e2;
@@ -78,9 +81,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   html,
   body {
     @apply bg-background text-foreground;
+    scroll-behavior: smooth;
     font-family:
       "Inter",
       -apple-system,
