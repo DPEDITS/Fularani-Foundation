@@ -10,11 +10,15 @@ import {
   EyeOff,
   Loader2,
   ChevronLeft,
+  X,
+  ShieldCheck,
+  Zap,
 } from "lucide-react";
-import { loginDonor, isAuthenticated } from "../services/donorService";
+import { loginDonor, isAuthenticated, forgotPasswordDonor } from "../services/donorService";
 import {
   loginVolunteer,
   isVolunteerAuthenticated,
+  forgotPasswordVolunteer,
 } from "../services/volunteerService";
 
 const DonorLogin = () => {
@@ -34,6 +38,15 @@ const DonorLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotForm, setForgotForm] = useState({
+    email: "",
+    panNumber: "",
+    newPassword: "",
+  });
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSuccess, setForgotSuccess] = useState(false);
+  const [forgotError, setForgotError] = useState("");
 
   useEffect(() => {
     if (role === "donor" && isAuthenticated()) {
@@ -69,6 +82,30 @@ const DonorLogin = () => {
       setError(errorMessage);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotSubmit = async (e) => {
+    e.preventDefault();
+    setForgotError("");
+    setForgotLoading(true);
+
+    try {
+      if (role === "donor") {
+        await forgotPasswordDonor(forgotForm.email, forgotForm.panNumber, forgotForm.newPassword);
+      } else {
+        await forgotPasswordVolunteer(forgotForm.email, forgotForm.panNumber, forgotForm.newPassword);
+      }
+      setForgotSuccess(true);
+      setTimeout(() => {
+        setShowForgotModal(false);
+        setForgotSuccess(false);
+        setForgotForm({ email: "", panNumber: "", newPassword: "" });
+      }, 3000);
+    } catch (err) {
+      setForgotError(err.response?.data?.message || "Reset failed. Verify details.");
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -186,12 +223,13 @@ const DonorLogin = () => {
                   <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
                     Password
                   </label>
-                  <a
-                    href="/forgot-password"
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotModal(true)}
                     className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline underline-offset-4 decoration-2"
                   >
                     Forgot?
-                  </a>
+                  </button>
                 </div>
                 <div className="relative">
                   <Lock
@@ -250,6 +288,93 @@ const DonorLogin = () => {
           </Motion.div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-secondary/80 backdrop-blur-md">
+          <Motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white w-full max-w-[450px] p-8 md:p-10 rounded-[40px] shadow-2xl relative overflow-hidden"
+          >
+            <button
+              onClick={() => setShowForgotModal(false)}
+              className="absolute top-6 right-6 p-2 hover:bg-muted/30 rounded-full transition-colors"
+            >
+              <X size={20} className="text-secondary/40" />
+            </button>
+
+            {forgotSuccess ? (
+              <div className="text-center py-8">
+                <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <ShieldCheck size={40} className="text-green-500" />
+                </div>
+                <h3 className="text-2xl font-black text-secondary mb-2 lowercase tracking-tighter">password reset!</h3>
+                <p className="text-secondary/60 text-sm font-bold">Your security is updated. You can now login with your new password.</p>
+              </div>
+            ) : (
+              <>
+                <div className="mb-8">
+                  <h3 className="text-3xl font-black text-secondary mb-2 lowercase tracking-tighter">forgot access?</h3>
+                  <p className="text-secondary/40 text-[10px] font-black uppercase tracking-widest">Verify your identity to reset password.</p>
+                </div>
+
+                {forgotError && (
+                  <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-[10px] font-bold border border-red-100 uppercase tracking-widest">
+                    {forgotError}
+                  </div>
+                )}
+
+                <form onSubmit={handleForgotSubmit} className="space-y-5">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">Email</label>
+                    <input
+                      type="email"
+                      value={forgotForm.email}
+                      onChange={(e) => setForgotForm({ ...forgotForm, email: e.target.value })}
+                      required
+                      placeholder="registered@email.com"
+                      className="w-full h-12 px-6 rounded-xl bg-muted/20 border-none focus:ring-2 focus:ring-primary/20 outline-none transition-all font-black text-sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">Verified PAN Number</label>
+                    <input
+                      type="text"
+                      value={forgotForm.panNumber}
+                      onChange={(e) => setForgotForm({ ...forgotForm, panNumber: e.target.value })}
+                      required
+                      placeholder="ABCDE1234F"
+                      className="w-full h-12 px-6 rounded-xl bg-muted/20 border-none focus:ring-2 focus:ring-primary/20 outline-none transition-all font-black text-sm uppercase"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">New Password</label>
+                    <input
+                      type="password"
+                      value={forgotForm.newPassword}
+                      onChange={(e) => setForgotForm({ ...forgotForm, newPassword: e.target.value })}
+                      required
+                      placeholder="••••••••"
+                      className="w-full h-12 px-6 rounded-xl bg-muted/20 border-none focus:ring-2 focus:ring-primary/20 outline-none transition-all font-black text-sm"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={forgotLoading}
+                    className="w-full h-14 bg-secondary text-white rounded-xl font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-xl transition-all active:scale-95 disabled:opacity-50 mt-4"
+                  >
+                    {forgotLoading ? <Loader2 className="animate-spin" /> : <>Reset Password <Zap size={14} className="fill-accent text-accent" /></>}
+                  </button>
+                </form>
+              </>
+            )}
+          </Motion.div>
+        </div>
+      )}
     </div>
   );
 };

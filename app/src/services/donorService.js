@@ -89,6 +89,15 @@ export const refreshAccessToken = async () => {
     }
 };
 
+export const forgotPasswordDonor = async (email, panNumber, newPassword) => {
+    try {
+        const response = await api.post('/api/donor/forgot-password', { email, panNumber, newPassword });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // Donor data API calls
 export const getDonorProfile = async () => {
     try {
@@ -166,7 +175,7 @@ export const updateDonorAvatar = async (formData) => {
 export const getRazorpayKey = async () => {
     try {
         const response = await api.get('/api/payment/getkey', {
-             headers: authHeader()
+            headers: authHeader()
         });
         return response.data;
     } catch (error) {
@@ -188,7 +197,7 @@ export const createRazorpayOrder = async (amount) => {
 export const verifyRazorpayPayment = async (paymentData) => {
     try {
         const response = await api.post('/api/payment/paymentverification', paymentData, {
-             headers: authHeader()
+            headers: authHeader()
         });
         return response.data;
     } catch (error) {
@@ -199,6 +208,28 @@ export const verifyRazorpayPayment = async (paymentData) => {
 export const createDonation = async (donationData) => {
     try {
         const response = await api.post('/api/donations/create', donationData, {
+            headers: authHeader()
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getActiveSubscriptions = async () => {
+    try {
+        const response = await api.get('/api/donations/active-subscriptions', {
+            headers: authHeader()
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const cancelSubscription = async (subscriptionId) => {
+    try {
+        const response = await api.patch(`/api/donations/cancel-subscription/${subscriptionId}`, {}, {
             headers: authHeader()
         });
         return response.data;
