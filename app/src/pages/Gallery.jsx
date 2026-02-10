@@ -22,8 +22,14 @@ import {
   deleteGalleryItem,
   updateGalleryItem,
 } from "../services/galleryService";
+import { getDonorUser } from "../services/donorService";
+import { getVolunteerUser } from "../services/volunteerService";
 
 const Gallery = () => {
+  const donor = getDonorUser();
+  const volunteer = getVolunteerUser();
+  const currentUser = donor || volunteer;
+  const isAuthorizedUser = currentUser?.email === "debashishparida75@gmail.com";
   const [selectedImage, setSelectedImage] = useState(null);
   const [activeCategory, setActiveCategory] = useState("All");
   const [items, setItems] = useState([]);
@@ -209,16 +215,18 @@ const Gallery = () => {
               volunteers.
             </p>
 
-            <button
-              onClick={() => setIsUploadModalOpen(true)}
-              className="bg-secondary hover:bg-black text-white px-12 py-6 rounded-2xl text-lg font-black uppercase tracking-tight transition-all flex items-center justify-center gap-3 group w-full sm:w-auto"
-            >
-              <Plus
-                size={24}
-                className="group-active:rotate-90 transition-transform"
-              />
-              Contribute Moment
-            </button>
+            {isAuthorizedUser && (
+              <button
+                onClick={() => setIsUploadModalOpen(true)}
+                className="bg-secondary hover:bg-black text-white px-12 py-6 rounded-2xl text-lg font-black uppercase tracking-tight transition-all flex items-center justify-center gap-3 group w-full sm:w-auto"
+              >
+                <Plus
+                  size={24}
+                  className="group-active:rotate-90 transition-transform"
+                />
+                Contribute Moment
+              </button>
+            )}
           </Motion.div>
         </div>
       </section>
@@ -237,11 +245,10 @@ const Gallery = () => {
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
-                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-tight transition-all whitespace-nowrap ${
-                  activeCategory === category
-                    ? "bg-primary text-white shadow-lg shadow-primary/20"
-                    : "bg-muted/30 text-secondary/60 hover:bg-muted/50"
-                }`}
+                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-tight transition-all whitespace-nowrap ${activeCategory === category
+                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  : "bg-muted/30 text-secondary/60 hover:bg-muted/50"
+                  }`}
               >
                 {category}
               </button>
@@ -299,23 +306,25 @@ const Gallery = () => {
                           {item.uploadedBy}
                         </span>
                       </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(item);
-                          }}
-                          className="p-3 rounded-xl bg-white/10 hover:bg-accent hover:text-secondary transition-all"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button
-                          onClick={(e) => handleDelete(e, item.id)}
-                          className="p-3 rounded-xl bg-white/10 hover:bg-red-500 transition-all"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                      {isAuthorizedUser && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(item);
+                            }}
+                            className="p-3 rounded-xl bg-white/10 hover:bg-accent hover:text-secondary transition-all"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button
+                            onClick={(e) => handleDelete(e, item.id)}
+                            className="p-3 rounded-xl bg-white/10 hover:bg-red-500 transition-all"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Motion.div>

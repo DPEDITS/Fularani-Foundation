@@ -288,10 +288,36 @@ const getVolunteerStats = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, stats, "Volunteer stats fetched successfully"));
 });
 
+const forgotPasswordVolunteer = asyncHandler(async (req, res) => {
+  const { email, panNumber, newPassword } = req.body;
+
+  if (!email || !panNumber || !newPassword) {
+    throw new ApiError(400, "Email, PAN Number and New Password are required");
+  }
+
+  const user = await Volunteer.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(404, "User with this email does not exist");
+  }
+
+  if (user.panNumber.toUpperCase() !== panNumber.toUpperCase()) {
+    throw new ApiError(401, "Invalid PAN Number for this account");
+  }
+
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password reset successfully"));
+});
+
 export {
   registerVolunteer,
   loginVolunteer,
   getVolunteerProfile,
   getVolunteerStats,
   refreshAccessToken,
+  forgotPasswordVolunteer
 };

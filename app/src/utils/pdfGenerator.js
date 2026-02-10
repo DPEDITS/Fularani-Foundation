@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import reactLogo from "../assets/logo.jpg";
-import reactLogoSvg from "../assets/react.svg";
+import authSig from "../assets/image.png";
 
 const numberToWords = (num) => {
     const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
@@ -54,9 +54,9 @@ export const generateDonationReceipt = async (donation, user) => {
         if (!donation) throw new Error("Donation data is missing");
 
         // 1. Load All Images First
-        const [logoImg, sigSvgImg] = await Promise.all([
+        const [logoImg, sigImg] = await Promise.all([
             loadImage(reactLogo),
-            loadImage(reactLogoSvg)
+            loadImage(authSig)
         ]);
 
         const doc = new (jsPDF.jsPDF || jsPDF)();
@@ -208,9 +208,9 @@ export const generateDonationReceipt = async (donation, user) => {
         doc.setFont("helvetica", "bold");
         doc.text("For Fularani Foundation", sigX, sigY);
 
-        // Authorized Signature (reactLogoSvg)
-        if (sigSvgImg) {
-            doc.addImage(sigSvgImg, "PNG", sigX - 5, sigY + 3, 40, 12);
+        // Authorized Signature (authSig)
+        if (sigImg) {
+            doc.addImage(sigImg, "PNG", sigX - 5, sigY + 3, 40, 12);
         } else {
             doc.setDrawColor(200);
             doc.setLineWidth(0.1);

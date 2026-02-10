@@ -8,7 +8,8 @@ import {
     getDonorDonations,
     getDonorStats,
     updateDonorProfile,
-    updateDonorAvatar
+    updateDonorAvatar,
+    forgotPasswordDonor
 } from '../controllers/donor.controller.js';
 import { upload } from '../middlewares/multer.middleware.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js';
@@ -27,6 +28,7 @@ donorRouter.route("/register").post(
 )
 
 donorRouter.route("/login").post(loginDonor)
+donorRouter.route("/forgot-password").post(forgotPasswordDonor)
 
 // Protected routes (require authentication)
 donorRouter.route("/logout").post(verifyJWT, logoutDonor)

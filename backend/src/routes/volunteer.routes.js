@@ -5,6 +5,7 @@ import {
     getVolunteerProfile,
     getVolunteerStats,
     refreshAccessToken,
+    forgotPasswordVolunteer,
 } from "../controllers/volunteer.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -17,6 +18,7 @@ router.route("/register").post(
 );
 
 router.route("/login").post(loginVolunteer);
+router.route("/forgot-password").post(forgotPasswordVolunteer);
 
 router.route("/profile").get(verifyJWT, getVolunteerProfile);
 router.route("/stats").get(verifyJWT, getVolunteerStats);

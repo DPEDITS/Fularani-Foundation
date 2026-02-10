@@ -93,6 +93,15 @@ export const refreshVolunteerAccessToken = async () => {
     }
 };
 
+export const forgotPasswordVolunteer = async (email, panNumber, newPassword) => {
+    try {
+        const response = await api.post('/api/volunteers/forgot-password', { email, panNumber, newPassword });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // Volunteer data API calls
 export const getVolunteerProfile = async () => {
     try {

@@ -40,6 +40,8 @@ import {
   getRazorpayKey,
   createRazorpayOrder,
   verifyRazorpayPayment,
+  getActiveSubscriptions,
+  cancelSubscription,
 } from "../services/donorService";
 import { generateDonationReceipt, generateDonationsReport } from "../utils/pdfGenerator";
 
@@ -72,6 +74,7 @@ const DonorDashboard = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successAmount, setSuccessAmount] = useState(0);
   const [toastMessage, setToastMessage] = useState(null);
+  const [activeSubscriptions, setActiveSubscriptions] = useState([]);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -84,14 +87,16 @@ const DonorDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [profileRes, donationsRes, statsRes] = await Promise.all([
+      const [profileRes, donationsRes, statsRes, subscriptionsRes] = await Promise.all([
         getDonorProfile(),
         getDonorDonations(),
         getDonorStats(),
+        getActiveSubscriptions(),
       ]);
       setProfile(profileRes.data);
       setDonations(donationsRes.data);
       setStats(statsRes.data);
+      setActiveSubscriptions(subscriptionsRes.data || []);
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
       setError("Failed to load dashboard data. Please try again.");
@@ -173,6 +178,12 @@ const DonorDashboard = () => {
             setShowDonationModal(false);
             setSuccessAmount(parseInt(amount));
             setShowSuccessModal(true);
+
+            // Auto-download 80G receipt if requested
+            if (donor?.wants80GReceipt || profile?.wants80GReceipt) {
+              console.log("Auto-downloading 80G receipt as requested...");
+              await generateDonationReceipt(donationData, donor || profile);
+            }
           } catch (verifyError) {
             console.error("Verification failed:", verifyError);
             setToastMessage({
@@ -203,6 +214,22 @@ const DonorDashboard = () => {
         err.response?.data?.message ||
         "Payment initiation failed. Please try again.";
       setToastMessage({ type: "error", text: errorMessage });
+      setTimeout(() => setToastMessage(null), 5000);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleCancelSubscription = async (subscriptionId) => {
+    try {
+      setIsUpdating(true);
+      await cancelSubscription(subscriptionId);
+      await fetchDashboardData();
+      setToastMessage({ type: "success", text: "Subscription stopped successfully." });
+      setTimeout(() => setToastMessage(null), 5000);
+    } catch (err) {
+      console.error("Cancel subscription failed:", err);
+      setToastMessage({ type: "error", text: "Failed to stop subscription." });
       setTimeout(() => setToastMessage(null), 5000);
     } finally {
       setIsUpdating(false);
@@ -301,8 +328,8 @@ const DonorDashboard = () => {
       <div className="max-w-[1440px] mx-auto">
         {/* Hero Header Section */}
         {/* Hero Header Section */}
-        <div className="flex flex-col lg:flex-row items-end justify-between gap-8 mb-12">
-          <div className="flex flex-col md:flex-row md:items-end gap-6">
+        <div className="flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8 mb-12 text-center lg:text-left">
+          <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
             <div className="relative group cursor-pointer" onClick={() => fileInputRef.current.click()}>
               <div className="w-36 h-36 md:w-48 md:h-48 rounded-[2.5rem] overflow-hidden border-4 border-white shadow-2xl transition-transform group-hover:scale-105 bg-accent">
                 {user?.avatar ? (
@@ -330,7 +357,7 @@ const DonorDashboard = () => {
               />
             </div>
 
-            <div>
+            <div className="flex flex-col items-center md:items-start text-center md:text-left">
               <div className="inline-block bg-accent px-3 py-1 rounded-sm text-xs font-black uppercase tracking-widest text-secondary mb-3 shadow-lg shadow-accent/20">
                 Donor Dashboard
               </div>
@@ -346,10 +373,10 @@ const DonorDashboard = () => {
           <div>
             <button
               onClick={() => setShowDonationModal(true)}
-              className="group relative px-6 py-4 bg-secondary text-white rounded-xl font-black uppercase tracking-tight text-sm overflow-hidden hover:bg-black transition-all shadow-xl shadow-secondary/30 hover:-translate-y-1 active:translate-y-0"
+              className="group relative px-6 py-4 bg-red-500 text-white rounded-xl font-black uppercase tracking-tight text-sm overflow-hidden hover:bg-red-600 transition-all shadow-xl shadow-red-500/30 hover:-translate-y-1 active:translate-y-0"
             >
               <span className="relative z-10 flex items-center gap-2">
-                Make Impact <Heart size={18} className="fill-accent text-accent animate-pulse" />
+                Donate Now <Heart size={18} className="fill-accent text-accent animate-pulse" />
               </span>
             </button>
           </div>
@@ -399,27 +426,12 @@ const DonorDashboard = () => {
             </div>
           </div>
 
-          {/* Recurring / Year Stats */}
-          <div className="flex flex-col gap-4">
-            <div className="flex-1 bg-muted/50 p-5 rounded-[24px] border border-secondary/5 flex items-center justify-between group hover:bg-white hover:shadow-xl transition-all">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 mb-1">This Year</p>
-                <p className="text-2xl font-black text-secondary tracking-tight">{formatCurrency(stats?.thisYearTotal || 0)}</p>
-              </div>
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-secondary/5 group-hover:scale-110 transition-transform">
-                <Calendar size={18} className="text-secondary" />
-              </div>
-            </div>
-
-            <div className="flex-1 bg-muted/50 p-5 rounded-[24px] border border-secondary/5 flex items-center justify-between group hover:bg-white hover:shadow-xl transition-all">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 mb-1">Active Plans</p>
-                <p className="text-2xl font-black text-secondary tracking-tight">{stats?.recurringCount || 0}</p>
-              </div>
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-secondary/5 group-hover:scale-110 transition-transform">
-                <RefreshCcw size={18} className="text-secondary" />
-              </div>
-            </div>
+          {/* Stats Column 4 - Supporter Since */}
+          <div className="bg-muted/20 p-6 md:p-10 rounded-[32px] border border-secondary/5 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <Sparkles className="text-secondary/10 absolute -bottom-4 -right-4" size={100} />
+            <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 relative z-10">Supporter Since</p>
+            <p className="text-2xl font-black text-secondary tracking-tight relative z-10">{formatDate(user?.createdAt || new Date())}</p>
           </div>
         </div>
 
@@ -451,6 +463,8 @@ const DonorDashboard = () => {
             <OverviewTab
               stats={stats}
               donations={donations}
+              activeSubscriptions={activeSubscriptions}
+              handleCancelSubscription={handleCancelSubscription}
               formatCurrency={formatCurrency}
               formatDate={formatDate}
               setActiveTab={setActiveTab}
@@ -517,26 +531,6 @@ const DonorDashboard = () => {
                           handleRazorpayPayment(e.target.value, false);
                       }}
                     />
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                <div className="flex gap-3">
-                  <RefreshCcw className="text-blue-500 shrink-0" size={20} />
-                  <div>
-                    <p className="text-blue-900 font-bold text-sm">
-                      Monthly Giving
-                    </p>
-                    <p className="text-blue-700/70 text-xs mt-1">
-                      Become a recurring donor to provide consistent support.
-                    </p>
-                    <button
-                      onClick={() => handleRazorpayPayment(1000, true)}
-                      className="mt-3 text-blue-600 font-bold text-xs hover:underline"
-                    >
-                      Start Monthly ₹1,000 →
-                    </button>
                   </div>
                 </div>
               </div>
@@ -635,16 +629,20 @@ const DonorDashboard = () => {
 const OverviewTab = ({
   stats,
   donations,
+  activeSubscriptions,
+  handleCancelSubscription,
   formatCurrency,
   formatDate,
   setActiveTab,
 }) => {
+  const engagementScore = Math.min(100, Math.max(15, (stats?.donationCount || 0) * 15));
+  const engagementLabel = engagementScore > 80 ? "Legendary" : engagementScore > 50 ? "Consistent" : "Growing";
   const recentDonations = donations?.slice(0, 3) || [];
 
   return (
-    <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+    <div className="grid md:grid-cols-2 gap-4 md:gap-6" >
       {/* Giving Insight */}
-      <div className="bg-white p-6 md:p-10 rounded-[32px] shadow-xl border border-secondary/10 flex flex-col justify-between group hover:border-secondary/20 transition-all">
+      < div className="bg-white p-6 md:p-10 rounded-[32px] shadow-xl border border-secondary/10 flex flex-col justify-between group hover:border-secondary/20 transition-all" >
         <div>
           <h3 className="text-xl md:text-2xl font-black text-secondary mb-6 lowercase tracking-tighter">giving insight.</h3>
           <div className="space-y-8">
@@ -654,17 +652,28 @@ const OverviewTab = ({
                 <p className="text-3xl font-black text-secondary tracking-tight">{formatCurrency(stats?.averageDonation || 0)}</p>
               </div>
               <div className="text-right">
-                <span className="text-[9px] font-black text-white bg-green-600 px-2 py-1 rounded-sm uppercase tracking-widest">Consistent</span>
+                <span className={`text-[9px] font-black text-white px-2 py-1 rounded-sm uppercase tracking-widest ${engagementScore > 50 ? 'bg-green-600' : 'bg-orange-500'}`}>
+                  {engagementLabel}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-end border-b border-muted pb-5">
+              <div>
+                <p className="text-secondary/40 text-[10px] font-black uppercase tracking-widest mb-1">Latest Contribution</p>
+                <p className="text-3xl font-black text-secondary tracking-tight">
+                  {donations?.[0] ? formatCurrency(donations[0].amount) : "—"}
+                </p>
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-secondary/60">
-                <span>Frequency</span>
-                <span className="text-secondary">{stats?.avgFrequency || "Monthly"}</span>
+                <span>Engagement Score</span>
+                <span className="text-secondary">{engagementScore}%</span>
               </div>
               <div className="w-full bg-muted rounded-sm h-3 overflow-hidden">
-                <div className="bg-accent h-full rounded-sm transition-all duration-1000" style={{ width: '75%' }} />
+                <div className="bg-accent h-full rounded-sm transition-all duration-1000" style={{ width: `${engagementScore}%` }} />
               </div>
             </div>
           </div>
@@ -672,10 +681,10 @@ const OverviewTab = ({
         <p className="text-secondary/60 text-xs font-bold leading-relaxed mt-8">
           Your regular contributions are building a legacy. Thank you for being a pillar of support.
         </p>
-      </div>
+      </div >
 
       {/* Recent Activity List */}
-      <div className="bg-secondary p-6 md:p-10 rounded-[32px] shadow-2xl flex flex-col">
+      < div className="bg-secondary p-6 md:p-10 rounded-[32px] shadow-2xl flex flex-col" >
         <h3 className="text-xl md:text-2xl font-black text-white mb-6 lowercase tracking-tighter">recent contributions.</h3>
         <div className="space-y-3 flex-1">
           {recentDonations.length > 0 ? recentDonations.map((donation, i) => (
@@ -698,89 +707,137 @@ const OverviewTab = ({
             </div>
           )}
         </div>
-        {recentDonations.length > 0 && (
-          <button
-            onClick={() => setActiveTab("donations")}
-            className="w-full py-4 mt-6 bg-white/10 text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-secondary transition-all rounded-xl"
-          >
-            View Full History
-          </button>
-        )}
-      </div>
-    </div>
+        {
+          recentDonations.length > 0 && (
+            <button
+              onClick={() => setActiveTab("donations")}
+              className="w-full py-4 mt-6 bg-white/10 text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-secondary transition-all rounded-xl"
+            >
+              View Full History
+            </button>
+          )
+        }
+      </div >
+
+    </div >
   );
 };
 
-const DonationsTab = ({ donations, user, formatCurrency, formatDate, setShowDonationModal }) => (
-  <div className="bg-white p-6 md:p-10 rounded-[32px] shadow-xl border border-secondary/10">
-    <div className="flex items-center justify-between mb-8">
-      <h3 className="text-2xl md:text-3xl font-black text-secondary tracking-tighter lowercase">donation history.</h3>
-      <button
-        onClick={() => generateDonationsReport(donations, user)}
-        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-secondary text-white font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-secondary/20"
-      >
-        <Download size={14} /> Export PDF
-      </button>
-    </div>
+const DonationsTab = ({ donations, user, formatCurrency, formatDate, setShowDonationModal }) => {
+  // Group donations by year
+  const groupedDonations = donations.reduce((acc, donation) => {
+    const year = new Date(donation.donatedAt).getFullYear();
+    if (!acc[year]) acc[year] = [];
+    acc[year].push(donation);
+    return acc;
+  }, {});
 
-    {donations.length > 0 ? (
-      <div className="overflow-x-auto -mx-4 md:-mx-0">
-        <table className="w-full text-left min-w-[700px] border-collapse">
-          <thead>
-            <tr className="border-b-2 border-secondary/10">
-              <th className="pb-4 pl-4 text-secondary/40 text-[10px] font-black uppercase tracking-widest">Date</th>
-              <th className="pb-4 px-4 text-secondary/40 text-[10px] font-black uppercase tracking-widest">Amount</th>
-              <th className="pb-4 px-4 text-secondary/40 text-[10px] font-black uppercase tracking-widest">Plan</th>
-              <th className="pb-4 pr-4 text-secondary/40 text-[10px] font-black uppercase tracking-widest text-right">Receipt</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-secondary/5">
-            {donations.map((donation, i) => (
-              <tr key={i} className="group hover:bg-muted/30 transition-colors">
-                <td className="py-4 pl-4 font-black text-secondary text-sm">{formatDate(donation.donatedAt)}</td>
-                <td className="py-4 px-4">
-                  <span className="text-lg font-black text-secondary">{formatCurrency(donation.amount)}</span>
-                </td>
-                <td className="py-4 px-4">
-                  {donation.isRecurring ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 text-[9px] font-black rounded-sm uppercase tracking-widest">
-                      <RefreshCcw size={10} /> Recurring
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-secondary/60 text-[9px] font-black rounded-sm uppercase tracking-widest">
-                      One-time
-                    </span>
-                  )}
-                </td>
-                <td className="py-4 pr-4 text-right">
-                  <button
-                    onClick={async () => await generateDonationReceipt(donation, user)}
-                    className="inline-flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-wider hover:underline underline-offset-4 decoration-2"
-                  >
-                    <Download size={14} /> Download
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    ) : (
-      <div className="text-center py-16 bg-muted/20 rounded-2xl border-2 border-dashed border-secondary/5">
-        <div className="w-14 h-14 bg-secondary/5 rounded-full flex items-center justify-center mx-auto mb-4">
-          <DollarSign size={20} className="text-secondary/40" />
+  const years = Object.keys(groupedDonations).sort((a, b) => b - a);
+
+  if (donations.length === 0) {
+    return (
+      <div className="bg-white p-10 rounded-[40px] shadow-xl border border-secondary/10 text-center py-24">
+        <div className="w-20 h-20 bg-secondary/5 rounded-full flex items-center justify-center mx-auto mb-6">
+          <DollarSign size={32} className="text-secondary/20" />
         </div>
-        <p className="text-secondary/60 font-bold mb-4 text-sm">Your donation history is waiting to be written.</p>
+        <p className="text-secondary/60 font-black text-lg mb-6 tracking-tight">Your story of impact starts here.</p>
         <button
           onClick={() => setShowDonationModal(true)}
-          className="text-accent font-black text-xs uppercase tracking-widest hover:underline underline-offset-4 decoration-2"
+          className="px-8 py-4 bg-secondary text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-black transition-all shadow-xl shadow-secondary/20"
         >
           Make your first donation
         </button>
       </div>
-    )}
-  </div>
-);
+    );
+  }
+
+  return (
+    <div className="relative grid grid-cols-1 lg:grid-cols-[1fr_80px] gap-8">
+      {/* The Chronicle Timeline */}
+      <div className="space-y-16">
+        {years.map((year) => {
+          const yearDonations = groupedDonations[year];
+          const yearTotal = yearDonations.reduce((sum, d) => sum + d.amount, 0);
+
+          return (
+            <section key={year} id={`year-${year}`} className="relative">
+              {/* Year Header */}
+              <div className="sticky top-28 z-30 mb-8">
+                <div className="inline-flex items-center gap-4 bg-secondary text-white px-6 py-3 rounded-2xl shadow-2xl">
+                  <span className="text-3xl font-black tracking-tighter">{year}</span>
+                  <div className="w-px h-6 bg-white/20"></div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 leading-none">Yearly Total</span>
+                    <span className="text-sm font-black text-accent">{formatCurrency(yearTotal)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Path Line */}
+              <div className="absolute left-10 top-20 bottom-0 w-px bg-gradient-to-b from-secondary/20 via-secondary/10 to-transparent"></div>
+
+              {/* Donation Nodes */}
+              <div className="space-y-6 ml-10 pl-10 border-l-2 border-dashed border-secondary/5 py-4">
+                {yearDonations.map((donation, i) => (
+                  <div key={i} className="group relative">
+                    {/* The Dot */}
+                    <div className="absolute -left-[51px] top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-4 border-secondary group-hover:bg-accent group-hover:border-accent group-hover:scale-125 transition-all z-10 shadow-lg"></div>
+
+                    {/* The Card */}
+                    <div className="bg-white p-6 rounded-[24px] border border-secondary/10 shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
+                      <div className="flex items-center gap-6">
+                        <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center shrink-0 transition-colors">
+                          <Heart size={24} className={i === 0 && year === years[0] ? "fill-primary text-primary" : ""} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-3 mb-1">
+                            <h4 className="text-2xl font-black text-secondary tracking-tight">{formatCurrency(donation.amount)}</h4>
+                            <span className="px-2 py-0.5 bg-green-50 text-green-600 text-[8px] font-black rounded-sm uppercase tracking-widest border border-green-100">Success</span>
+                          </div>
+                          <p className="text-secondary/40 text-[10px] font-black uppercase tracking-[0.1em]">{formatDate(donation.donatedAt)}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={async () => await generateDonationReceipt(donation, user)}
+                          className="flex items-center gap-2 px-5 py-3 rounded-xl bg-muted text-secondary font-black text-[10px] uppercase tracking-widest transition-all shadow-sm"
+                        >
+                          <Download size={14} /> Receipt
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+
+        {/* Ending Milestone */}
+        <div className="flex flex-col items-center py-10 opacity-20">
+          <div className="w-px h-20 bg-gradient-to-b from-secondary to-transparent mb-4"></div>
+          <Award size={40} className="text-secondary" />
+          <p className="text-[10px] font-black uppercase tracking-widest mt-2">The journey continues</p>
+        </div>
+      </div>
+
+      {/* Quick Jump Sidebar - Desktop Only */}
+      <div className="hidden lg:flex flex-col gap-2 sticky top-48 h-fit">
+        <p className="text-[8px] font-black uppercase tracking-[0.3em] text-secondary/30 mb-4 rotate-180 [writing-mode:vertical-lr] mx-auto">Quick Jump</p>
+        {years.map(year => (
+          <a
+            key={year}
+            href={`#year-${year}`}
+            className="w-12 h-12 rounded-xl border border-secondary/10 flex items-center justify-center font-black text-xs text-secondary/40 hover:bg-accent hover:text-secondary hover:border-accent transition-all shadow-sm"
+          >
+            '{year.toString().slice(-2)}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const ProfileTab = ({ user, onUpdate, isUpdating }) => {
   const [isEditing, setIsEditing] = useState(false);

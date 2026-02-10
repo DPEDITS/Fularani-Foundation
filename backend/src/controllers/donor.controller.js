@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Donor } from "../models/donor.model.js";
 import { Donation } from "../models/donation.model.js";
+import { Subscription } from "../models/subscription.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
@@ -240,7 +241,7 @@ const getDonorStats = asyncHandler(async (req, res) => {
 
   const thisYearTotal = thisYearDonations.reduce((sum, d) => sum + d.amount, 0);
 
-  const recurringDonations = donations.filter(d => d.isRecurring);
+  const activeSubscriptions = await Subscription.find({ donorId, status: "active" });
 
   const calculatedTotal = donations.reduce((sum, d) => sum + d.amount, 0);
 
@@ -249,7 +250,7 @@ const getDonorStats = asyncHandler(async (req, res) => {
     donationCount: donations.length,
     thisYearTotal,
     thisYearCount: thisYearDonations.length,
-    recurringCount: recurringDonations.length,
+    recurringCount: activeSubscriptions.length,
     averageDonation: donations.length > 0
       ? Math.round(calculatedTotal / donations.length)
       : 0
@@ -324,6 +325,31 @@ const updateDonorAvatar = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, donor, "Avatar image updated successfully"));
 });
 
+const forgotPasswordDonor = asyncHandler(async (req, res) => {
+  const { email, panNumber, newPassword } = req.body;
+
+  if (!email || !panNumber || !newPassword) {
+    throw new ApiError(400, "Email, PAN Number and New Password are required");
+  }
+
+  const user = await Donor.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(404, "User with this email does not exist");
+  }
+
+  if (user.panNumber.toUpperCase() !== panNumber.toUpperCase()) {
+    throw new ApiError(401, "Invalid PAN Number for this account");
+  }
+
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password reset successfully"));
+});
+
 export {
   registerDonor,
   loginDonor,
@@ -334,5 +360,6 @@ export {
   getDonorDonations,
   getDonorStats,
   updateDonorProfile,
-  updateDonorAvatar
+  updateDonorAvatar,
+  forgotPasswordDonor
 };

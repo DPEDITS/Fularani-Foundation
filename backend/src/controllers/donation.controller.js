@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { Donation } from "../models/donation.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Donor } from "../models/donor.model.js";
+import { Subscription } from "../models/subscription.model.js";
 
 const createDonation = asyncHandler(async (req, res) => {
   const {
@@ -50,8 +51,28 @@ const createDonation = asyncHandler(async (req, res) => {
     receiptUrl,
     receiptGeneratedAt,
     donatedAt,
-    donatedAt,
   });
+
+  // Manage Subscription Entry
+  if (isRecurring) {
+    const nextPaymentDate = new Date(donatedAt);
+    if (recurringInterval.toLowerCase() === "monthly") nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+    else if (recurringInterval.toLowerCase() === "quarterly") nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 3);
+    else if (recurringInterval.toLowerCase() === "yearly") nextPaymentDate.setFullYear(nextPaymentDate.getFullYear() + 1);
+
+    await Subscription.findOneAndUpdate(
+      { donorId, status: "active", interval: recurringInterval.toLowerCase() },
+      {
+        donorId,
+        amount,
+        interval: recurringInterval.toLowerCase(),
+        status: "active",
+        lastPaymentDate: donatedAt,
+        nextPaymentDate: nextPaymentDate,
+      },
+      { upsert: true, new: true }
+    );
+  }
 
   await Donor.findByIdAndUpdate(donorId, {
     $inc: {
@@ -65,4 +86,21 @@ const createDonation = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, donation, "Donation created successfully"));
 });
 
-export { createDonation };
+const getActiveSubscriptions = asyncHandler(async (req, res) => {
+  const donorId = req.user._id;
+  const subscriptions = await Subscription.find({ donorId, status: "active" });
+  return res.status(200).json(new ApiResponse(200, subscriptions, "Active subscriptions fetched successfully"));
+});
+
+const cancelSubscription = asyncHandler(async (req, res) => {
+  const { subscriptionId } = req.params;
+  const subscription = await Subscription.findByIdAndUpdate(
+    subscriptionId,
+    { status: "cancelled" },
+    { new: true }
+  );
+  if (!subscription) throw new ApiError(404, "Subscription not found");
+  return res.status(200).json(new ApiResponse(200, subscription, "Subscription cancelled successfully"));
+});
+
+export { createDonation, getActiveSubscriptions, cancelSubscription };
