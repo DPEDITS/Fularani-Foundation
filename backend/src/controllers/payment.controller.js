@@ -5,14 +5,15 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const checkout = asyncHandler(async (req, res) => {
+  if (!process.env.RAZORPAY_API_KEY || process.env.RAZORPAY_API_KEY === "YOUR_RAZORPAY_KEY_ID") {
+    console.error("RAZORPAY_API_KEY is missing from environment variables");
+    throw new ApiError(500, "Razorpay API Keys are not configured properly in the backend .env file");
+  }
+
   const instance = new Razorpay({
     key_id: process.env.RAZORPAY_API_KEY,
     key_secret: process.env.RAZORPAY_API_SECRET,
   });
-
-  if (!process.env.RAZORPAY_API_KEY || process.env.RAZORPAY_API_KEY === "YOUR_RAZORPAY_KEY_ID") {
-      throw new ApiError(500, "Razorpay API Keys are not configured");
-  }
 
   const options = {
     amount: Number(req.body.amount * 100),
@@ -57,9 +58,9 @@ const paymentVerification = asyncHandler(async (req, res) => {
 
   if (isAuthentic) {
     console.log("Payment verification successful for:", razorpay_payment_id);
-      
+
     res.status(200).json(new ApiResponse(200, {
-        reference: razorpay_payment_id
+      reference: razorpay_payment_id
     }, "Payment verified successfully"));
 
   } else {
@@ -72,7 +73,7 @@ const paymentVerification = asyncHandler(async (req, res) => {
 });
 
 const getKey = asyncHandler(async (req, res) => {
-    res.status(200).json(new ApiResponse(200, { key: process.env.RAZORPAY_API_KEY }, "Key fetched successfully"));
+  res.status(200).json(new ApiResponse(200, { key: process.env.RAZORPAY_API_KEY }, "Key fetched successfully"));
 });
 
 export { checkout, paymentVerification, getKey };
