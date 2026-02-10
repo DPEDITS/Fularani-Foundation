@@ -41,6 +41,7 @@ import {
   createRazorpayOrder,
   verifyRazorpayPayment,
 } from "../services/donorService";
+import { generateDonationReceipt, generateDonationsReport } from "../utils/pdfGenerator";
 
 const loadScript = (src) => {
   return new Promise((resolve) => {
@@ -458,6 +459,7 @@ const DonorDashboard = () => {
           {activeTab === "donations" && (
             <DonationsTab
               donations={donations}
+              user={user}
               formatCurrency={formatCurrency}
               formatDate={formatDate}
               setShowDonationModal={setShowDonationModal}
@@ -605,11 +607,10 @@ const DonorDashboard = () => {
       {/* Toast Notification */}
       {toastMessage && (
         <div
-          className={`fixed top-24 right-8 z-[110] px-6 py-4 rounded-2xl shadow-lg flex items-center gap-3 animate-in slide-in-from-right duration-500 max-w-sm ${
-            toastMessage.type === "error"
-              ? "bg-red-500 text-white shadow-red-500/20"
-              : "bg-green-500 text-white shadow-green-500/20"
-          }`}
+          className={`fixed top-24 right-8 z-[110] px-6 py-4 rounded-2xl shadow-lg flex items-center gap-3 animate-in slide-in-from-right duration-500 max-w-sm ${toastMessage.type === "error"
+            ? "bg-red-500 text-white shadow-red-500/20"
+            : "bg-green-500 text-white shadow-green-500/20"
+            }`}
         >
           <div className="bg-white/20 p-1.5 rounded-full shrink-0">
             {toastMessage.type === "error" ? (
@@ -710,11 +711,14 @@ const OverviewTab = ({
   );
 };
 
-const DonationsTab = ({ donations, formatCurrency, formatDate, setShowDonationModal }) => (
+const DonationsTab = ({ donations, user, formatCurrency, formatDate, setShowDonationModal }) => (
   <div className="bg-white p-6 md:p-10 rounded-[32px] shadow-xl border border-secondary/10">
     <div className="flex items-center justify-between mb-8">
       <h3 className="text-2xl md:text-3xl font-black text-secondary tracking-tighter lowercase">donation history.</h3>
-      <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-secondary text-white font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-secondary/20">
+      <button
+        onClick={() => generateDonationsReport(donations, user)}
+        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-secondary text-white font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-secondary/20"
+      >
         <Download size={14} /> Export PDF
       </button>
     </div>
@@ -750,7 +754,7 @@ const DonationsTab = ({ donations, formatCurrency, formatDate, setShowDonationMo
                 </td>
                 <td className="py-4 pr-4 text-right">
                   <button
-                    onClick={() => window.open(donation.receiptUrl, '_blank')}
+                    onClick={async () => await generateDonationReceipt(donation, user)}
                     className="inline-flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-wider hover:underline underline-offset-4 decoration-2"
                   >
                     <Download size={14} /> Download
