@@ -13,6 +13,7 @@ import {
   getVolunteerUser,
   logoutVolunteer,
 } from "../services/volunteerService";
+import logo from "../assets/image copy.png";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -77,11 +78,10 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 border-b ${
-          scrolled
-            ? "bg-white/95 backdrop-blur-md border-secondary/10 shadow-sm py-2"
-            : "bg-white border-transparent py-3"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 border-b ${scrolled
+          ? "bg-white/95 backdrop-blur-md border-secondary/10 shadow-sm py-2"
+          : "bg-white border-transparent py-3"
+          }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between">
           {/* Logo Section */}
@@ -89,17 +89,11 @@ const Navbar = () => {
             to="/"
             className="flex items-center gap-3 cursor-pointer group shrink-0"
           >
-            <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center font-black text-xl text-white shadow-md group-hover:bg-primary/90 transition-all">
-              F
-            </div>
-            <div className="flex flex-col -gap-1">
-              <span className="text-xl font-black text-secondary uppercase tracking-tight leading-none">
-                Fularani
-              </span>
-              <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.2em] leading-none">
-                Foundation
-              </span>
-            </div>
+            <img
+              src={logo}
+              alt="Fularani Foundation"
+              className="h-10 md:h-12 w-auto object-contain transition-transform group-hover:scale-105"
+            />
           </Link>
 
           {/* Desktop Nav Links */}
