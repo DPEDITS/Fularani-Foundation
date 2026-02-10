@@ -26,7 +26,7 @@ const createDonation = asyncHandler(async (req, res) => {
     !currency ||
     !paymentGateway ||
     !paymentId ||
-    !isRecurring ||
+    isRecurring === undefined ||
     !recurringInterval ||
     !recurringId ||
     !receiptNumber ||

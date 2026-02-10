@@ -26,6 +26,20 @@ const checkout = asyncHandler(async (req, res) => {
 const paymentVerification = asyncHandler(async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
+  console.log("Payment Verification Request:", {
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature: razorpay_signature ? "received" : "missing",
+  });
+
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    console.log("Missing required fields for verification");
+    return res.status(400).json({
+      success: false,
+      message: "Missing required payment verification fields"
+    });
+  }
+
   const body = razorpay_order_id + "|" + razorpay_payment_id;
 
   const expectedSignature = crypto
@@ -33,27 +47,27 @@ const paymentVerification = asyncHandler(async (req, res) => {
     .update(body.toString())
     .digest("hex");
 
+  console.log("Signature comparison:", {
+    expectedLength: expectedSignature.length,
+    receivedLength: razorpay_signature.length,
+    match: expectedSignature === razorpay_signature
+  });
+
   const isAuthentic = expectedSignature === razorpay_signature;
 
   if (isAuthentic) {
-    // Database save logic here
-
-    // await Payment.create({
-    //   razorpay_order_id,
-    //   razorpay_payment_id,
-    //   razorpay_signature,
-    // });
-
-    // res.redirect(
-    //   `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`
-    // );
+    console.log("Payment verification successful for:", razorpay_payment_id);
       
-      res.status(200).json(new ApiResponse(200, {
-          reference: razorpay_payment_id
-      }, "Payment verified successfully"));
+    res.status(200).json(new ApiResponse(200, {
+        reference: razorpay_payment_id
+    }, "Payment verified successfully"));
 
   } else {
-    res.status(400).json(new ApiError(400, "Invalid signature"));
+    console.log("Payment verification failed - signature mismatch");
+    res.status(400).json({
+      success: false,
+      message: "Invalid payment signature"
+    });
   }
 });
 
