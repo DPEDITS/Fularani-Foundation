@@ -1,6 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { stories } from "../data/stories";
+import { getContentById } from "../services/contentService";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   ArrowLeft,
   Calendar,
@@ -15,13 +17,45 @@ import {
 const StoryInfo = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  // Ensure stories is loaded and id exists
-  const story = stories && id ? stories.find((s) => s.id === id) : null;
+  const [story, setStory] = useState(null);
+  const [markdownContent, setMarkdownContent] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const fetchStory = async () => {
+      try {
+        const response = await getContentById(id);
+        if (response.success) {
+          setStory(response.data);
+          // Fetch markdown content
+          if (response.data.markdownFile) {
+            const mdResponse = await fetch(response.data.markdownFile);
+            const text = await mdResponse.text();
+            setMarkdownContent(text);
+          }
+        } else {
+          console.error(response.message);
+        }
+      } catch (error) {
+        console.error("Failed to fetch story", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchStory();
+      window.scrollTo(0, 0);
+    }
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-xl font-bold text-secondary">Loading...</div>
+      </div>
+    );
+  }
 
   if (!story) {
     return (
@@ -44,17 +78,15 @@ const StoryInfo = () => {
     );
   }
 
-  const {
-    title,
-    subtitle,
-    category,
-    coverImage,
-    image,
-    author,
-    date,
-    content,
-  } = story;
-  const heroImage = coverImage || image;
+  const { title, shortDescription, category, coverImage, author, createdAt } =
+    story;
+
+  // Format date
+  const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   return (
     <article className="min-h-screen bg-white pt-24 pb-20">
@@ -77,7 +109,7 @@ const StoryInfo = () => {
             {title}
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground font-medium leading-relaxed max-w-3xl border-l-4 border-primary pl-6">
-            {subtitle}
+            {shortDescription}
           </p>
         </header>
 
@@ -90,7 +122,7 @@ const StoryInfo = () => {
             <div>
               <div className="text-sm font-bold text-secondary">{author}</div>
               <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <Calendar size={14} /> {date}
+                <Calendar size={14} /> {formattedDate}
               </div>
             </div>
           </div>
@@ -115,74 +147,96 @@ const StoryInfo = () => {
         </div>
 
         {/* FEATURED IMAGE */}
-        <div className="relative aspect-video rounded-3xl overflow-hidden mb-16 shadow-2xl">
-          <img
-            src={heroImage}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {coverImage && (
+          <div className="relative aspect-video rounded-3xl overflow-hidden mb-16 shadow-2xl">
+            <img
+              src={coverImage}
+              alt={title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
 
         {/* CONTENT BODY */}
         <div className="prose prose-lg md:prose-xl prose-slate mx-auto text-secondary/80 leading-relaxed font-serif">
-          {content.map((block, index) => {
-            switch (block.type) {
-              case "heading":
-                return (
-                  <h2
-                    key={index}
-                    className="text-3xl md:text-4xl font-black text-secondary tracking-tight mt-12 mb-6 font-sans border-b-2 border-primary/20 pb-2 inline-block"
-                  >
-                    {block.text}
-                  </h2>
-                );
-              case "quote":
-                return (
-                  <blockquote
-                    key={index}
-                    className="my-10 pl-8 border-l-8 border-primary bg-gray-50 py-8 pr-8 rounded-r-xl italic text-2xl text-secondary font-medium relative"
-                  >
-                    <span className="absolute top-4 left-4 text-6xl text-primary/20 font-black pointer-events-none">
-                      “
-                    </span>
-                    {block.text}
-                    <footer className="mt-4 text-sm font-bold uppercase tracking-widest not-italic text-primary">
-                      — {block.author}
-                    </footer>
-                  </blockquote>
-                );
-              case "image":
-                return (
-                  <figure
-                    key={index}
-                    className="my-10 rounded-2xl overflow-hidden shadow-lg not-prose"
-                  >
-                    <img
-                      src={block.src}
-                      alt={block.caption || "Story image"}
-                      className="w-full h-auto object-cover"
-                      loading="lazy"
-                    />
-                    {block.caption && (
-                      <figcaption className="text-center text-sm font-medium text-muted-foreground py-3 px-4 bg-gray-50/80">
-                        {block.caption}
-                      </figcaption>
-                    )}
-                  </figure>
-                );
-              case "paragraph":
-              default:
-                return (
-                  <p
-                    key={index}
-                    className="mb-6 first-letter:text-5xl first-letter:font-black first-letter:text-primary first-letter:mr-3 first-letter:float-left"
-                  >
-                    {block.text}
-                  </p>
-                );
-            }
-          })}
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              h1: ({ node, ...props }) => (
+                <h1
+                  className="text-4xl md:text-5xl font-black text-secondary tracking-tight mt-12 mb-6 font-sans"
+                  {...props}
+                />
+              ),
+              h2: ({ node, ...props }) => (
+                <h2
+                  className="text-3xl md:text-4xl font-black text-secondary tracking-tight mt-12 mb-6 font-sans border-b-2 border-primary/20 pb-2 inline-block"
+                  {...props}
+                />
+              ),
+              h3: ({ node, ...props }) => (
+                <h3
+                  className="text-2xl md:text-3xl font-bold text-secondary mt-8 mb-4 font-sans"
+                  {...props}
+                />
+              ),
+              p: ({ node, ...props }) => <p className="mb-6" {...props} />,
+              blockquote: ({ node, ...props }) => (
+                <blockquote
+                  className="my-10 pl-8 border-l-8 border-primary bg-gray-50 py-8 pr-8 rounded-r-xl italic text-2xl text-secondary font-medium relative"
+                  {...props}
+                >
+                  <span className="absolute top-4 left-4 text-6xl text-primary/20 font-black pointer-events-none">
+                    “
+                  </span>
+                  {props.children}
+                </blockquote>
+              ),
+              img: ({ node, ...props }) => (
+                <figure className="my-10 rounded-2xl overflow-hidden shadow-lg not-prose">
+                  <img className="w-full h-auto object-cover" {...props} />
+                  {props.title && (
+                    <figcaption className="text-center text-sm font-medium text-muted-foreground py-3 px-4 bg-gray-50/80">
+                      {props.title}
+                    </figcaption>
+                  )}
+                </figure>
+              ),
+              ul: ({ node, ...props }) => (
+                <ul className="list-disc pl-6 mb-6" {...props} />
+              ),
+              ol: ({ node, ...props }) => (
+                <ol className="list-decimal pl-6 mb-6" {...props} />
+              ),
+              li: ({ node, ...props }) => <li className="mb-2" {...props} />,
+            }}
+          >
+            {markdownContent}
+          </ReactMarkdown>
         </div>
+
+        {/* GALLERY SECTION */}
+        {story.images && story.images.length > 0 && (
+          <div className="mt-16 mb-16">
+            <h3 className="text-2xl font-black text-secondary mb-6 border-l-4 border-primary pl-4">
+              Gallery
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {story.images.map((img, index) => (
+                <div
+                  key={index}
+                  className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+                >
+                  <img
+                    src={img}
+                    alt={`Gallery image ${index + 1}`}
+                    className="w-full h-64 object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* TAGS (Optional placeholder) */}
         <div className="mt-16 pt-8 border-t border-gray-100 flex flex-wrap gap-2">
@@ -197,32 +251,6 @@ const StoryInfo = () => {
           </span>
         </div>
       </div>
-
-      {/* NEXT STORY NAV */}
-      <section className="mt-20 border-t border-gray-100 bg-gray-50 py-20 px-6">
-        <div className="max-w-[1000px] mx-auto text-center">
-          <h3 className="text-lg font-bold text-muted-foreground uppercase tracking-widest mb-6">
-            Read Next
-          </h3>
-
-          {/* Simple logic to just show the next one, or loop back to first */}
-          {(() => {
-            const currentIndex = stories.findIndex((s) => s.id === id);
-            const nextStory = stories[(currentIndex + 1) % stories.length];
-
-            return (
-              <Link to={`/stories/${nextStory.id}`} className="group block">
-                <h2 className="text-4xl md:text-6xl font-black text-secondary group-hover:text-primary transition-colors tracking-tighter mb-4">
-                  {nextStory.title}
-                </h2>
-                <div className="inline-flex items-center gap-2 text-lg font-bold text-muted-foreground group-hover:underline underline-offset-4">
-                  Read Story <ArrowRight size={20} />
-                </div>
-              </Link>
-            );
-          })()}
-        </div>
-      </section>
     </article>
   );
 };
