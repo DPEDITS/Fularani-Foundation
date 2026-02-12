@@ -17,7 +17,6 @@ import VolunteerRegister from "./pages/VolunteerRegister";
 import VolunteerDashboard from "./pages/VolunteerDashboard";
 import Footer from "./components/Footer";
 import CSRPartnership from "./pages/CSRPartnership";
-import ScrollProgress from "./components/ui/ScrollProgress";
 import AdminDashboard from "./pages/AdminDashboard";
 
 const App = () => {
@@ -33,7 +32,6 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <ScrollProgress />
       <Navbar />
       <main>
         <Routes>
