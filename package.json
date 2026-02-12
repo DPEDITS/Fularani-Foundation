@@ -1,0 +1,26 @@
+{
+  "name": "fularani-foundation",
+  "version": "1.0.0",
+  "description": "This repository contains the source code for **fularanifoundation.org**, the official website of **Fularani Foundation**.\r The website is built using **React + Vite**, ensuring fast performance, scalability, and a modern development workflow.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix app\" \"npm run dev --prefix backend\"",
+    "start": "npm run dev",
+    "install-all": "npm install && npm install --prefix app && npm install --prefix backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DPEDITS/Fularani-Foundation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/DPEDITS/Fularani-Foundation/issues"
+  },
+  "homepage": "https://github.com/DPEDITS/Fularani-Foundation#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
