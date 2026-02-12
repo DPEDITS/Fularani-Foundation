@@ -1,0 +1,3 @@
+@echo off
+echo Starting Fularani Foundation...
+npm run dev
