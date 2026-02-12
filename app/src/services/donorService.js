@@ -55,6 +55,12 @@ export const loginDonor = async (email, password) => {
 export const registerDonor = async (formData) => {
     try {
         const response = await api.post('/api/donor/register', formData);
+        const { user, accessToken, refreshToken } = response.data.data;
+        if (accessToken && refreshToken) {
+            setAuthTokens(accessToken, refreshToken);
+            setDonorUser(user);
+            window.dispatchEvent(new Event("storage"));
+        }
         return response.data;
     } catch (error) {
         throw error;
