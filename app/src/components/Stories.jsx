@@ -1,37 +1,7 @@
 import React, { useRef } from "react";
-import { ArrowLeft, ArrowRight, Quote, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
 import { Link } from "react-router-dom";
-import storyBg from "../assets/missions1.jpeg";
-
-const stories = [
-  {
-    id: "ranjeetas-vision",
-    category: "Education",
-    title: "ranjeeta's vision.",
-    description:
-      "How one scholarship and a digital tablet changed an entire family's economic path in rural Odisha.",
-    image: storyBg,
-    author: "Primary Donor: Tech4Impact",
-  },
-  {
-    id: "the-green-village",
-    category: "Sustainability",
-    title: "the green village.",
-    description:
-      "Transforming 50 acres of barren land into a thriving, income-generating ecosystem for local farmers.",
-    image: storyBg,
-    author: "Project Lead: Mission Green",
-  },
-  {
-    id: "access-to-dignity",
-    category: "Health",
-    title: "access to dignity.",
-    description:
-      "Providing specialized wheelchairs and home-care support to 200+ individuals with mobility challenges.",
-    image: storyBg,
-    author: "Foundation Healthcare",
-  },
-];
+import { stories } from "../data/stories";
 
 const Stories = () => {
   const scrollContainerRef = useRef(null);
@@ -91,14 +61,14 @@ const Stories = () => {
         >
           {stories.map((story, index) => (
             <Link
-              key={index}
+              key={story.id}
               to={`/stories/${story.id}`}
               className="min-w-[280px] md:min-w-[500px] snap-start bg-white shadow-2xl overflow-hidden group border border-secondary/5 cursor-pointer hover:shadow-3xl transition-shadow"
             >
               <div className="flex flex-col md:flex-row h-full">
                 <div className="w-full md:w-2/5 h-48 md:h-auto overflow-hidden relative">
                   <img
-                    src={story.image}
+                    src={story.coverImage || story.image}
                     alt={story.title}
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-110"
                   />
@@ -117,7 +87,7 @@ const Stories = () => {
                       {story.title}
                     </h3>
                     <p className="text-muted-foreground font-bold text-base md:text-lg leading-tight mb-6 md:mb-8">
-                      "{story.description}"
+                      "{story.subtitle || story.description}"
                     </p>
                   </div>
 
