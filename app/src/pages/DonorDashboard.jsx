@@ -74,12 +74,13 @@ const DonorDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [profileRes, donationsRes, statsRes, subscriptionsRes] = await Promise.all([
-        getDonorProfile(),
-        getDonorDonations(),
-        getDonorStats(),
-        getActiveSubscriptions(),
-      ]);
+      const [profileRes, donationsRes, statsRes, subscriptionsRes] =
+        await Promise.all([
+          getDonorProfile(),
+          getDonorDonations(),
+          getDonorStats(),
+          getActiveSubscriptions(),
+        ]);
       setProfile(profileRes.data);
       setDonations(donationsRes.data);
       setStats(statsRes.data);
@@ -96,7 +97,9 @@ const DonorDashboard = () => {
   const handleRazorpayPayment = async (amount, isRecurring) => {
     try {
       setIsUpdating(true);
-      const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+      const res = await loadScript(
+        "https://checkout.razorpay.com/v1/checkout.js",
+      );
       if (!res) {
         alert("Razorpay SDK failed to load. Are you online?");
         return;
@@ -132,7 +135,9 @@ const DonorDashboard = () => {
               paymentId: response.razorpay_payment_id,
               isRecurring,
               recurringInterval: isRecurring ? "monthly" : "once",
-              recurringId: isRecurring ? `rec_${Math.random().toString(36).substr(2, 9)}` : "na",
+              recurringId: isRecurring
+                ? `rec_${Math.random().toString(36).substr(2, 9)}`
+                : "na",
               receiptNumber: `FF-${Date.now()}`,
               receiptUrl: "https://example.com/receipt.pdf",
               receiptGeneratedAt: new Date().toISOString(),
@@ -150,7 +155,10 @@ const DonorDashboard = () => {
             }
           } catch (verifyError) {
             console.error("Verification failed:", verifyError);
-            setToastMessage({ type: "error", text: "Payment verification failed. Please contact support." });
+            setToastMessage({
+              type: "error",
+              text: "Payment verification failed. Please contact support.",
+            });
             setTimeout(() => setToastMessage(null), 5000);
           }
         },
@@ -165,7 +173,10 @@ const DonorDashboard = () => {
       new window.Razorpay(options).open();
     } catch (err) {
       console.error("Payment initiation failed:", err);
-      setToastMessage({ type: "error", text: err.response?.data?.message || "Payment initiation failed." });
+      setToastMessage({
+        type: "error",
+        text: err.response?.data?.message || "Payment initiation failed.",
+      });
       setTimeout(() => setToastMessage(null), 5000);
     } finally {
       setIsUpdating(false);
@@ -177,7 +188,10 @@ const DonorDashboard = () => {
       setIsUpdating(true);
       await cancelSubscription(subscriptionId);
       await fetchDashboardData();
-      setToastMessage({ type: "success", text: "Subscription stopped successfully." });
+      setToastMessage({
+        type: "success",
+        text: "Subscription stopped successfully.",
+      });
       setTimeout(() => setToastMessage(null), 5000);
     } catch (err) {
       setToastMessage({ type: "error", text: "Failed to stop subscription." });
@@ -216,35 +230,54 @@ const DonorDashboard = () => {
   };
 
   const formatCurrency = (amount) =>
-    new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(amount);
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount);
 
   const formatDate = (dateString) =>
-    new Date(dateString).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    new Date(dateString).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
 
-  if (loading) return (
-    <main className="min-h-screen bg-[#f5f5f7] flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="relative">
-          <div className="w-16 h-16 border-4 border-rose-500/10 rounded-full animate-spin border-t-rose-500"></div>
-          <Heart className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-rose-500" />
+  if (loading)
+    return (
+      <main className="min-h-screen bg-[#f5f5f7] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-rose-500/10 rounded-full animate-spin border-t-rose-500"></div>
+            <Heart className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-rose-500" />
+          </div>
+          <p className="text-[#1d1d1f]/60 font-medium">
+            Preparing your insights...
+          </p>
         </div>
-        <p className="text-[#1d1d1f]/60 font-medium">Preparing your insights...</p>
-      </div>
-    </main>
-  );
+      </main>
+    );
 
-  if (error) return (
-    <main className="min-h-screen bg-[#f5f5f7] flex items-center justify-center px-4">
-      <div className="text-center p-10 bg-white rounded-[32px] shadow-sm border border-black/5 max-w-md w-full">
-        <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <ShieldCheck className="w-8 h-8 text-red-500" />
+  if (error)
+    return (
+      <main className="min-h-screen bg-[#f5f5f7] flex items-center justify-center px-4">
+        <div className="text-center p-10 bg-white rounded-[32px] shadow-sm border border-black/5 max-w-md w-full">
+          <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <ShieldCheck className="w-8 h-8 text-red-500" />
+          </div>
+          <p className="text-[#1d1d1f] text-lg font-bold mb-2">
+            Something went wrong
+          </p>
+          <p className="text-[#86868b] mb-8">{error}</p>
+          <button
+            onClick={fetchDashboardData}
+            className="w-full py-4 bg-[#1d1d1f] text-white rounded-2xl font-bold hover:bg-black transition-all"
+          >
+            Try Again
+          </button>
         </div>
-        <p className="text-[#1d1d1f] text-lg font-bold mb-2">Something went wrong</p>
-        <p className="text-[#86868b] mb-8">{error}</p>
-        <button onClick={fetchDashboardData} className="w-full py-4 bg-[#1d1d1f] text-white rounded-2xl font-bold hover:bg-black transition-all">Try Again</button>
-      </div>
-    </main>
-  );
+      </main>
+    );
 
   const user = profile || getDonorUser();
 
@@ -254,10 +287,17 @@ const DonorDashboard = () => {
         {/* Hero Header Section */}
         <div className="flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8 mb-12 text-center lg:text-left">
           <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
-            <div className="relative group cursor-pointer" onClick={() => fileInputRef.current.click()}>
+            <div
+              className="relative group cursor-pointer"
+              onClick={() => fileInputRef.current.click()}
+            >
               <div className="w-36 h-36 md:w-48 md:h-48 rounded-[2.5rem] overflow-hidden border-4 border-white shadow-2xl transition-transform group-hover:scale-105 bg-accent">
                 {user?.avatar ? (
-                  <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+                  <img
+                    src={user.avatar}
+                    alt={user.username}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full bg-secondary flex items-center justify-center text-white text-6xl font-black uppercase">
                     {user?.username?.[0] || "D"}
@@ -267,11 +307,20 @@ const DonorDashboard = () => {
                   <Camera className="text-white" size={40} />
                 </div>
               </div>
-              <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleAvatarChange} disabled={isUpdating} />
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                disabled={isUpdating}
+              />
             </div>
 
             <div className="flex flex-col items-center md:items-start text-center md:text-left">
-              <div className="inline-block bg-accent px-3 py-1 rounded-sm text-xs font-black uppercase tracking-widest text-secondary mb-3 shadow-lg shadow-accent/20">Donor Dashboard</div>
+              <div className="inline-block bg-accent px-3 py-1 rounded-sm text-xs font-black uppercase tracking-widest text-secondary mb-3 shadow-lg shadow-accent/20">
+                Donor Dashboard
+              </div>
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-secondary tracking-tighter leading-[0.9] lowercase">
                 welcome, <br />
                 <span className="text-white bg-primary px-4 py-2 inline-block -rotate-2 shadow-xl shadow-primary/30 mt-2">
@@ -286,7 +335,11 @@ const DonorDashboard = () => {
             className="group relative px-6 py-4 bg-red-500 text-white rounded-xl font-black uppercase tracking-tight text-sm shadow-xl shadow-red-500/30 hover:-translate-y-1 transition-all"
           >
             <span className="relative z-10 flex items-center gap-2">
-              Donate Now <Heart size={18} className="fill-accent text-accent animate-pulse" />
+              Donate Now{" "}
+              <Heart
+                size={18}
+                className="fill-accent text-accent animate-pulse"
+              />
             </span>
           </button>
         </div>
@@ -299,30 +352,54 @@ const DonorDashboard = () => {
               <div className="flex items-start justify-between">
                 <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full backdrop-blur-md border border-white/10">
                   <Sparkles size={12} className="text-accent" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white/80">Total Impact</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/80">
+                    Total Impact
+                  </span>
                 </div>
-                <ArrowUpRight className="text-white/40 group-hover:text-white transition-all" size={28} />
+                <ArrowUpRight
+                  className="text-white/40 group-hover:text-white transition-all"
+                  size={28}
+                />
               </div>
               <div>
-                <h3 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-2">{formatCurrency(stats?.totalDonatedAmount || 0)}</h3>
-                <p className="text-white/60 font-bold text-base">Invested in changing lives.</p>
+                <h3 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-2">
+                  {formatCurrency(stats?.totalDonatedAmount || 0)}
+                </h3>
+                <p className="text-white/60 font-bold text-base">
+                  Invested in changing lives.
+                </p>
               </div>
             </div>
           </div>
 
           <div className="bg-primary p-6 md:p-10 rounded-[32px] relative overflow-hidden group shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all">
-            <div className="absolute -bottom-10 -right-10 text-white/10 transition-transform duration-500"><Heart size={120} fill="currentColor" /></div>
+            <div className="absolute -bottom-10 -right-10 text-white/10 transition-transform duration-500">
+              <Heart size={120} fill="currentColor" />
+            </div>
             <div className="relative z-10">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-10"><Heart size={24} className="text-primary fill-primary" /></div>
-              <h3 className="text-5xl font-black text-white tracking-tighter mb-1">{stats?.donationCount || 0}</h3>
-              <p className="text-[11px] font-black uppercase tracking-widest text-white/80">Contributions</p>
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-10">
+                <Heart size={24} className="text-primary fill-primary" />
+              </div>
+              <h3 className="text-5xl font-black text-white tracking-tighter mb-1">
+                {stats?.donationCount || 0}
+              </h3>
+              <p className="text-[11px] font-black uppercase tracking-widest text-white/80">
+                Contributions
+              </p>
             </div>
           </div>
 
           <div className="bg-muted/20 p-6 md:p-10 rounded-[32px] border border-secondary/5 relative overflow-hidden group">
-            <Sparkles className="text-secondary/10 absolute -bottom-4 -right-4" size={100} />
-            <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 relative z-10">Supporter Since</p>
-            <p className="text-2xl font-black text-secondary tracking-tight relative z-10">{formatDate(user?.createdAt || new Date())}</p>
+            <Sparkles
+              className="text-secondary/10 absolute -bottom-4 -right-4"
+              size={100}
+            />
+            <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 relative z-10">
+              Supporter Since
+            </p>
+            <p className="text-2xl font-black text-secondary tracking-tight relative z-10">
+              {formatDate(user?.createdAt || new Date())}
+            </p>
           </div>
         </div>
 
@@ -347,19 +424,45 @@ const DonorDashboard = () => {
 
         <div className="min-h-[400px]">
           {activeTab === "overview" && (
-            <OverviewTab stats={stats} donations={donations} formatCurrency={formatCurrency} formatDate={formatDate} setActiveTab={setActiveTab} />
+            <OverviewTab
+              stats={stats}
+              donations={donations}
+              formatCurrency={formatCurrency}
+              formatDate={formatDate}
+              setActiveTab={setActiveTab}
+            />
           )}
           {activeTab === "donations" && (
-            <DonationsTab donations={donations} user={user} formatCurrency={formatCurrency} formatDate={formatDate} setShowDonationModal={setShowDonationModal} />
+            <DonationsTab
+              donations={donations}
+              user={user}
+              formatCurrency={formatCurrency}
+              formatDate={formatDate}
+              setShowDonationModal={setShowDonationModal}
+            />
           )}
           {activeTab === "profile" && (
-            <ProfileTab user={user} onUpdate={handleUpdateProfile} isUpdating={isUpdating} />
+            <ProfileTab
+              user={user}
+              onUpdate={handleUpdateProfile}
+              isUpdating={isUpdating}
+            />
           )}
         </div>
       </div>
 
-      <DonationModal show={showDonationModal} onClose={() => setShowDonationModal(false)} onDonate={handleRazorpayPayment} />
-      <SuccessModal show={showSuccessModal} onClose={() => setShowSuccessModal(false)} amount={successAmount} formatCurrency={formatCurrency} />
+      <DonationModal
+        show={showDonationModal}
+        onClose={() => setShowDonationModal(false)}
+        onDonate={handleRazorpayPayment}
+      />
+      <SuccessModal
+        show={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        amount={successAmount}
+        formatCurrency={formatCurrency}
+        donorName={user?.username}
+      />
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
     </main>
   );
