@@ -1,18 +1,26 @@
 import { Router } from "express";
-import { createContent } from "../controllers/content.controller.js";
-import multer from "multer";
-import { upload } from "../middlewares/multer.middleware.js";
 import {
+  createContent,
   getAllContent,
   getContentById,
   updateContent,
   deleteContent,
 } from "../controllers/content.controller.js";
 
+import { upload } from "../middlewares/multer.middleware.js";
+
 const contentRouter = Router();
+
+/*
+    CREATE CONTENT
+*/
 contentRouter.route("/create").post(
   upload.fields([
     {
+      name: "markdownFile",
+      maxCount: 1,
+    },
+    {
       name: "images",
       maxCount: 10,
     },
@@ -21,13 +29,29 @@ contentRouter.route("/create").post(
       maxCount: 1,
     },
   ]),
-  createContent,
+  createContent
 );
+
+/*
+    GET ALL CONTENT
+*/
 contentRouter.route("/").get(getAllContent);
+
+/*
+    GET CONTENT BY ID
+*/
 contentRouter.route("/:id").get(getContentById);
+
+/*
+    UPDATE CONTENT
+*/
 contentRouter.route("/update/:id").put(
   upload.fields([
     {
+      name: "markdownFile",   // <-- allow markdown update
+      maxCount: 1,
+    },
+    {
       name: "images",
       maxCount: 10,
     },
@@ -36,8 +60,12 @@ contentRouter.route("/update/:id").put(
       maxCount: 1,
     },
   ]),
-  updateContent,
+  updateContent
 );
+
+/*
+    DELETE CONTENT
+*/
 contentRouter.route("/:id").delete(deleteContent);
 
 export default contentRouter;

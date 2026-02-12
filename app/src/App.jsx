@@ -19,6 +19,7 @@ import Footer from "./components/Footer";
 import CSRPartnership from "./pages/CSRPartnership";
 import ScrollProgress from "./components/ui/ScrollProgress";
 import AdminDashboard from "./pages/AdminDashboard";
+import AddContent from "./pages/AddContent";
 
 const App = () => {
   const location = useLocation();
@@ -52,6 +53,7 @@ const App = () => {
           <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
           <Route path="/donor-dashboard" element={<DonorDashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/add-content" element={<AddContent />} />
         </Routes>
       </main>
       {!shouldHideFooter && <Footer />}

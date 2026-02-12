@@ -1,10 +1,21 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
 import { Link } from "react-router-dom";
-import { stories } from "../data/stories";
+import { getAllContent } from "../services/contentService";
 
 const Stories = () => {
   const scrollContainerRef = useRef(null);
+  const [stories, setStories] = useState([]);
+
+  useEffect(() => {
+    const fetchStories = async () => {
+      const response = await getAllContent();
+      if (response.success) {
+        setStories(response.data);
+      }
+    };
+    fetchStories();
+  }, []);
 
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
@@ -17,6 +28,10 @@ const Stories = () => {
       }
     }
   };
+
+  if (stories.length === 0) {
+    return null; // Or a loading state
+  }
 
   return (
     <section className="py-12 md:py-32 bg-muted/30 overflow-hidden">
@@ -61,14 +76,14 @@ const Stories = () => {
         >
           {stories.map((story, index) => (
             <Link
-              key={story.id}
-              to={`/stories/${story.id}`}
+              key={story._id}
+              to={`/stories/${story._id}`}
               className="min-w-[280px] md:min-w-[500px] snap-start bg-white shadow-2xl overflow-hidden group border border-secondary/5 cursor-pointer hover:shadow-3xl transition-shadow"
             >
               <div className="flex flex-col md:flex-row h-full">
                 <div className="w-full md:w-2/5 h-48 md:h-auto overflow-hidden relative">
                   <img
-                    src={story.coverImage || story.image}
+                    src={story.coverImage}
                     alt={story.title}
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-110"
                   />
@@ -86,8 +101,8 @@ const Stories = () => {
                     <h3 className="text-2xl md:text-3xl font-black text-secondary mb-3 md:mb-4 tracking-tighter leading-none">
                       {story.title}
                     </h3>
-                    <p className="text-muted-foreground font-bold text-base md:text-lg leading-tight mb-6 md:mb-8">
-                      "{story.subtitle || story.description}"
+                    <p className="text-muted-foreground font-bold text-base md:text-lg leading-tight mb-6 md:mb-8 line-clamp-3">
+                      "{story.shortDescription}"
                     </p>
                   </div>
 
@@ -95,8 +110,7 @@ const Stories = () => {
                     <button className="font-bold text-secondary/70 hover:text-blue-800 transition-colors">
                       Tap to read more
                     </button>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/70 whitespace-nowrap">
-                      <br />
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/70 whitespace-nowrap mt-2">
                       {story.author}
                     </p>
                   </div>

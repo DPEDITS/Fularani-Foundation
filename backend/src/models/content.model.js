@@ -9,12 +9,18 @@ const contentSchema = new Schema(
     },
     shortDescription: {
       type: String,
+      required: true,
+    },
+    author: {
+      type: String,
+      required: true,
     },
     images: {
-      type: [String], 
+      type: [String],
     },
     coverImage: {
       type: String,
+      required: true,
     },
     markdownFile: {
       type: String,
@@ -22,14 +28,17 @@ const contentSchema = new Schema(
     },
     category: {
       type: String,
+      required: true,
     },
     eventDate: {
       type: Date,
+      required: true,
     },
     status: {
       type: String,
       enum: ["planning", "active", "completed", "onhold", "upcoming", "past"],
       default: "planning",
+      required: true,
     },
     isPublished: {
       type: Boolean,
@@ -39,7 +48,6 @@ const contentSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Volunteer",
     },
-
   },
   { timestamps: true },
 );
