@@ -75,9 +75,28 @@ const registerDonor = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Something went wrong while registering the donor");
   }
 
+  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(donor._id);
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
   return res
     .status(201)
-    .json(new ApiResponse(200, createdDonor, "Donor registered Successfully"));
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        201,
+        {
+          user: createdDonor,
+          accessToken,
+          refreshToken,
+        },
+        "Donor registered Successfully",
+      ),
+    );
 });
 
 const loginDonor = asyncHandler(async (req, res) => {
