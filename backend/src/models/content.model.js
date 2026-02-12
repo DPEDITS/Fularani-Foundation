@@ -2,11 +2,6 @@ import mongoose, { Schema } from "mongoose";
 
 const contentSchema = new Schema(
   {
-    type: {
-      type: String,
-      required: true,
-      enum: ["MISSION", "EVENT"],
-    },
     title: {
       type: String,
       required: true,
@@ -15,26 +10,18 @@ const contentSchema = new Schema(
     shortDescription: {
       type: String,
     },
-    fullDescription: {
-      type: String,
-    },
     images: {
       type: [String], 
     },
     coverImage: {
       type: String,
     },
+    markdownFile: {
+      type: String,
+      required: true,
+    },
     category: {
       type: String,
-    },
-    location: {
-      type: String,
-    },
-    startDate: {
-      type: Date,
-    },
-    endDate: {
-      type: Date,
     },
     eventDate: {
       type: Date,
@@ -52,6 +39,7 @@ const contentSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Volunteer",
     },
+
   },
   { timestamps: true },
 );
