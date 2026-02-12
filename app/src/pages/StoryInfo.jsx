@@ -44,7 +44,17 @@ const StoryInfo = () => {
     );
   }
 
-  const { title, subtitle, category, image, author, date, content } = story;
+  const {
+    title,
+    subtitle,
+    category,
+    coverImage,
+    image,
+    author,
+    date,
+    content,
+  } = story;
+  const heroImage = coverImage || image;
 
   return (
     <article className="min-h-screen bg-white pt-24 pb-20">
@@ -106,7 +116,11 @@ const StoryInfo = () => {
 
         {/* FEATURED IMAGE */}
         <div className="relative aspect-video rounded-3xl overflow-hidden mb-16 shadow-2xl">
-          <img src={image} alt={title} className="w-full h-full object-cover" />
+          <img
+            src={heroImage}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
         </div>
 
         {/* CONTENT BODY */}
@@ -136,6 +150,25 @@ const StoryInfo = () => {
                       — {block.author}
                     </footer>
                   </blockquote>
+                );
+              case "image":
+                return (
+                  <figure
+                    key={index}
+                    className="my-10 rounded-2xl overflow-hidden shadow-lg not-prose"
+                  >
+                    <img
+                      src={block.src}
+                      alt={block.caption || "Story image"}
+                      className="w-full h-auto object-cover"
+                      loading="lazy"
+                    />
+                    {block.caption && (
+                      <figcaption className="text-center text-sm font-medium text-muted-foreground py-3 px-4 bg-gray-50/80">
+                        {block.caption}
+                      </figcaption>
+                    )}
+                  </figure>
                 );
               case "paragraph":
               default:
