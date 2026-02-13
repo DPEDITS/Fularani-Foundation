@@ -3,34 +3,48 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import mongoSanitize from "express-mongo-sanitize";
+import compression from "compression";
 import logger from "./utils/logger.js";
 
 const app = express();
 
 // --- Security headers ---
 app.use(helmet());
+app.use(mongoSanitize());
+app.use(compression());
 
 // --- Rate limiting ---
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,                  // 100 requests per window per IP
+  max: 100, // 100 requests per window per IP
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
     logger.warn(`Rate limit exceeded for IP: ${req.ip}`);
-    res.status(429).json({ success: false, message: "Too many requests — please try again later" });
+    res
+      .status(429)
+      .json({
+        success: false,
+        message: "Too many requests — please try again later",
+      });
   },
 });
 app.use(globalLimiter);
 
 const paymentLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,                   // 10 payment attempts per 15 min per IP
+  max: 10, // 10 payment attempts per 15 min per IP
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
     logger.warn(`Payment rate limit exceeded for IP: ${req.ip}`);
-    res.status(429).json({ success: false, message: "Too many payment attempts — please try again later" });
+    res
+      .status(429)
+      .json({
+        success: false,
+        message: "Too many payment attempts — please try again later",
+      });
   },
 });
 
@@ -40,7 +54,7 @@ const allowedOrigins = [
   "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
-  "https://fularani-foundation-1.onrender.com"
+  "https://fularani-foundation-1.onrender.com",
 ].filter(Boolean);
 
 app.use(
@@ -54,17 +68,17 @@ app.use(
       }
     },
     credentials: true,
-  })
+  }),
 );
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
-app.use(express.static("public"));
+// app.use(express.static("public")); // Disable static serving of temp files for security
 app.use(cookieParser());
 
 //routes import
-import volunteerRouter from "./routes/volunteer.routes.js"
-import donorRouter from "./routes/donor.routes.js"
-import contactRouter from "./routes/contact.routes.js"
+import volunteerRouter from "./routes/volunteer.routes.js";
+import donorRouter from "./routes/donor.routes.js";
+import contactRouter from "./routes/contact.routes.js";
 import galleryRouter from "./routes/gallery.routes.js";
 import donationRouter from "./routes/donation.routes.js";
 import contentRouter from "./routes/content.routes.js";
@@ -72,14 +86,14 @@ import adminRouter from "./routes/admin.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
 
 //routes declaration
-app.use("/api/volunteers", volunteerRouter)
-app.use("/api/donor", donorRouter)
-app.use("/api/v1/contact", contactRouter)
-app.use("/api/gallery", galleryRouter)
-app.use("/api/donations", paymentLimiter, donationRouter)
-app.use("/api/content", contentRouter)
-app.use("/api/admin", adminRouter)
-app.use("/api/payment", paymentLimiter, paymentRouter)
+app.use("/api/volunteers", volunteerRouter);
+app.use("/api/donor", donorRouter);
+app.use("/api/v1/contact", contactRouter);
+app.use("/api/gallery", galleryRouter);
+app.use("/api/donations", paymentLimiter, donationRouter);
+app.use("/api/content", contentRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/payment", paymentLimiter, paymentRouter);
 
 // error handler
 app.use((err, req, res, next) => {
@@ -92,6 +106,7 @@ app.use((err, req, res, next) => {
     message,
     errors,
     data: null,
+    stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
   });
 });
 

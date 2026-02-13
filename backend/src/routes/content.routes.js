@@ -9,8 +9,11 @@ import {
   deleteContent,
 } from "../controllers/content.controller.js";
 
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+
 const contentRouter = Router();
 contentRouter.route("/create").post(
+  verifyJWT,
   upload.fields([
     {
       name: "images",
@@ -26,6 +29,7 @@ contentRouter.route("/create").post(
 contentRouter.route("/").get(getAllContent);
 contentRouter.route("/:id").get(getContentById);
 contentRouter.route("/update/:id").put(
+  verifyJWT,
   upload.fields([
     {
       name: "images",
@@ -38,6 +42,6 @@ contentRouter.route("/update/:id").put(
   ]),
   updateContent,
 );
-contentRouter.route("/:id").delete(deleteContent);
+contentRouter.route("/:id").delete(verifyJWT, deleteContent);
 
 export default contentRouter;
