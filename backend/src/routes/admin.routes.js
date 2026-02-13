@@ -1,11 +1,13 @@
 import { Router } from "express";
 import { registerAdmin, loginAdmin, getAdminStats, getAllVolunteers, getAllDonors, getAllMissions, updateVolunteerStatus, assignTask, getAllDonations } from "../controllers/admin.controller.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT, verifyAdmin, verifySuperAdmin } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const adminRouter = Router();
 
 adminRouter.route("/register").post(
+  verifyJWT,
+  verifySuperAdmin,
   upload.fields([
     {
       name: "avatar",
@@ -16,12 +18,12 @@ adminRouter.route("/register").post(
 );
 
 adminRouter.route("/login").post(loginAdmin);
-adminRouter.route("/stats").get(verifyJWT, getAdminStats);
-adminRouter.route("/volunteers").get(verifyJWT, getAllVolunteers);
-adminRouter.route("/donors").get(verifyJWT, getAllDonors);
-adminRouter.route("/donations").get(verifyJWT, getAllDonations);
-adminRouter.route("/missions").get(verifyJWT, getAllMissions);
-adminRouter.route("/update-volunteer-status").post(verifyJWT, updateVolunteerStatus);
-adminRouter.route("/assign-task").post(verifyJWT, assignTask);
+adminRouter.route("/stats").get(verifyJWT, verifyAdmin, getAdminStats);
+adminRouter.route("/volunteers").get(verifyJWT, verifyAdmin, getAllVolunteers);
+adminRouter.route("/donors").get(verifyJWT, verifyAdmin, getAllDonors);
+adminRouter.route("/donations").get(verifyJWT, verifyAdmin, getAllDonations);
+adminRouter.route("/missions").get(verifyJWT, verifyAdmin, getAllMissions);
+adminRouter.route("/update-volunteer-status").post(verifyJWT, verifyAdmin, updateVolunteerStatus);
+adminRouter.route("/assign-task").post(verifyJWT, verifyAdmin, assignTask);
 
 export default adminRouter;

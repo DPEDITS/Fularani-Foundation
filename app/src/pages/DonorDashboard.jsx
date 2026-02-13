@@ -412,7 +412,7 @@ const DonorDashboard = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`text-sm font-black uppercase tracking-widest whitespace-nowrap pb-4 border-b-4 transition-all ${activeTab === tab.id ? "border-primary text-secondary" : "border-transparent text-secondary/30 hover:text-secondary/60"}`}
+                className={`text-sm font-black uppercase tracking-widest whitespace-nowrap pb-4 border-b-4 transition-all focus:outline-none ${activeTab === tab.id ? "border-primary text-secondary" : "border-transparent text-secondary/30 hover:text-secondary/60"}`}
               >
                 {tab.label}
               </button>
