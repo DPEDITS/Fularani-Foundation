@@ -171,18 +171,15 @@ const AddContent = () => {
                 <label className="block text-sm font-bold text-secondary uppercase tracking-wider mb-2">
                   Category
                 </label>
-                <select
+                <input
+                  type="text"
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium bg-white"
-                >
-                  <option value="Education">Education</option>
-                  <option value="Health">Health</option>
-                  <option value="Environment">Environment</option>
-                  <option value="Community">Community</option>
-                  <option value="Women Empowerment">Women Empowerment</option>
-                </select>
+                  required
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium"
+                  placeholder="Enter category"
+                />
               </div>
 
               {/* Author */}
