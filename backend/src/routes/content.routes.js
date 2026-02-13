@@ -8,6 +8,7 @@ import {
 } from "../controllers/content.controller.js";
 
 import { upload } from "../middlewares/multer.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const contentRouter = Router();
 
@@ -15,6 +16,7 @@ const contentRouter = Router();
     CREATE CONTENT
 */
 contentRouter.route("/create").post(
+  verifyJWT,
   upload.fields([
     {
       name: "markdownFile",
@@ -46,6 +48,7 @@ contentRouter.route("/:id").get(getContentById);
     UPDATE CONTENT
 */
 contentRouter.route("/update/:id").put(
+  verifyJWT,
   upload.fields([
     {
       name: "markdownFile",   // <-- allow markdown update
@@ -62,10 +65,6 @@ contentRouter.route("/update/:id").put(
   ]),
   updateContent
 );
-
-/*
-    DELETE CONTENT
-*/
-contentRouter.route("/:id").delete(deleteContent);
+contentRouter.route("/:id").delete(verifyJWT, deleteContent);
 
 export default contentRouter;

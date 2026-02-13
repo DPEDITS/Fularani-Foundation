@@ -73,24 +73,23 @@ const DonorLogin = () => {
     setLoading(true);
 
     try {
-      // Admin Redirection Logic
-      const isSystemAdmin =
-        form.email.trim().toLowerCase() === "admin@gmail.com";
-      if (isSystemAdmin) {
-        const response = await loginAdmin(
-          form.email.trim().toLowerCase(),
-          form.password,
-        );
-        if (response.success) {
-          safeNavigate(navigate, "/admin-dashboard");
-          return;
-        }
-      }
-
       if (role === "donor") {
         await loginDonor(form.email, form.password);
         safeNavigate(navigate, "/donor-dashboard");
       } else {
+        // Check for Admin Login via Environment Variable (Only for Volunteer tab)
+        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL?.toLowerCase();
+        if (adminEmail && form.email.trim().toLowerCase() === adminEmail) {
+          const response = await loginAdmin(
+            form.email.trim().toLowerCase(),
+            form.password,
+          );
+          if (response.success) {
+            safeNavigate(navigate, "/admin-dashboard");
+            return;
+          }
+        }
+
         await loginVolunteer(form.email, form.password);
         safeNavigate(navigate, "/volunteer-dashboard");
       }
