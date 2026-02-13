@@ -80,12 +80,8 @@ app.use("/api/gallery", galleryRouter)
 app.use("/api/donations", paymentLimiter, donationRouter)
 app.use("/api/content", contentRouter)
 app.use("/api/admin", adminRouter)
-<<<<<<< HEAD
-app.use("/api/payment", paymentRouter)
-app.use("/api/projects", projectRouter)
-=======
 app.use("/api/payment", paymentLimiter, paymentRouter)
->>>>>>> origin/Dutta
+app.use("/api/projects", projectRouter)
 
 // error handler
 app.use((err, req, res, next) => {
