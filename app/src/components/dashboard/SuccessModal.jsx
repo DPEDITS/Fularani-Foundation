@@ -277,7 +277,9 @@ const SuccessModal = ({ show, onClose, amount, formatCurrency, donorName }) => {
       }
       await navigator.share(shareData);
     } catch (err) {
-      if (err.name !== "AbortError") console.log("Share failed:", err);
+      if (err.name !== "AbortError") {
+        // Non-abort share failures are silently ignored in production
+      }
     }
   };
 

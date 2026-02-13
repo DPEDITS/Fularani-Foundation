@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Link } from "react-router-dom";
 import { Heart, ChevronDown, Menu, X, LogOut, ArrowRight } from "lucide-react";
+import { safeLocationRedirect } from "../utils/safeNavigate";
 import {
   isAuthenticated as isDonorAuthenticated,
   getDonorUser,
@@ -78,10 +79,10 @@ const Navbar = () => {
       } else {
         await logoutDonor();
       }
-      window.location.href = "/";
+      safeLocationRedirect("/");
     } catch (err) {
       console.error("Logout failed:", err);
-      window.location.href = "/";
+      safeLocationRedirect("/");
     }
   };
 
@@ -95,10 +96,11 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 border-b ${scrolled
-          ? "bg-white/95 backdrop-blur-md border-secondary/10 shadow-sm py-2"
-          : "bg-white border-transparent py-3"
-          }`}
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 border-b ${
+          scrolled
+            ? "bg-white/95 backdrop-blur-md border-secondary/10 shadow-sm py-2"
+            : "bg-white border-transparent py-3"
+        }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between">
           {/* Logo Section */}

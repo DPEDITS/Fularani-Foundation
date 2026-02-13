@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { safeNavigate } from "../utils/safeNavigate";
 import { stories } from "../data/stories";
 import {
   ArrowLeft,
@@ -34,7 +35,7 @@ const StoryInfo = () => {
             The story you are looking for does not exist.
           </p>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => safeNavigate(navigate, "/")}
             className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-colors"
           >
             Back to Home
