@@ -1,5 +1,14 @@
 import { Router } from "express";
-import { registerAdmin, loginAdmin, getAdminStats, getAllVolunteers, getAllDonors, getAllMissions, updateVolunteerStatus, assignTask } from "../controllers/admin.controller.js";
+import {
+  registerAdmin,
+  loginAdmin,
+  getAdminStats,
+  getAllVolunteers,
+  getAllDonors,
+  getAllMissions,
+  updateVolunteerStatus,
+  assignTask,
+} from "../controllers/admin.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -12,6 +21,7 @@ adminRouter.route("/register").post(
       maxCount: 1,
     },
   ]),
+  verifyJWT,
   registerAdmin,
 );
 
@@ -20,7 +30,9 @@ adminRouter.route("/stats").get(verifyJWT, getAdminStats);
 adminRouter.route("/volunteers").get(verifyJWT, getAllVolunteers);
 adminRouter.route("/donors").get(verifyJWT, getAllDonors);
 adminRouter.route("/missions").get(verifyJWT, getAllMissions);
-adminRouter.route("/update-volunteer-status").post(verifyJWT, updateVolunteerStatus);
+adminRouter
+  .route("/update-volunteer-status")
+  .post(verifyJWT, updateVolunteerStatus);
 adminRouter.route("/assign-task").post(verifyJWT, assignTask);
 
 export default adminRouter;
