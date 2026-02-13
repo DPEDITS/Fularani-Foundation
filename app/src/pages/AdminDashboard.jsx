@@ -441,13 +441,15 @@ const AdminDashboard = () => {
                             {activeTab === "volunteers" && item.status === "Approved" && (
                               <button
                                 onClick={async () => {
-                                  // Assign project logic if needed, or stick to separate tab
-                                  // Currently using centralized Projects tab for creation/assignment
+                                  await fetchMissionsForAssignment();
+                                  setSelectedVolunteer(item);
+                                  setSelectedProject(null);
+                                  setIsAssignModalOpen(true);
                                 }}
                                 className="p-2 hover:bg-accent hover:text-secondary rounded-lg transition-all text-accent/50 bg-secondary"
-                                title="View Details"
+                                title="Assign Task"
                               >
-                                <Eye size={16} />
+                                <Database size={16} />
                               </button>
                             )}
                             {activeTab === "projects" && !item.assignedTo && (
@@ -456,6 +458,7 @@ const AdminDashboard = () => {
                                   // Open Assignment Modal fetching volunteers
                                   await fetchVolunteersForAssignment();
                                   setSelectedProject(item);
+                                  setSelectedVolunteer(null);
                                   setIsAssignModalOpen(true);
                                 }}
                                 className="p-2 hover:bg-black hover:text-white rounded-lg transition-all text-black/50 bg-gray-100"
@@ -509,6 +512,15 @@ const AdminDashboard = () => {
       </div>
 
       {/* Assignment Modal */}
+      {/* Assignment Modal for Volunteers */}
+      {isAssignModalOpen && selectedVolunteer && (
+        <AssignTaskModal
+          volunteer={selectedVolunteer}
+          missions={missions}
+          onClose={() => setIsAssignModalOpen(false)}
+        />
+      )}
+
       {isAssignModalOpen && selectedProject && (
         <AssignProjectModal
           project={selectedProject}
@@ -545,356 +557,7 @@ const AdminDashboard = () => {
       )}
     </main>
   );
-=======
-  const dashboardStats = [
-    {
-      label: "Total Donors",
-      value: stats.totalDonors,
-      icon: Users,
-      color: "text-blue-500",
-      bg: "bg-blue-50",
-    },
-    {
-      label: "Total Volunteers",
-      value: stats.totalVolunteers,
-      icon: Briefcase,
-      color: "text-emerald-500",
-      bg: "bg-emerald-50",
-    },
-    {
-      label: "Total Funds",
-      value: formatCurrency(stats.totalFunds),
-      icon: DollarSign,
-      color: "text-amber-500",
-      bg: "bg-amber-50",
-    },
-    {
-      label: "Active Missions",
-      value: stats.activeMissions,
-      icon: TargetIcon,
-      color: "text-rose-500",
-      bg: "bg-rose-50",
-    },
-  ];
-
-  return (
-    <main className="min-h-screen bg-white pt-32 pb-20 px-6 md:px-10">
-      <div className="max-w-[1540px] mx-auto">
-        {/* Admin Hero Header */}
-        <div className="flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8 mb-16 text-center lg:text-left">
-          <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-secondary flex items-center justify-center relative group">
-              {admin?.avatar ? (
-                <img
-                  src={admin.avatar}
-                  alt={admin.username}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <ShieldCheck size={48} className="text-accent animate-pulse" />
-              )}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Camera className="text-white" size={24} />
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center md:items-start text-center md:text-left">
-              <div className="inline-flex items-center gap-2 bg-secondary text-accent px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-[0.2em] mb-4 shadow-xl">
-                <Activity size={12} />{" "}
-                {admin?.role?.replace("_", " ") || "System Administrator"}
-              </div>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-secondary tracking-tighter leading-[0.9] lowercase">
-                Control <br />
-                <span className="text-white bg-secondary px-4 py-2 inline-block -rotate-1 shadow-2xl mt-2 italic">
-                  {admin?.username || "Command"}.
-                </span>
-              </h1>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button className="p-4 bg-muted/30 rounded-2xl hover:bg-muted transition-all relative">
-              <Bell size={20} className="text-secondary" />
-              <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-3 px-6 py-4 bg-red-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-black transition-all shadow-xl shadow-red-500/20"
-            >
-              <LogOut size={16} /> Termination
-            </button>
-          </div>
-        </div>
-
-        {/* System Vital Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
-          {dashboardStats.map((stat, i) => (
-            <div
-              key={i}
-              className="bg-white p-8 rounded-[32px] border border-secondary/5 shadow-xl hover:-translate-y-2 transition-all group overflow-hidden relative"
-            >
-              <div
-                className={`absolute -right-4 -bottom-4 ${stat.bg} w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-700`}
-              ></div>
-              <div className="relative z-10">
-                <div
-                  className={`w-12 h-12 ${stat.bg} rounded-xl flex items-center justify-center mb-10 transition-transform group-hover:scale-110`}
-                >
-                  <stat.icon className={stat.color} size={24} />
-                </div>
-                <p className="text-secondary/40 text-[10px] font-black uppercase tracking-widest mb-1">
-                  {stat.label}
-                </p>
-                <h3 className="text-4xl font-black text-secondary tracking-tighter">
-                  {loadingStats ? "..." : stat.value}
-                </h3>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Navigation Bar */}
-        <div className="mb-12 border-b-2 border-muted sticky top-24 bg-white/95 backdrop-blur-xl z-40 py-4 -mx-6 px-6 md:mx-0 md:px-0 flex items-center justify-between">
-          <div className="flex gap-10 overflow-x-auto no-scrollbar">
-            {[
-              { id: "overview", label: "Dashboard", icon: LayoutDashboard },
-              { id: "volunteers", label: "Volunteers", icon: Briefcase },
-              { id: "donors", label: "Donors", icon: Heart },
-              { id: "missions", label: "Missions", icon: Database },
-              { id: "settings", label: "System", icon: Settings },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 text-sm font-black uppercase tracking-widest whitespace-nowrap pb-4 border-b-4 transition-all ${activeTab === tab.id ? "border-secondary text-secondary" : "border-transparent text-secondary/30 hover:text-secondary/60"}`}
-              >
-                <tab.icon size={16} />
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="hidden md:flex items-center gap-4 bg-muted/20 px-4 py-2 rounded-xl border border-secondary/5">
-            <Search size={16} className="text-secondary/30" />
-            <input
-              type="text"
-              placeholder="Global search..."
-              className="bg-transparent border-none outline-none text-xs font-bold text-secondary w-48"
-            />
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="min-h-[600px] animate-in fade-in slide-in-from-bottom-6 duration-700">
-          <div className="bg-white rounded-[40px] border border-secondary/10 shadow-2xl p-8 md:p-12">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-              <div>
-                <h2 className="text-3xl font-black text-secondary tracking-tighter lowercase">
-                  active {activeTab}.
-                </h2>
-                <p className="text-secondary/50 text-sm font-bold mt-1 uppercase tracking-tight">
-                  Real-time system telemetry and management.
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-5 py-3 rounded-xl bg-secondary text-white font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all">
-                  <Download size={14} /> Export Report
-                </button>
-                <button className="flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-secondary font-black text-[10px] uppercase tracking-widest shadow-lg shadow-accent/20 hover:scale-105 transition-all">
-                  + Add New
-                </button>
-              </div>
-            </div>
-
-            {/* List Component Shell */}
-            <div className="w-full overflow-hidden">
-              {loadingList ? (
-                <div className="py-20 flex flex-col items-center justify-center gap-4 text-secondary/20">
-                  <Activity size={48} className="animate-spin" />
-                  <p className="font-black uppercase tracking-widest text-xs">
-                    Synchronizing stream...
-                  </p>
-                </div>
-              ) : listData.length === 0 ? (
-                <div className="py-20 flex flex-col items-center justify-center gap-4 text-secondary/10">
-                  <Database size={48} />
-                  <p className="font-black uppercase tracking-widest text-xs">
-                    No records found in active sector.
-                  </p>
-                </div>
-              ) : (
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b border-muted">
-                      <th className="text-left py-6 text-[10px] font-black uppercase tracking-widest text-secondary/40">
-                        Identifier
-                      </th>
-                      <th className="text-left py-6 text-[10px] font-black uppercase tracking-widest text-secondary/40">
-                        {activeTab === "missions"
-                          ? "Classification"
-                          : "Communication"}
-                      </th>
-                      <th className="text-left py-6 text-[10px] font-black uppercase tracking-widest text-secondary/40">
-                        {activeTab === "donors"
-                          ? "Contribution"
-                          : "Current Status"}
-                      </th>
-                      <th className="text-left py-6 text-[10px] font-black uppercase tracking-widest text-secondary/40">
-                        Temporal Mark
-                      </th>
-                      <th className="text-right py-6 text-[10px] font-black uppercase tracking-widest text-secondary/40">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {listData.map((item, i) => (
-                      <tr
-                        key={item._id}
-                        className="group hover:bg-muted/10 transition-colors border-b border-muted/50 last:border-none"
-                      >
-                        <td className="py-6">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-secondary/5 shadow-sm">
-                              {item.avatar || item.coverImage ? (
-                                <img
-                                  src={item.avatar || item.coverImage}
-                                  className="w-full h-full object-cover"
-                                  alt=""
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-muted flex items-center justify-center font-black text-secondary/20">
-                                  {(item.username || item.title)
-                                    .charAt(0)
-                                    .toUpperCase()}
-                                </div>
-                              )}
-                            </div>
-                            <div>
-                              <p className="text-base font-black text-secondary">
-                                {item.username || item.title}
-                              </p>
-                              <p className="text-[10px] font-bold text-secondary/40 lowercase">
-                                {item.email || "mission_stream"}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-6">
-                          {activeTab === "missions" ? (
-                            <span className="bg-muted px-2 py-1 rounded-sm text-[9px] font-black uppercase text-secondary/60">
-                              {item.category || "General"}
-                            </span>
-                          ) : (
-                            <p className="text-xs font-bold text-secondary/60 lowercase tracking-tighter">
-                              {item.phone || "no_contact_data"}
-                            </p>
-                          )}
-                        </td>
-                        <td className="py-6">
-                          {activeTab === "donors" ? (
-                            <p className="text-sm font-black text-emerald-600 tracking-tighter">
-                              ₹{(item.totalDonatedAmount || 0).toLocaleString()}
-                            </p>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <div
-                                className={`w-2 h-2 rounded-full ${item.status === "active" || item.status === "Approved" ? "bg-green-500 animate-pulse" : "bg-amber-500"}`}
-                              ></div>
-                              <span
-                                className={`text-xs font-black uppercase tracking-tight ${item.status === "active" || item.status === "Approved" ? "text-green-600" : "text-amber-600"}`}
-                              >
-                                {item.status || "Pending"}
-                              </span>
-                            </div>
-                          )}
-                        </td>
-                        <td className="py-6 text-sm font-bold text-secondary/60">
-                          {format(new Date(item.createdAt), "dd MMM yyyy")}
-                        </td>
-                        <td className="py-6 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {activeTab === "volunteers" &&
-                              item.status === "Pending" && (
-                                <>
-                                  <button
-                                    onClick={() =>
-                                      handleStatusUpdate(item._id, "Approved")
-                                    }
-                                    className="p-2 hover:bg-green-500 hover:text-white rounded-lg transition-all text-green-500/50 bg-green-50"
-                                    title="Approve Volunteer"
-                                  >
-                                    <Check size={16} />
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      handleStatusUpdate(item._id, "Rejected")
-                                    }
-                                    className="p-2 hover:bg-red-500 hover:text-white rounded-lg transition-all text-red-500/50 bg-red-50"
-                                    title="Reject Volunteer"
-                                  >
-                                    <CloseIcon size={16} />
-                                  </button>
-                                </>
-                              )}
-                            {activeTab === "volunteers" &&
-                              item.status === "Approved" && (
-                                <button
-                                  onClick={async () => {
-                                    await fetchMissionsForAssignment();
-                                    setSelectedVolunteer(item);
-                                    setIsAssignModalOpen(true);
-                                  }}
-                                  className="p-2 hover:bg-accent hover:text-secondary rounded-lg transition-all text-accent/50 bg-secondary"
-                                  title="Assign Task"
-                                >
-                                  <Database size={16} />
-                                </button>
-                              )}
-                            <button className="p-2 hover:bg-secondary hover:text-white rounded-lg transition-all text-secondary/30">
-                              <Eye size={18} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Assignment Modal */}
-      {isAssignModalOpen && selectedVolunteer && (
-        <AssignTaskModal
-          volunteer={selectedVolunteer}
-          missions={missions}
-          onClose={() => setIsAssignModalOpen(false)}
-        />
-      )}
-    </main>
-  );
 };
-
-const TargetIcon = ({ size, className }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <circle cx="12" cy="12" r="10" />
-    <circle cx="12" cy="12" r="6" />
-    <circle cx="12" cy="12" r="2" />
-  </svg>
-);
 
 const CreateProjectModal = ({ missions, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -1019,464 +682,471 @@ const CreateProjectModal = ({ missions, onClose, onSuccess }) => {
             </button>
           </form>
         </div>
-const AssignTaskModal = ({volunteer, missions, onClose}) => {
+      </div>
+    </div>
+  );
+};
+
+const AssignTaskModal = ({ volunteer, missions, onClose }) => {
   const [formData, setFormData] = useState({
-          missionId: "",
-        taskTitle: "",
-        taskDescription: "",
+    missionId: "",
+    taskTitle: "",
+    taskDescription: "",
   });
-        const [loading, setLoading] = useState(false);
-        const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleSubmit = async (e) => {
-          e.preventDefault();
-        if (!formData.missionId) return alert("Please select a mission.");
-        setLoading(true);
-        try {
-      const response = await assignTask({
-          volunteerId: volunteer._id,
-        ...formData,
+    e.preventDefault();
+    if (!formData.missionId) return alert("Please select a mission.");
+    setLoading(true);
+    try {
+      const response = await createProject({
+        title: formData.taskTitle,
+        description: formData.taskDescription,
+        mission: formData.missionId,
+        assignedTo: volunteer._id
       });
-        if (response.success) {
-          alert("Task assigned successfully!");
+      if (response.success) {
+        alert("Task assigned successfully!");
         onClose();
       }
     } catch (error) {
-          console.error("Assignment failed:", error);
-        alert("Failed to assign task.");
+      console.error("Assignment failed:", error);
+      alert("Failed to assign task.");
     } finally {
-          setLoading(false);
+      setLoading(false);
     }
   };
 
   const selectedMission = missions.find((m) => m._id === formData.missionId);
 
-        return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10">
-          <div
-            className="absolute inset-0 bg-secondary/80 backdrop-blur-sm"
-            onClick={onClose}
-          />
-          <div className="relative w-full max-w-xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-            <div className="p-10">
-              <div className="flex justify-between items-start mb-10">
-                <div>
-                  <h3 className="text-3xl font-black text-secondary tracking-tighter lowercase">
-                    Task Allocation.
-                  </h3>
-                  <p className="text-secondary/50 text-xs font-bold uppercase tracking-widest mt-1">
-                    Assigning mission for : {volunteer.username}
-                  </p>
-                </div>
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10">
+      <div
+        className="absolute inset-0 bg-secondary/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="p-10">
+          <div className="flex justify-between items-start mb-10">
+            <div>
+              <h3 className="text-3xl font-black text-secondary tracking-tighter lowercase">
+                Task Allocation.
+              </h3>
+              <p className="text-secondary/50 text-xs font-bold uppercase tracking-widest mt-1">
+                Assigning mission for : {volunteer.username}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-muted rounded-xl transition-all"
+            >
+              <CloseIcon size={24} />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2 relative">
+              <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">
+                Target Mission
+              </label>
+
+              {/* Custom Dropdown */}
+              <div className="relative">
                 <button
-                  onClick={onClose}
-                  className="p-2 hover:bg-muted rounded-xl transition-all"
+                  type="button"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className={`w-full flex items-center justify-between bg-muted/30 border-2 transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none ${isDropdownOpen ? "border-secondary" : "border-transparent"}`}
                 >
-                  <CloseIcon size={24} />
-                </button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2 relative">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">
-                    Target Mission
-                  </label>
-
-                  {/* Custom Dropdown */}
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className={`w-full flex items-center justify-between bg-muted/30 border-2 transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none ${isDropdownOpen ? "border-secondary" : "border-transparent"}`}
-                    >
-                      <span
-                        className={
-                          formData.missionId
-                            ? "text-secondary font-black"
-                            : "text-secondary/40"
-                        }
-                      >
-                        {selectedMission
-                          ? selectedMission.title
-                          : "Select a mission..."}
-                      </span>
-                      <ChevronDown
-                        size={20}
-                        className={`transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""}`}
-                      />
-                    </button>
-
-                    {isDropdownOpen && (
-                      <div className="absolute top-full left-0 w-full mt-2 bg-white border border-secondary/10 rounded-3xl shadow-2xl z-[210] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="max-h-[250px] overflow-y-auto no-scrollbar">
-                          {missions.length === 0 ? (
-                            <div className="px-6 py-4 text-xs font-bold text-secondary/40 text-center">
-                              No active missions available.
-                            </div>
-                          ) : (
-                            missions.map((m) => (
-                              <button
-                                key={m._id}
-                                type="button"
-                                onClick={() => {
-                                  setFormData({ ...formData, missionId: m._id });
-                                  setIsDropdownOpen(false);
-                                }}
-                                className={`w-full px-6 py-4 text-left text-sm transition-all hover:bg-secondary hover:text-white flex items-center justify-between group ${formData.missionId === m._id ? "bg-secondary/5 text-secondary" : "text-secondary/70"}`}
-                              >
-                                <span className="font-bold">{m.title}</span>
-                                <span className="text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Select Sector
-                                </span>
-                              </button>
-                            ))
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">
-                    Designated Task Title
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    placeholder="e.g. Area Survey Coordinator"
-                    value={formData.taskTitle}
-                    onChange={(e) =>
-                      setFormData({ ...formData, taskTitle: e.target.value })
+                  <span
+                    className={
+                      formData.missionId
+                        ? "text-secondary font-black"
+                        : "text-secondary/40"
                     }
-                    className="w-full bg-muted/30 border-2 border-transparent focus:border-secondary transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">
-                    Operational Directives
-                  </label>
-                  <textarea
-                    required
-                    rows={4}
-                    placeholder="Detail the specific responsibilities and expected deliverables..."
-                    value={formData.taskDescription}
-                    onChange={(e) =>
-                      setFormData({ ...formData, taskDescription: e.target.value })
-                    }
-                    className="w-full bg-muted/30 border-2 border-transparent focus:border-secondary transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none resize-none placeholder:text-secondary/20 font-bold"
-                  />
-                </div>
-
-                <button
-                  disabled={loading}
-                  type="submit"
-                  className="w-full py-5 bg-secondary text-white rounded-[20px] font-black uppercase tracking-[0.2em] text-xs hover:bg-black transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
-                >
-                  {loading ? (
-                    <>
-                      <Activity size={16} className="animate-spin" />
-                      Allocating Resources...
-                    </>
-                  ) : (
-                    "Initialize Assignment"
-                  )}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-        );
-};
-
-        const AssignProjectModal = ({project, volunteers, onClose, onSuccess}) => {
-    const [selectedVolunteerId, setSelectedVolunteerId] = useState("");
-        const [loading, setLoading] = useState(false);
-        const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-    const handleSubmit = async (e) => {
-          e.preventDefault();
-        if (!selectedVolunteerId) return alert("Please select a volunteer.");
-        setLoading(true);
-        try {
-            const response = await assignTask({
-          projectId: project._id,
-        volunteerId: selectedVolunteerId
-            });
-        if (response.success) {
-          alert("Project assigned successfully!");
-        onSuccess();
-            }
-        } catch (error) {
-          console.error("Assignment failed:", error);
-        alert("Failed to assign project.");
-        } finally {
-          setLoading(false);
-        }
-    };
-
-    const selectedVol = volunteers.find(v => v._id === selectedVolunteerId);
-
-        return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10">
-          <div className="absolute inset-0 bg-secondary/80 backdrop-blur-sm" onClick={onClose} />
-          <div className="relative w-full max-w-xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-            <div className="p-10">
-              <div className="flex justify-between items-start mb-10">
-                <div>
-                  <h3 className="text-3xl font-black text-secondary tracking-tighter lowercase">Dispatch Order.</h3>
-                  <p className="text-secondary/50 text-xs font-bold uppercase tracking-widest mt-1">Assigning: {project.title}</p>
-                </div>
-                <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-all"><CloseIcon size={24} /></button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2 relative">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">Select Operative</label>
-
-                  {/* Custom Dropdown */}
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className={`w-full flex items-center justify-between bg-muted/30 border-2 transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none ${isDropdownOpen ? 'border-secondary' : 'border-transparent'}`}
-                    >
-                      <span className={selectedVolunteerId ? 'text-secondary font-black' : 'text-secondary/40'}>
-                        {selectedVol ? selectedVol.username : "Select a volunteer..."}
-                      </span>
-                      <ChevronDown size={20} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                    </button>
-
-                    {isDropdownOpen && (
-                      <div className="absolute top-full left-0 w-full mt-2 bg-white border border-secondary/10 rounded-3xl shadow-2xl z-[210] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="max-h-[250px] overflow-y-auto no-scrollbar">
-                          {volunteers.length === 0 ? (
-                            <div className="px-6 py-4 text-xs font-bold text-secondary/40 text-center">No approved volunteers available.</div>
-                          ) : (
-                            volunteers.map((m) => (
-                              <button
-                                key={m._id}
-                                type="button"
-                                onClick={() => {
-                                  setSelectedVolunteerId(m._id);
-                                  setIsDropdownOpen(false);
-                                }}
-                                className={`w-full px-6 py-4 text-left text-sm transition-all hover:bg-secondary hover:text-white flex items-center justify-between group ${selectedVolunteerId === m._id ? 'bg-secondary/5 text-secondary' : 'text-secondary/70'}`}
-                              >
-                                <span className="font-bold">{m.username}</span>
-                                <span className="text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Select</span>
-                              </button>
-                            ))
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <button
-                  disabled={loading}
-                  type="submit"
-                  className="w-full py-5 bg-secondary text-white rounded-[20px] font-black uppercase tracking-[0.2em] text-xs hover:bg-black transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
-                >
-                  {loading ? (
-                    <>
-                      <Activity size={16} className="animate-spin" />
-                      Assigning...
-                    </>
-                  ) : "Confirm Assignment"}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-        );
-};
-
-        const LinkDonationModal = ({project, onClose, onSuccess}) => {
-    const [donations, setDonations] = useState([]);
-        const [selectedDonationId, setSelectedDonationId] = useState("");
-        const [loading, setLoading] = useState(false);
-        const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-    // We need to import linkDonationToProject here or pass it down.
-    // Assuming it's imported at top. If not, dynamic import or verify imports.
-    // Assuming imported as part of adminService in AdminDashboard.jsx
-
-    useEffect(() => {
-          fetchDonations();
-    }, []);
-
-    const fetchDonations = async () => {
-        try {
-            const {getAllDonations} = await import("../services/adminService");
-        const response = await getAllDonations();
-        if (response.success) {
-                // Filter out donations that are already linked to projects
-                const availableDonations = response.data.filter(d => !d.project);
-        setDonations(availableDonations);
-            }
-        } catch (error) {
-          console.error("Failed to fetch donations", error);
-        }
-    };
-
-    const handleSubmit = async (e) => {
-          e.preventDefault();
-        if (!selectedDonationId) return alert("Please select a donation.");
-        setLoading(true);
-        try {
-            const response = await linkDonationToProject({
-          projectId: project._id,
-        donationId: selectedDonationId
-            });
-        if (response.success) {
-          alert("Donation linked successfully!");
-        onSuccess();
-            }
-        } catch (error) {
-          console.error("Linking failed:", error);
-        alert("Failed to link donation.");
-        } finally {
-          setLoading(false);
-        }
-    };
-
-    const selectedDonation = donations.find(d => d._id === selectedDonationId);
-
-        return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10">
-          <div className="absolute inset-0 bg-secondary/80 backdrop-blur-sm" onClick={onClose} />
-          <div className="relative w-full max-w-xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-            <div className="p-10">
-              <div className="flex justify-between items-start mb-10">
-                <div>
-                  <h3 className="text-3xl font-black text-secondary tracking-tighter lowercase">Fund Allocation.</h3>
-                  <p className="text-secondary/50 text-xs font-bold uppercase tracking-widest mt-1">Linking funds to: {project.title}</p>
-                </div>
-                <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-all"><CloseIcon size={24} /></button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2 relative">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">Select Contribution</label>
-
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className={`w-full flex items-center justify-between bg-muted/30 border-2 transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none ${isDropdownOpen ? 'border-secondary' : 'border-transparent'}`}
-                    >
-                      <span className={selectedDonationId ? 'text-secondary font-black' : 'text-secondary/40'}>
-                        {selectedDonation ? `₹${selectedDonation.amount?.toLocaleString('en-IN') || 0} - ${selectedDonation.donorId?.username || selectedDonation.donorId?.fullName || "Anonymous"}` : "Select a donation..."}
-                      </span>
-                      <ChevronDown size={20} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                    </button>
-
-                    {isDropdownOpen && (
-                      <div className="absolute top-full left-0 w-full mt-2 bg-white border border-secondary/10 rounded-3xl shadow-2xl z-[210] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="max-h-[250px] overflow-y-auto no-scrollbar">
-                          {donations.length === 0 ? (
-                            <div className="px-6 py-4 text-xs font-bold text-secondary/40 text-center">No available donations.</div>
-                          ) : (
-                            donations.map((d) => (
-                              <button
-                                key={d._id}
-                                type="button"
-                                onClick={() => {
-                                  setSelectedDonationId(d._id);
-                                  setIsDropdownOpen(false);
-                                }}
-                                className={`w-full px-6 py-4 text-left text-sm transition-all hover:bg-secondary hover:text-white flex items-center justify-between group ${selectedDonationId === d._id ? 'bg-secondary/5 text-secondary' : 'text-secondary/70'}`}
-                              >
-                                <span className="font-bold">₹{d.amount?.toLocaleString('en-IN') || 0} - {d.donorId?.username || d.donorId?.fullName || "Anonymous"}</span>
-                                <span className="text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Select</span>
-                              </button>
-                            ))
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <button
-                  disabled={loading}
-                  type="submit"
-                  className="w-full py-5 bg-secondary text-white rounded-[20px] font-black uppercase tracking-[0.2em] text-xs hover:bg-black transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
-                >
-                  {loading ? (
-                    <>
-                      <Activity size={16} className="animate-spin" />
-                      Linking...
-                    </>
-                  ) : "Confirm Link"}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-        );
-};
-
-        const ViewProofModal = ({project, onClose}) => {
-    const [selectedImage, setSelectedImage] = useState(null);
-
-        return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10">
-          <div className="absolute inset-0 bg-secondary/80 backdrop-blur-sm" onClick={onClose} />
-          <div className="relative w-full max-w-3xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
-            <div className="p-8 border-b border-secondary/5 flex justify-between items-center bg-white sticky top-0 z-10">
-              <div>
-                <h3 className="text-2xl font-black text-secondary tracking-tighter lowercase">Proof of Work.</h3>
-                <p className="text-secondary/50 text-xs font-bold uppercase tracking-widest mt-1">Project: {project.title}</p>
-              </div>
-              <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-all"><CloseIcon size={24} /></button>
-            </div>
-
-            <div className="p-8 overflow-y-auto custom-scrollbar">
-              {project.proofOfWork?.description && (
-                <div className="mb-8 bg-muted/20 p-6 rounded-[24px]">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 mb-2">Volunteer's Report</p>
-                  <p className="text-sm font-medium text-secondary/80 italic leading-relaxed">"{project.proofOfWork.description}"</p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {project.proofOfWork?.images?.map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="group relative aspect-square rounded-[24px] overflow-hidden border-2 border-transparent hover:border-secondary/10 transition-all cursor-pointer shadow-sm hover:shadow-xl"
-                    onClick={() => setSelectedImage(img.url)}
                   >
-                    <img src={img.url} alt={`Proof ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-white text-xs font-black uppercase tracking-widest px-3 py-1 border border-white/30 rounded-full backdrop-blur-sm">View</span>
+                    {selectedMission
+                      ? selectedMission.title
+                      : "Select a mission..."}
+                  </span>
+                  <ChevronDown
+                    size={20}
+                    className={`transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="absolute top-full left-0 w-full mt-2 bg-white border border-secondary/10 rounded-3xl shadow-2xl z-[210] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="max-h-[250px] overflow-y-auto no-scrollbar">
+                      {missions.length === 0 ? (
+                        <div className="px-6 py-4 text-xs font-bold text-secondary/40 text-center">
+                          No active missions available.
+                        </div>
+                      ) : (
+                        missions.map((m) => (
+                          <button
+                            key={m._id}
+                            type="button"
+                            onClick={() => {
+                              setFormData({ ...formData, missionId: m._id });
+                              setIsDropdownOpen(false);
+                            }}
+                            className={`w-full px-6 py-4 text-left text-sm transition-all hover:bg-secondary hover:text-white flex items-center justify-between group ${formData.missionId === m._id ? "bg-secondary/5 text-secondary" : "text-secondary/70"}`}
+                          >
+                            <span className="font-bold">{m.title}</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                              Select Sector
+                            </span>
+                          </button>
+                        ))
+                      )}
                     </div>
                   </div>
-                ))}
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Lightbox for Admin */}
-          {selectedImage && (
-            <div className="fixed inset-0 z-[300] flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
-              <div className="absolute inset-0 bg-black/95 backdrop-blur-md"></div>
-              <div className="relative max-w-5xl max-h-[90vh] w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-                <button
-                  onClick={() => setSelectedImage(null)}
-                  className="absolute top-4 right-4 z-20 p-2 bg-white/10 rounded-full text-white hover:bg-white/20 transition-all backdrop-blur-sm border border-white/10"
-                >
-                  <CloseIcon size={24} />
-                </button>
-                <img src={selectedImage} alt="Proof Fullscreen" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
-              </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">
+                Designated Task Title
+              </label>
+              <input
+                required
+                type="text"
+                placeholder="e.g. Area Survey Coordinator"
+                value={formData.taskTitle}
+                onChange={(e) =>
+                  setFormData({ ...formData, taskTitle: e.target.value })
+                }
+                className="w-full bg-muted/30 border-2 border-transparent focus:border-secondary transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none"
+              />
             </div>
-          )}
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">
+                Operational Directives
+              </label>
+              <textarea
+                required
+                rows={4}
+                placeholder="Detail the specific responsibilities and expected deliverables..."
+                value={formData.taskDescription}
+                onChange={(e) =>
+                  setFormData({ ...formData, taskDescription: e.target.value })
+                }
+                className="w-full bg-muted/30 border-2 border-transparent focus:border-secondary transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none resize-none placeholder:text-secondary/20 font-bold"
+              />
+            </div>
+
+            <button
+              disabled={loading}
+              type="submit"
+              className="w-full py-5 bg-secondary text-white rounded-[20px] font-black uppercase tracking-[0.2em] text-xs hover:bg-black transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Activity size={16} className="animate-spin" />
+                  Allocating Resources...
+                </>
+              ) : (
+                "Initialize Assignment"
+              )}
+            </button>
+          </form>
         </div>
-        );
+      </div>
+    </div>
+  );
 };
 
-        export default AdminDashboard;
+const AssignProjectModal = ({ project, volunteers, onClose, onSuccess }) => {
+  const [selectedVolunteerId, setSelectedVolunteerId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedVolunteerId) return alert("Please select a volunteer.");
+    setLoading(true);
+    try {
+      const response = await assignTask({
+        projectId: project._id,
+        volunteerId: selectedVolunteerId
+      });
+      if (response.success) {
+        alert("Project assigned successfully!");
+        onSuccess();
+      }
+    } catch (error) {
+      console.error("Assignment failed:", error);
+      alert("Failed to assign project.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const selectedVol = volunteers.find(v => v._id === selectedVolunteerId);
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10">
+      <div className="absolute inset-0 bg-secondary/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="p-10">
+          <div className="flex justify-between items-start mb-10">
+            <div>
+              <h3 className="text-3xl font-black text-secondary tracking-tighter lowercase">Dispatch Order.</h3>
+              <p className="text-secondary/50 text-xs font-bold uppercase tracking-widest mt-1">Assigning: {project.title}</p>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-all"><CloseIcon size={24} /></button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2 relative">
+              <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">Select Operative</label>
+
+              {/* Custom Dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className={`w-full flex items-center justify-between bg-muted/30 border-2 transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none ${isDropdownOpen ? 'border-secondary' : 'border-transparent'}`}
+                >
+                  <span className={selectedVolunteerId ? 'text-secondary font-black' : 'text-secondary/40'}>
+                    {selectedVol ? selectedVol.username : "Select a volunteer..."}
+                  </span>
+                  <ChevronDown size={20} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="absolute top-full left-0 w-full mt-2 bg-white border border-secondary/10 rounded-3xl shadow-2xl z-[210] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="max-h-[250px] overflow-y-auto no-scrollbar">
+                      {volunteers.length === 0 ? (
+                        <div className="px-6 py-4 text-xs font-bold text-secondary/40 text-center">No approved volunteers available.</div>
+                      ) : (
+                        volunteers.map((m) => (
+                          <button
+                            key={m._id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedVolunteerId(m._id);
+                              setIsDropdownOpen(false);
+                            }}
+                            className={`w-full px-6 py-4 text-left text-sm transition-all hover:bg-secondary hover:text-white flex items-center justify-between group ${selectedVolunteerId === m._id ? 'bg-secondary/5 text-secondary' : 'text-secondary/70'}`}
+                          >
+                            <span className="font-bold">{m.username}</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Select</span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <button
+              disabled={loading}
+              type="submit"
+              className="w-full py-5 bg-secondary text-white rounded-[20px] font-black uppercase tracking-[0.2em] text-xs hover:bg-black transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Activity size={16} className="animate-spin" />
+                  Assigning...
+                </>
+              ) : "Confirm Assignment"}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const LinkDonationModal = ({ project, onClose, onSuccess }) => {
+  const [donations, setDonations] = useState([]);
+  const [selectedDonationId, setSelectedDonationId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // We need to import linkDonationToProject here or pass it down.
+  // Assuming it's imported at top. If not, dynamic import or verify imports.
+  // Assuming imported as part of adminService in AdminDashboard.jsx
+
+  useEffect(() => {
+    fetchDonations();
+  }, []);
+
+  const fetchDonations = async () => {
+    try {
+      const { getAllDonations } = await import("../services/adminService");
+      const response = await getAllDonations();
+      if (response.success) {
+        // Filter out donations that are already linked to projects
+        const availableDonations = response.data.filter(d => !d.project);
+        setDonations(availableDonations);
+      }
+    } catch (error) {
+      console.error("Failed to fetch donations", error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedDonationId) return alert("Please select a donation.");
+    setLoading(true);
+    try {
+      const response = await linkDonationToProject({
+        projectId: project._id,
+        donationId: selectedDonationId
+      });
+      if (response.success) {
+        alert("Donation linked successfully!");
+        onSuccess();
+      }
+    } catch (error) {
+      console.error("Linking failed:", error);
+      alert("Failed to link donation.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const selectedDonation = donations.find(d => d._id === selectedDonationId);
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10">
+      <div className="absolute inset-0 bg-secondary/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="p-10">
+          <div className="flex justify-between items-start mb-10">
+            <div>
+              <h3 className="text-3xl font-black text-secondary tracking-tighter lowercase">Fund Allocation.</h3>
+              <p className="text-secondary/50 text-xs font-bold uppercase tracking-widest mt-1">Linking funds to: {project.title}</p>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-all"><CloseIcon size={24} /></button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2 relative">
+              <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">Select Contribution</label>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className={`w-full flex items-center justify-between bg-muted/30 border-2 transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none ${isDropdownOpen ? 'border-secondary' : 'border-transparent'}`}
+                >
+                  <span className={selectedDonationId ? 'text-secondary font-black' : 'text-secondary/40'}>
+                    {selectedDonation ? `₹${selectedDonation.amount?.toLocaleString('en-IN') || 0} - ${selectedDonation.donorId?.username || selectedDonation.donorId?.fullName || "Anonymous"}` : "Select a donation..."}
+                  </span>
+                  <ChevronDown size={20} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="absolute top-full left-0 w-full mt-2 bg-white border border-secondary/10 rounded-3xl shadow-2xl z-[210] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="max-h-[250px] overflow-y-auto no-scrollbar">
+                      {donations.length === 0 ? (
+                        <div className="px-6 py-4 text-xs font-bold text-secondary/40 text-center">No available donations.</div>
+                      ) : (
+                        donations.map((d) => (
+                          <button
+                            key={d._id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedDonationId(d._id);
+                              setIsDropdownOpen(false);
+                            }}
+                            className={`w-full px-6 py-4 text-left text-sm transition-all hover:bg-secondary hover:text-white flex items-center justify-between group ${selectedDonationId === d._id ? 'bg-secondary/5 text-secondary' : 'text-secondary/70'}`}
+                          >
+                            <span className="font-bold">₹{d.amount?.toLocaleString('en-IN') || 0} - {d.donorId?.username || d.donorId?.fullName || "Anonymous"}</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Select</span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <button
+              disabled={loading}
+              type="submit"
+              className="w-full py-5 bg-secondary text-white rounded-[20px] font-black uppercase tracking-[0.2em] text-xs hover:bg-black transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Activity size={16} className="animate-spin" />
+                  Linking...
+                </>
+              ) : "Confirm Link"}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ViewProofModal = ({ project, onClose }) => {
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10">
+      <div className="absolute inset-0 bg-secondary/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-3xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+        <div className="p-8 border-b border-secondary/5 flex justify-between items-center bg-white sticky top-0 z-10">
+          <div>
+            <h3 className="text-2xl font-black text-secondary tracking-tighter lowercase">Proof of Work.</h3>
+            <p className="text-secondary/50 text-xs font-bold uppercase tracking-widest mt-1">Project: {project.title}</p>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-all"><CloseIcon size={24} /></button>
+        </div>
+
+        <div className="p-8 overflow-y-auto custom-scrollbar">
+          {project.proofOfWork?.description && (
+            <div className="mb-8 bg-muted/20 p-6 rounded-[24px]">
+              <p className="text-[10px] font-black uppercase tracking-widest text-secondary/40 mb-2">Volunteer's Report</p>
+              <p className="text-sm font-medium text-secondary/80 italic leading-relaxed">"{project.proofOfWork.description}"</p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {project.proofOfWork?.images?.map((img, idx) => (
+              <div
+                key={idx}
+                className="group relative aspect-square rounded-[24px] overflow-hidden border-2 border-transparent hover:border-secondary/10 transition-all cursor-pointer shadow-sm hover:shadow-xl"
+                onClick={() => setSelectedImage(img.url)}
+              >
+                <img src={img.url} alt={`Proof ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <span className="text-white text-xs font-black uppercase tracking-widest px-3 py-1 border border-white/30 rounded-full backdrop-blur-sm">View</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Lightbox for Admin */}
+      {selectedImage && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
+          <div className="absolute inset-0 bg-black/95 backdrop-blur-md"></div>
+          <div className="relative max-w-5xl max-h-[90vh] w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-4 right-4 z-20 p-2 bg-white/10 rounded-full text-white hover:bg-white/20 transition-all backdrop-blur-sm border border-white/10"
+            >
+              <CloseIcon size={24} />
+            </button>
+            <img src={selectedImage} alt="Proof Fullscreen" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AdminDashboard;

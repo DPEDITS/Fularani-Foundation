@@ -1,4 +1,4 @@
-```javascript
+
 "use client";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -276,8 +276,8 @@ const VolunteerDashboard = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`text - sm font - black uppercase tracking - widest whitespace - nowrap pb - 4 border - b - 4 transition - all ${
   activeTab === tab.id
-  ? "border-primary text-secondary"
-  : "border-transparent text-secondary/30 hover:text-secondary/60"
+    ? "border-primary text-secondary"
+    : "border-transparent text-secondary/30 hover:text-secondary/60"
 } `}
               >
                 {tab.label}
