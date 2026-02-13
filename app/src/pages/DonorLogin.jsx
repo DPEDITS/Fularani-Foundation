@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { safeNavigate } from "../utils/safeNavigate";
 import { motion as Motion } from "motion/react";
 import {
   Mail,
@@ -14,7 +15,11 @@ import {
   ShieldCheck,
   Zap,
 } from "lucide-react";
-import { loginDonor, isAuthenticated, forgotPasswordDonor } from "../services/donorService";
+import {
+  loginDonor,
+  isAuthenticated,
+  forgotPasswordDonor,
+} from "../services/donorService";
 import {
   loginVolunteer,
   isVolunteerAuthenticated,
@@ -51,9 +56,9 @@ const DonorLogin = () => {
 
   useEffect(() => {
     if (role === "donor" && isAuthenticated()) {
-      navigate("/donor-dashboard");
+      safeNavigate(navigate, "/donor-dashboard");
     } else if (role === "volunteer" && isVolunteerAuthenticated()) {
-      navigate("/volunteer-dashboard");
+      safeNavigate(navigate, "/volunteer-dashboard");
     }
   }, [navigate, role]);
 
@@ -69,21 +74,25 @@ const DonorLogin = () => {
 
     try {
       // Admin Redirection Logic
-      const isSystemAdmin = form.email.trim().toLowerCase() === "admin@gmail.com";
+      const isSystemAdmin =
+        form.email.trim().toLowerCase() === "admin@gmail.com";
       if (isSystemAdmin) {
-        const response = await loginAdmin(form.email.trim().toLowerCase(), form.password);
+        const response = await loginAdmin(
+          form.email.trim().toLowerCase(),
+          form.password,
+        );
         if (response.success) {
-          navigate("/admin-dashboard");
+          safeNavigate(navigate, "/admin-dashboard");
           return;
         }
       }
 
       if (role === "donor") {
         await loginDonor(form.email, form.password);
-        navigate("/donor-dashboard");
+        safeNavigate(navigate, "/donor-dashboard");
       } else {
         await loginVolunteer(form.email, form.password);
-        navigate("/volunteer-dashboard");
+        safeNavigate(navigate, "/volunteer-dashboard");
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -103,9 +112,17 @@ const DonorLogin = () => {
 
     try {
       if (role === "donor") {
-        await forgotPasswordDonor(forgotForm.email, forgotForm.panNumber, forgotForm.newPassword);
+        await forgotPasswordDonor(
+          forgotForm.email,
+          forgotForm.panNumber,
+          forgotForm.newPassword,
+        );
       } else {
-        await forgotPasswordVolunteer(forgotForm.email, forgotForm.panNumber, forgotForm.newPassword);
+        await forgotPasswordVolunteer(
+          forgotForm.email,
+          forgotForm.panNumber,
+          forgotForm.newPassword,
+        );
       }
       setForgotSuccess(true);
       setTimeout(() => {
@@ -114,7 +131,9 @@ const DonorLogin = () => {
         setForgotForm({ email: "", panNumber: "", newPassword: "" });
       }, 3000);
     } catch (err) {
-      setForgotError(err.response?.data?.message || "Reset failed. Verify details.");
+      setForgotError(
+        err.response?.data?.message || "Reset failed. Verify details.",
+      );
     } finally {
       setForgotLoading(false);
     }
@@ -181,7 +200,7 @@ const DonorLogin = () => {
                 type="button"
                 onClick={() => {
                   setRole("donor");
-                  navigate("/donor-login");
+                  safeNavigate(navigate, "/donor-login");
                   setError("");
                 }}
                 className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "donor" ? "text-white" : "text-secondary/40"}`}
@@ -192,7 +211,7 @@ const DonorLogin = () => {
                 type="button"
                 onClick={() => {
                   setRole("volunteer");
-                  navigate("/donor-login?role=volunteer");
+                  safeNavigate(navigate, "/donor-login?role=volunteer");
                   setError("");
                 }}
                 className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "volunteer" ? "text-white" : "text-secondary/40"}`}
@@ -320,14 +339,23 @@ const DonorLogin = () => {
                 <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
                   <ShieldCheck size={40} className="text-green-500" />
                 </div>
-                <h3 className="text-2xl font-black text-secondary mb-2 lowercase tracking-tighter">password reset!</h3>
-                <p className="text-secondary/60 text-sm font-bold">Your security is updated. You can now login with your new password.</p>
+                <h3 className="text-2xl font-black text-secondary mb-2 lowercase tracking-tighter">
+                  password reset!
+                </h3>
+                <p className="text-secondary/60 text-sm font-bold">
+                  Your security is updated. You can now login with your new
+                  password.
+                </p>
               </div>
             ) : (
               <>
                 <div className="mb-8">
-                  <h3 className="text-3xl font-black text-secondary mb-2 lowercase tracking-tighter">forgot access?</h3>
-                  <p className="text-secondary/40 text-[10px] font-black uppercase tracking-widest">Verify your identity to reset password.</p>
+                  <h3 className="text-3xl font-black text-secondary mb-2 lowercase tracking-tighter">
+                    forgot access?
+                  </h3>
+                  <p className="text-secondary/40 text-[10px] font-black uppercase tracking-widest">
+                    Verify your identity to reset password.
+                  </p>
                 </div>
 
                 {forgotError && (
@@ -338,11 +366,15 @@ const DonorLogin = () => {
 
                 <form onSubmit={handleForgotSubmit} className="space-y-5">
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">Email</label>
+                    <label className="text-[9px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
+                      Email
+                    </label>
                     <input
                       type="email"
                       value={forgotForm.email}
-                      onChange={(e) => setForgotForm({ ...forgotForm, email: e.target.value })}
+                      onChange={(e) =>
+                        setForgotForm({ ...forgotForm, email: e.target.value })
+                      }
                       required
                       placeholder="registered@email.com"
                       className="w-full h-12 px-6 rounded-xl bg-muted/20 border-none focus:ring-2 focus:ring-primary/20 outline-none transition-all font-black text-sm"
@@ -350,11 +382,18 @@ const DonorLogin = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">Verified PAN Number</label>
+                    <label className="text-[9px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
+                      Verified PAN Number
+                    </label>
                     <input
                       type="text"
                       value={forgotForm.panNumber}
-                      onChange={(e) => setForgotForm({ ...forgotForm, panNumber: e.target.value })}
+                      onChange={(e) =>
+                        setForgotForm({
+                          ...forgotForm,
+                          panNumber: e.target.value,
+                        })
+                      }
                       required
                       placeholder="ABCDE1234F"
                       className="w-full h-12 px-6 rounded-xl bg-muted/20 border-none focus:ring-2 focus:ring-primary/20 outline-none transition-all font-black text-sm uppercase"
@@ -362,11 +401,18 @@ const DonorLogin = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">New Password</label>
+                    <label className="text-[9px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
+                      New Password
+                    </label>
                     <input
                       type="password"
                       value={forgotForm.newPassword}
-                      onChange={(e) => setForgotForm({ ...forgotForm, newPassword: e.target.value })}
+                      onChange={(e) =>
+                        setForgotForm({
+                          ...forgotForm,
+                          newPassword: e.target.value,
+                        })
+                      }
                       required
                       placeholder="••••••••"
                       className="w-full h-12 px-6 rounded-xl bg-muted/20 border-none focus:ring-2 focus:ring-primary/20 outline-none transition-all font-black text-sm"
@@ -378,7 +424,14 @@ const DonorLogin = () => {
                     disabled={forgotLoading}
                     className="w-full h-14 bg-secondary text-white rounded-xl font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-xl transition-all active:scale-95 disabled:opacity-50 mt-4"
                   >
-                    {forgotLoading ? <Loader2 className="animate-spin" /> : <>Reset Password <Zap size={14} className="fill-accent text-accent" /></>}
+                    {forgotLoading ? (
+                      <Loader2 className="animate-spin" />
+                    ) : (
+                      <>
+                        Reset Password{" "}
+                        <Zap size={14} className="fill-accent text-accent" />
+                      </>
+                    )}
                   </button>
                 </form>
               </>

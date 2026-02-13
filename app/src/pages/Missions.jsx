@@ -5,6 +5,7 @@ import MissionPeriod from "../components/MissionPeriod";
 import MissionThalassemia from "../components/MissionThalassemia";
 import { useEffect, useState } from "react";
 import { motion as Motion } from "motion/react";
+import { safeLocationRedirect } from "../utils/safeNavigate";
 import {
   ArrowRight,
   Globe,
@@ -188,7 +189,7 @@ const Missions = () => {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <button
-                onClick={() => (window.location.href = "/volunteer-login")}
+                onClick={() => safeLocationRedirect("/volunteer-login")}
                 className="w-full sm:w-auto bg-secondary text-white px-12 py-6 rounded-2xl text-lg font-black uppercase tracking-tight hover:bg-black transition-all flex items-center justify-center gap-3 group"
               >
                 Join the Mission{" "}

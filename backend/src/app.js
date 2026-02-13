@@ -1,8 +1,39 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import logger from "./utils/logger.js";
 
 const app = express();
+
+// --- Security headers ---
+app.use(helmet());
+
+// --- Rate limiting ---
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,                  // 100 requests per window per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Rate limit exceeded for IP: ${req.ip}`);
+    res.status(429).json({ success: false, message: "Too many requests — please try again later" });
+  },
+});
+app.use(globalLimiter);
+
+const paymentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,                   // 10 payment attempts per 15 min per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Payment rate limit exceeded for IP: ${req.ip}`);
+    res.status(429).json({ success: false, message: "Too many payment attempts — please try again later" });
+  },
+});
+
 const allowedOrigins = [
   process.env.CORS_ORIGIN,
   "http://localhost:5173",
@@ -18,7 +49,7 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        console.log("Origin not allowed by CORS:", origin);
+        logger.warn("Origin not allowed by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
@@ -45,10 +76,10 @@ app.use("/api/volunteers", volunteerRouter)
 app.use("/api/donor", donorRouter)
 app.use("/api/v1/contact", contactRouter)
 app.use("/api/gallery", galleryRouter)
-app.use("/api/donations", donationRouter)
+app.use("/api/donations", paymentLimiter, donationRouter)
 app.use("/api/content", contentRouter)
 app.use("/api/admin", adminRouter)
-app.use("/api/payment", paymentRouter)
+app.use("/api/payment", paymentLimiter, paymentRouter)
 
 // error handler
 app.use((err, req, res, next) => {

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { safeNavigate } from "../utils/safeNavigate";
 import {
   Heart,
   ChevronRight,
@@ -65,7 +66,7 @@ const DonorDashboard = () => {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate("/donor-login");
+      safeNavigate(navigate, "/donor-login");
       return;
     }
     fetchDashboardData();
@@ -88,7 +89,7 @@ const DonorDashboard = () => {
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
       setError("Failed to load dashboard data. Please try again.");
-      if (err.response?.status === 401) navigate("/donor-login");
+      if (err.response?.status === 401) safeNavigate(navigate, "/donor-login");
     } finally {
       setLoading(false);
     }
@@ -127,21 +128,16 @@ const DonorDashboard = () => {
 
             await verifyRazorpayPayment(verificationData);
 
+            // Server handles: donorId (from JWT), receipt number, dates, recurringId
             const donationData = {
-              donorId: donor._id,
               amount: parseInt(amount),
               currency: "INR",
               paymentGateway: "Razorpay",
               paymentId: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
               isRecurring,
               recurringInterval: isRecurring ? "monthly" : "once",
-              recurringId: isRecurring
-                ? `rec_${Math.random().toString(36).substr(2, 9)}`
-                : "na",
-              receiptNumber: `FF-${Date.now()}`,
-              receiptUrl: "https://example.com/receipt.pdf",
-              receiptGeneratedAt: new Date().toISOString(),
-              donatedAt: new Date().toISOString(),
             };
 
             await createDonation(donationData);

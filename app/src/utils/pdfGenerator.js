@@ -63,8 +63,6 @@ const loadImage = (url) => {
 
 export const generateDonationReceipt = async (donation, user) => {
     try {
-        console.log("Generating official receipt for donation:", donation);
-        console.log("Using donor information:", user);
         if (!donation) throw new Error("Donation data is missing");
 
         // 1. Load All Images First
@@ -73,7 +71,7 @@ export const generateDonationReceipt = async (donation, user) => {
             loadImage(authSig)
         ]);
 
-        console.log("Images loaded:", { logo: !!logoImg, signature: !!sigImg });
+
 
         const doc = new (jsPDF.jsPDF || jsPDF)();
         const pageWidth = doc.internal.pageSize.getWidth();
@@ -246,7 +244,7 @@ export const generateDonationReceipt = async (donation, user) => {
 
         // Save
         doc.save(`Fularani_Official_Receipt_${receiptNo}.pdf`);
-        console.log("Official PDF generated successfully");
+
 
     } catch (error) {
         console.error("Failed to generate official PDF receipt:", error);
@@ -256,7 +254,6 @@ export const generateDonationReceipt = async (donation, user) => {
 
 export const generateDonationsReport = (donations, user) => {
     try {
-        console.log("Generating donations report for:", donations);
         if (!donations || donations.length === 0) {
             alert("No donation history found to export.");
             return;
@@ -325,7 +322,7 @@ export const generateDonationsReport = (donations, user) => {
         );
 
         doc.save(`Fularani_Donation_History_${user?.username || "Donor"}.pdf`);
-        console.log("Donations report generated successfully");
+
     } catch (error) {
         console.error("Failed to generate donations report:", error);
         alert("Failed to generate donations report. Please check the console for details.");

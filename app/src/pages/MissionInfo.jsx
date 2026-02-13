@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { safeNavigate } from "../utils/safeNavigate";
 import { missions } from "../data/missions";
 import { ArrowLeft, ArrowRight, Heart } from "lucide-react";
 import { motion } from "motion/react";
@@ -53,7 +54,7 @@ const MissionInfo = () => {
             The mission you are looking for does not exist.
           </p>
           <button
-            onClick={() => navigate("/missions")}
+            onClick={() => safeNavigate(navigate, "/missions")}
             className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-colors"
           >
             Back to Missions
