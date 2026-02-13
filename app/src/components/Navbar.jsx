@@ -95,10 +95,11 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 border-b ${scrolled
-          ? "bg-white/95 backdrop-blur-md border-secondary/10 shadow-sm py-2"
-          : "bg-white border-transparent py-3"
-          }`}
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 border-b ${
+          scrolled
+            ? "bg-white/95 backdrop-blur-md border-secondary/10 shadow-sm py-2"
+            : "bg-white border-transparent py-3"
+        }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between">
           {/* Logo Section */}
@@ -165,6 +166,14 @@ const Navbar = () => {
                 )}
               </div>
             ))}
+            {currentUser?.email?.toLowerCase() === "admin@gmail.com" && (
+              <Link
+                to="/add-content"
+                className="text-[14px] font-bold text-secondary/70 hover:text-secondary hover:text-primary transition-colors uppercase tracking-tight"
+              >
+                Add Story
+              </Link>
+            )}
           </div>
 
           {/* Right Section Actions */}
