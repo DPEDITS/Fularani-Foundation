@@ -75,9 +75,28 @@ const registerDonor = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Something went wrong while registering the donor");
   }
 
+  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(donor._id);
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
   return res
     .status(201)
-    .json(new ApiResponse(200, createdDonor, "Donor registered Successfully"));
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        201,
+        {
+          user: createdDonor,
+          accessToken,
+          refreshToken,
+        },
+        "Donor registered Successfully",
+      ),
+    );
 });
 
 const loginDonor = asyncHandler(async (req, res) => {
@@ -351,18 +370,44 @@ const forgotPasswordDonor = asyncHandler(async (req, res) => {
 });
 
 const getRecentDonors = asyncHandler(async (req, res) => {
-  const donors = await Donor.find({
-    avatar: { $exists: true, $ne: "" }
-  })
-    .sort({ createdAt: -1 })
-    .limit(4)
-    .select("avatar username");
+  // Fetch recent donations with donor details
+  const recentDonations = await Donation.find()
+    .sort({ donatedAt: -1 })
+    .populate({
+      path: "donorId",
+      select: "username avatar"
+    })
+    .limit(50); // Fetch more to ensure we find enough unique donors
+
+  const uniqueDonors = [];
+  const seenDonorIds = new Set();
+
+  for (const donation of recentDonations) {
+    if (uniqueDonors.length >= 4) break;
+
+    // Check if donor exists and hasn't been added yet
+    // Also skip if donor was deleted (donorId would be null) or avatar is missing/empty if that's a requirement
+    // The previous code required avatar, so let's keep that preference but maybe relax it if we want names
+    if (donation.donorId && !seenDonorIds.has(donation.donorId._id.toString())) {
+      // Optional: Filter out if no avatar, or keep?
+      // The prompt wants specific usernames. Let's assume valid donors.
+      // If we strictly follow "avatar: { $exists: true, $ne: "" }" from before:
+      if (donation.donorId.avatar) {
+        seenDonorIds.add(donation.donorId._id.toString());
+        uniqueDonors.push({
+          _id: donation.donorId._id,
+          username: donation.donorId.username,
+          avatar: donation.donorId.avatar
+        });
+      }
+    }
+  }
 
   const totalDonors = await Donor.countDocuments();
 
   return res
     .status(200)
-    .json(new ApiResponse(200, { donors, totalDonors }, "Recent donors fetched successfully"));
+    .json(new ApiResponse(200, { donors: uniqueDonors, totalDonors }, "Recent donors fetched successfully"));
 });
 
 export {

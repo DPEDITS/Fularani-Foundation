@@ -225,7 +225,7 @@ const DonorRegister = () => {
       setTimeout(
         () =>
           navigate(
-            role === "donor" ? "/donor-login" : "/donor-login?role=volunteer",
+            role === "donor" ? "/donor-dashboard" : "/volunteer-dashboard",
           ),
         2000,
       );
@@ -292,12 +292,59 @@ const DonorRegister = () => {
                     ? "donor registration"
                     : "volunteer registration"}
                 </p>
-                <div className="flex items-center gap-6">
-                  <div className="h-[1px] w-20 bg-secondary/10"></div>
-                  <span className="text-primary font-black text-2xl tracking-tighter">
-                    Step {currentStep}{" "}
-                    <span className="text-secondary/20">/ {totalSteps}</span>
-                  </span>
+                <div className="space-y-6 pt-4">
+                  {(role === "donor" ? [
+                    { id: 1, title: "Account", desc: "Credentials" },
+                    { id: 2, title: "Personal", desc: "Details" }
+                  ] : [
+                    { id: 1, title: "Account", desc: "Credentials" },
+                    { id: 2, title: "Basic Info", desc: "Personal" },
+                    { id: 3, title: "Skills", desc: "Expertise" },
+                    { id: 4, title: "Final", desc: "Motivation" }
+                  ]).map((step, index, arr) => (
+                    <div key={step.id} className="flex gap-4 relative group">
+                      {/* Connecting Line */}
+                      {index !== arr.length - 1 && (
+                        <div className="absolute left-[19px] top-10 bottom-[-24px] w-[2px] bg-secondary/5 rounded-full overflow-hidden">
+                          <Motion.div
+                            initial={{ height: "0%" }}
+                            animate={{
+                              height: currentStep > step.id ? "100%" : "0%"
+                            }}
+                            transition={{ duration: 0.5, ease: "easeInOut" }}
+                            className="w-full bg-primary"
+                          />
+                        </div>
+                      )}
+
+                      {/* Step Indicator */}
+                      <Motion.div
+                        initial={false}
+                        animate={{
+                          backgroundColor: currentStep >= step.id ? "var(--color-primary)" : "var(--color-muted)",
+                          scale: currentStep === step.id ? 1.1 : 1,
+                          opacity: currentStep < step.id ? 0.3 : 1
+                        }}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg relative z-10 ${currentStep >= step.id ? 'shadow-primary/30' : ''}`}
+                      >
+                        {currentStep > step.id ? (
+                          <CheckCircle2 size={20} />
+                        ) : (
+                          <span className="font-black text-sm">{step.id}</span>
+                        )}
+                      </Motion.div>
+
+                      {/* Step Content */}
+                      <div className={`pt-1 transition-opacity duration-300 ${currentStep === step.id ? 'opacity-100' : 'opacity-40'}`}>
+                        <h4 className="text-sm font-black uppercase tracking-wider text-secondary">
+                          {step.title}
+                        </h4>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
+                          {step.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -316,13 +363,25 @@ const DonorRegister = () => {
             className="bg-white p-8 md:p-10 rounded-[48px] shadow-2xl border border-secondary/5 relative overflow-hidden max-w-[500px] mx-auto lg:mr-0 lg:ml-auto"
           >
             {/* Progress Bar (Mobile) */}
-            <div className="lg:hidden flex items-center justify-between mb-8">
-              <Link to="/" className="text-primary">
-                <ChevronLeft size={20} />
-              </Link>
-              <span className="text-[10px] font-black uppercase tracking-widest text-primary">
-                Step {currentStep} of {totalSteps}
-              </span>
+            {/* Progress Bar (Mobile) */}
+            <div className="lg:hidden mb-10">
+              <div className="flex items-center justify-between mb-4">
+                <Link to="/" className="text-primary p-2 -ml-2 hover:bg-muted/10 rounded-full transition-colors">
+                  <ChevronLeft size={20} />
+                </Link>
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary">
+                  Step {currentStep} / {totalSteps}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                {Array.from({ length: totalSteps }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-1 flex-1 rounded-full transition-all duration-500 ${i + 1 <= currentStep ? 'bg-primary' : 'bg-secondary/10'
+                      }`}
+                  />
+                ))}
+              </div>
             </div>
             {/* Role Switcher */}
             <div className="relative flex items-center bg-muted/20 p-1.5 rounded-2xl mb-8">
