@@ -2,11 +2,6 @@ import mongoose, { Schema } from "mongoose";
 
 const contentSchema = new Schema(
   {
-    type: {
-      type: String,
-      required: true,
-      enum: ["MISSION", "EVENT"],
-    },
     title: {
       type: String,
       required: true,
@@ -14,35 +9,36 @@ const contentSchema = new Schema(
     },
     shortDescription: {
       type: String,
+      required: true,
     },
-    fullDescription: {
+    author: {
       type: String,
+      required: true,
     },
     images: {
-      type: [String], 
+      type: [String],
     },
     coverImage: {
       type: String,
+      required: true,
+    },
+    markdownFile: {
+      type: String,
+      required: true,
     },
     category: {
       type: String,
-    },
-    location: {
-      type: String,
-    },
-    startDate: {
-      type: Date,
-    },
-    endDate: {
-      type: Date,
+      required: true,
     },
     eventDate: {
       type: Date,
+      required: true,
     },
     status: {
       type: String,
       enum: ["planning", "active", "completed", "onhold", "upcoming", "past"],
       default: "planning",
+      required: true,
     },
     isPublished: {
       type: Boolean,

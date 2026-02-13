@@ -18,6 +18,7 @@ import VolunteerDashboard from "./pages/VolunteerDashboard";
 import Footer from "./components/Footer";
 import CSRPartnership from "./pages/CSRPartnership";
 import AdminDashboard from "./pages/AdminDashboard";
+import AddContent from "./pages/AddContent";
 
 const App = () => {
   const location = useLocation();
@@ -50,6 +51,7 @@ const App = () => {
           <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
           <Route path="/donor-dashboard" element={<DonorDashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/add-content" element={<AddContent />} />
         </Routes>
       </main>
       {!shouldHideFooter && <Footer />}
