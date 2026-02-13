@@ -26,6 +26,8 @@ const donationSchema = new Schema(
     },
     paymentId: {
       type: String,
+      unique: true,
+      sparse: true,
     },
     // paymentStatus: {
     //   type: String,

@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, ArrowRight, Eye, EyeOff, Users, ShieldCheck } from "lucide-react";
+import { safeNavigate } from "../utils/safeNavigate";
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Users,
+  ShieldCheck,
+} from "lucide-react";
 import { loginVolunteer } from "../services/volunteerService";
 import { loginAdmin } from "../services/adminService";
 
@@ -20,24 +29,30 @@ const VolunteerLogin = () => {
     setError("");
 
     try {
-      const isSystemAdmin = form.email.trim().toLowerCase() === "admin@gmail.com";
+      const isSystemAdmin =
+        form.email.trim().toLowerCase() === "admin@gmail.com";
 
       if (isSystemAdmin) {
-        const response = await loginAdmin(form.email.trim().toLowerCase(), form.password);
+        const response = await loginAdmin(
+          form.email.trim().toLowerCase(),
+          form.password,
+        );
         if (response.success) {
-          navigate("/admin-dashboard");
+          safeNavigate(navigate, "/admin-dashboard");
           return;
         }
       } else {
         const response = await loginVolunteer(form.email, form.password);
         if (response.success) {
-          navigate("/volunteer-dashboard");
+          safeNavigate(navigate, "/volunteer-dashboard");
           return;
         }
       }
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+      setError(
+        err.response?.data?.message || "Invalid credentials. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -53,8 +68,12 @@ const VolunteerLogin = () => {
           <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-6 border border-black/5">
             <Users size={32} className="text-[#0071e3]" />
           </div>
-          <h1 className="text-[32px] font-bold text-[#1d1d1f] tracking-tight mb-2">Volunteer Sign In</h1>
-          <p className="text-[17px] text-[#86868b] font-medium">Welcome back, hero. Ready to make an impact?</p>
+          <h1 className="text-[32px] font-bold text-[#1d1d1f] tracking-tight mb-2">
+            Volunteer Sign In
+          </h1>
+          <p className="text-[17px] text-[#86868b] font-medium">
+            Welcome back, hero. Ready to make an impact?
+          </p>
         </div>
 
         <div className="apple-card p-8 md:p-10">
@@ -65,9 +84,14 @@ const VolunteerLogin = () => {
           )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Email</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Email
+              </label>
               <div className="relative">
-                <Mail className="absolute left-4 top-4 text-[#86868b]" size={20} />
+                <Mail
+                  className="absolute left-4 top-4 text-[#86868b]"
+                  size={20}
+                />
                 <input
                   type="email"
                   name="email"
@@ -82,13 +106,22 @@ const VolunteerLogin = () => {
 
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
-                <label className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-tight">Password</label>
-                <a href="/forgot-password" size="sm" className="text-[13px] text-[#0066cc] font-medium hover:underline">
+                <label className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-tight">
+                  Password
+                </label>
+                <a
+                  href="/forgot-password"
+                  size="sm"
+                  className="text-[13px] text-[#0066cc] font-medium hover:underline"
+                >
                   Forgot password?
                 </a>
               </div>
               <div className="relative">
-                <Lock className="absolute left-4 top-4 text-[#86868b]" size={20} />
+                <Lock
+                  className="absolute left-4 top-4 text-[#86868b]"
+                  size={20}
+                />
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -114,12 +147,19 @@ const VolunteerLogin = () => {
               className="w-full h-14 bg-[#1d1d1f] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
             >
               {loading ? "Signing In..." : "Sign In"}
-              {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
+              {!loading && (
+                <ArrowRight
+                  size={18}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+              )}
             </button>
 
             <div className="relative flex items-center justify-center py-2">
               <div className="absolute w-full border-t border-black/5"></div>
-              <span className="relative bg-white px-4 text-[13px] text-[#86868b] font-medium uppercase tracking-widest">or</span>
+              <span className="relative bg-white px-4 text-[13px] text-[#86868b] font-medium uppercase tracking-widest">
+                or
+              </span>
             </div>
 
             <button
@@ -151,7 +191,10 @@ const VolunteerLogin = () => {
           <div className="mt-8 text-center">
             <p className="text-[15px] text-[#86868b] font-medium">
               New Volunteer?{" "}
-              <a href="/volunteer-register" className="text-[#0066cc] font-bold hover:underline">
+              <a
+                href="/volunteer-register"
+                className="text-[#0066cc] font-bold hover:underline"
+              >
                 Register Now
               </a>
             </p>
@@ -160,7 +203,9 @@ const VolunteerLogin = () => {
 
         <div className="mt-12 flex items-center justify-center gap-2 text-[#86868b]">
           <ShieldCheck size={16} />
-          <span className="text-[13px] font-medium">Secure login with bank-grade encryption</span>
+          <span className="text-[13px] font-medium">
+            Secure login with bank-grade encryption
+          </span>
         </div>
       </div>
     </main>

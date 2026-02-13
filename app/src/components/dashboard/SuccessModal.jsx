@@ -344,7 +344,34 @@ const SuccessModal = ({ show, onClose, amount, formatCurrency, donorName }) => {
   };
 
   const handleNativeShare = async () => {
+<<<<<<< HEAD
     await shareWithNativeApi("Native");
+=======
+    if (!navigator.share) return;
+    try {
+      const shareData = {
+        title: "Fularani Foundation Donation",
+        text: shareCaption,
+        url: websiteUrl,
+      };
+      // Try sharing with image if possible
+      if (shareImageUrl && navigator.canShare) {
+        const response = await fetch(shareImageUrl);
+        const blob = await response.blob();
+        const file = new File([blob], "donation-share.png", {
+          type: "image/png",
+        });
+        if (navigator.canShare({ files: [file] })) {
+          shareData.files = [file];
+        }
+      }
+      await navigator.share(shareData);
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        // Non-abort share failures are silently ignored in production
+      }
+    }
+>>>>>>> origin/Dutta
   };
 
   if (!show) return null;

@@ -1,4 +1,5 @@
 import { ArrowRight, Heart, Users } from "lucide-react";
+import { safeLocationRedirect } from "../utils/safeNavigate";
 
 const CTASection = () => {
   return (
@@ -40,7 +41,7 @@ const CTASection = () => {
 
             <button
               onClick={() =>
-                (window.location.href = "/donor-register?role=volunteer")
+                safeLocationRedirect("/donor-register?role=volunteer")
               }
               className="relative z-10 w-full md:w-auto bg-white text-secondary px-10 py-5 rounded-xl text-lg font-black uppercase tracking-tight hover:bg-primary transition-all flex items-center justify-center gap-3 group/btn shadow-xl"
             >
@@ -75,7 +76,7 @@ const CTASection = () => {
             </div>
 
             <button
-              onClick={() => (window.location.href = "/donor-register")}
+              onClick={() => safeLocationRedirect("/donor-register")}
               className="relative z-10 w-full md:w-auto bg-secondary text-white px-10 py-5 rounded-xl text-lg font-black uppercase tracking-tight hover:bg-black transition-all flex items-center justify-center gap-3 group/btn shadow-2xl shadow-black/20"
             >
               Donate Now{" "}
