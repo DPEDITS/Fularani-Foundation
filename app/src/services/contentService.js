@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/content";
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api/content`;
 
 export const getAllContent = async () => {
   try {
@@ -24,9 +24,11 @@ export const getContentById = async (id) => {
 
 export const createContent = async (formData) => {
   try {
+    const token = localStorage.getItem("admin_access_token");
     const response = await axios.post(`${API_URL}/create`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     });
     return response.data;
