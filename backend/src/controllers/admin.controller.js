@@ -154,4 +154,11 @@ const assignTask = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, assignment, "Task assigned successfully to volunteer"));
 });
 
-export { registerAdmin, loginAdmin, getAdminStats, getAllVolunteers, getAllDonors, getAllMissions, updateVolunteerStatus, assignTask };
+const getAllDonations = asyncHandler(async (req, res) => {
+    const donations = await Donation.find()
+        .populate("donorId", "username email fullName")
+        .sort({ donatedAt: -1 });
+    return res.status(200).json(new ApiResponse(200, donations, "Donations fetched successfully"));
+});
+
+export { registerAdmin, loginAdmin, getAdminStats, getAllVolunteers, getAllDonors, getAllMissions, updateVolunteerStatus, assignTask, getAllDonations };
