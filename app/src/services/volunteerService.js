@@ -59,6 +59,12 @@ export const registerVolunteer = async (formData) => {
                 'Content-Type': 'multipart/form-data',
             },
         });
+        const { user, accessToken, refreshToken } = response.data.data;
+        if (accessToken && refreshToken) {
+            setAuthTokens(accessToken, refreshToken);
+            setVolunteerUser(user);
+            window.dispatchEvent(new Event("storage"));
+        }
         return response.data;
     } catch (error) {
         throw error;
