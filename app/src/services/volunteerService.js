@@ -141,3 +141,28 @@ export const getCurrentVolunteer = async () => {
         throw error;
     }
 };
+
+export const getMyProjects = async () => {
+    try {
+        const response = await api.get('/api/projects/my-projects', {
+            headers: authHeader()
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const submitProofOfWork = async (formData) => {
+    try {
+        const response = await api.post('/api/projects/submit-proof', formData, {
+            headers: {
+                ...authHeader(),
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

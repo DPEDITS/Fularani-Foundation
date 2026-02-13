@@ -32,6 +32,7 @@ import { generateDonationReceipt } from "../utils/pdfGenerator";
 import OverviewTab from "../components/dashboard/OverviewTab";
 import DonationsTab from "../components/dashboard/DonationsTab";
 import ProfileTab from "../components/dashboard/ProfileTab";
+import ImpactTab from "../components/dashboard/ImpactTab";
 import DonationModal from "../components/dashboard/DonationModal";
 import SuccessModal from "../components/dashboard/SuccessModal";
 import Toast from "../components/dashboard/Toast";
@@ -409,6 +410,7 @@ const DonorDashboard = () => {
             {[
               { id: "overview", label: "Overview" },
               { id: "donations", label: "History" },
+              { id: "impact", label: "Impact" },
               { id: "profile", label: "Settings" },
             ].map((tab) => (
               <button
@@ -439,6 +441,12 @@ const DonorDashboard = () => {
               formatCurrency={formatCurrency}
               formatDate={formatDate}
               setShowDonationModal={setShowDonationModal}
+            />
+          )}
+          {activeTab === "impact" && (
+            <ImpactTab
+              formatCurrency={formatCurrency}
+              formatDate={formatDate}
             />
           )}
           {activeTab === "profile" && (

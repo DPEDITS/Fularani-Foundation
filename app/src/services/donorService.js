@@ -252,3 +252,14 @@ export const getRecentDonors = async () => {
         throw error;
     }
 };
+
+export const getDonorDonationsWithProjects = async () => {
+    try {
+        const response = await api.get('/api/donations/donations-with-projects', {
+            headers: authHeader()
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

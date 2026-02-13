@@ -58,6 +58,10 @@ const donationSchema = new Schema(
       type: Date,
       default: Date.now,
     },
+    project: {
+      type: Schema.Types.ObjectId,
+      ref: "Project",
+    },
   },
   { timestamps: true },
 );

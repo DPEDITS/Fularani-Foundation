@@ -103,4 +103,21 @@ const cancelSubscription = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, subscription, "Subscription cancelled successfully"));
 });
 
-export { createDonation, getActiveSubscriptions, cancelSubscription };
+const getDonorDonationsWithProjects = asyncHandler(async (req, res) => {
+  const donorId = req.user._id;
+  const donations = await Donation.find({ donorId })
+    .populate({
+      path: "project",
+      populate: {
+        path: "assignedTo",
+        select: "username email"
+      }
+    })
+    .sort({ donatedAt: -1 });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, donations, "Donations with projects fetched successfully"));
+});
+
+export { createDonation, getActiveSubscriptions, cancelSubscription, getDonorDonationsWithProjects };

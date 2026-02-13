@@ -107,7 +107,43 @@ export const updateVolunteerStatus = async (volunteerId, status) => {
 
 export const assignTask = async (data) => {
     try {
-        const response = await api.post('/api/admin/assign-task', data, { headers: authHeader() });
+        const response = await api.post('/api/projects/assign', data, { headers: authHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getAllProjects = async () => {
+    try {
+        const response = await api.get('/api/projects/all', { headers: authHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getAllDonations = async () => {
+    try {
+        const response = await api.get('/api/admin/donations', { headers: authHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createProject = async (data) => {
+    try {
+        const response = await api.post('/api/projects/create', data, { headers: authHeader() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const linkDonationToProject = async (data) => {
+    try {
+        const response = await api.post('/api/projects/link-donation', data, { headers: authHeader() });
         return response.data;
     } catch (error) {
         throw error;
