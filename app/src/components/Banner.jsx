@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
 import ImpactStats from "./ImpactStats";
+import { safeLocationRedirect } from "../utils/safeNavigate";
 
 export const Banner = () => {
   const [loopNum, setLoopNum] = useState(0);
@@ -54,7 +55,8 @@ export const Banner = () => {
           <h1 className="text-[48px] md:text-[64px] font-bold tracking-tight text-[#1d1d1f] leading-[1.1] mb-6">
             Empowering Lives. <br />
             <span className="text-[#0071e3] transition-all duration-300">
-              {text}<span className="border-r-2 border-[#0071e3] ml-1 animate-pulse"></span>
+              {text}
+              <span className="border-r-2 border-[#0071e3] ml-1 animate-pulse"></span>
             </span>
           </h1>
 
@@ -67,14 +69,25 @@ export const Banner = () => {
           <div className="flex flex-col sm:flex-row items-center gap-6 mb-20">
             <button
               onClick={() => {
-                window.location.href = "/donor-register";
+                safeLocationRedirect("/donor-register");
               }}
               className="bg-[#0071e3] text-white px-8 py-3 rounded-full text-[17px] font-medium hover:bg-[#0077ed] transition-all shadow-sm flex items-center gap-2 group"
             >
-              Donate <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              Donate{" "}
+              <ArrowRight
+                size={20}
+                className="group-hover:translate-x-1 transition-transform"
+              />
             </button>
-            <a href="/about" className="text-[#0066cc] text-[17px] hover:underline flex items-center gap-1 group">
-              Learn more <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            <a
+              href="/about"
+              className="text-[#0066cc] text-[17px] hover:underline flex items-center gap-1 group"
+            >
+              Learn more{" "}
+              <ArrowRight
+                size={18}
+                className="group-hover:translate-x-1 transition-transform"
+              />
             </a>
           </div>
 

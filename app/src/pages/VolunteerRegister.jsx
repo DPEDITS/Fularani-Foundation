@@ -1,7 +1,21 @@
 "use client";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Lock, ArrowRight, Eye, EyeOff, Users, ShieldCheck, Phone, Calendar, MapPin, Target } from "lucide-react";
+import { safeNavigate } from "../utils/safeNavigate";
+import {
+  User,
+  Mail,
+  Lock,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Users,
+  ShieldCheck,
+  Phone,
+  Calendar,
+  MapPin,
+  Target,
+} from "lucide-react";
 import { registerVolunteer } from "../services/volunteerService";
 
 const VolunteerRegister = () => {
@@ -20,7 +34,7 @@ const VolunteerRegister = () => {
     skills: "",
     availabilityHours: "",
     preferredAreas: "",
-    motivation: ""
+    motivation: "",
   });
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
@@ -33,13 +47,13 @@ const VolunteerRegister = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleDateChange = (e) => {
-    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
 
     if (value.length >= 2) {
-      value = value.slice(0, 2) + '/' + value.slice(2);
+      value = value.slice(0, 2) + "/" + value.slice(2);
     }
     if (value.length >= 5) {
-      value = value.slice(0, 5) + '/' + value.slice(5, 9);
+      value = value.slice(0, 5) + "/" + value.slice(5, 9);
     }
 
     setForm({ ...form, dateOfBirth: value });
@@ -68,7 +82,7 @@ const VolunteerRegister = () => {
       if (avatar) formData.append("avatar", avatar);
 
       await registerVolunteer(formData);
-      navigate("/donor-login?role=volunteer");
+      safeNavigate(navigate, "/donor-login?role=volunteer");
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
@@ -79,7 +93,8 @@ const VolunteerRegister = () => {
   const isNameValid = form.username.length > 2;
   const isEmailValid = form.email.includes("@") && form.email.includes(".");
   const isPasswordValid = form.password.length >= 6;
-  const isConfirmValid = form.confirmPassword === form.password && form.confirmPassword.length > 0;
+  const isConfirmValid =
+    form.confirmPassword === form.password && form.confirmPassword.length > 0;
 
   return (
     <main className="min-h-screen bg-[#fbfbfd] flex items-center justify-center p-6 pt-32 pb-20">
@@ -88,8 +103,12 @@ const VolunteerRegister = () => {
           <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-6 border border-black/5">
             <Users size={32} className="text-[#0071e3]" />
           </div>
-          <h1 className="text-[32px] font-bold text-[#1d1d1f] tracking-tight mb-2">Volunteer Signup</h1>
-          <p className="text-[17px] text-[#86868b] font-medium">Join our community of changemakers.</p>
+          <h1 className="text-[32px] font-bold text-[#1d1d1f] tracking-tight mb-2">
+            Volunteer Signup
+          </h1>
+          <p className="text-[17px] text-[#86868b] font-medium">
+            Join our community of changemakers.
+          </p>
         </div>
 
         <div className="apple-card p-8 md:p-10">
@@ -100,9 +119,14 @@ const VolunteerRegister = () => {
           )}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Full Name</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Full Name
+              </label>
               <div className="relative">
-                <User className="absolute left-4 top-4 text-[#86868b]" size={20} />
+                <User
+                  className="absolute left-4 top-4 text-[#86868b]"
+                  size={20}
+                />
                 <input
                   type="text"
                   name="username"
@@ -116,9 +140,14 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Email</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Email
+              </label>
               <div className="relative">
-                <Mail className="absolute left-4 top-4 text-[#86868b]" size={20} />
+                <Mail
+                  className="absolute left-4 top-4 text-[#86868b]"
+                  size={20}
+                />
                 <input
                   type="email"
                   name="email"
@@ -132,9 +161,14 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Password</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Password
+              </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-4 text-[#86868b]" size={20} />
+                <Lock
+                  className="absolute left-4 top-4 text-[#86868b]"
+                  size={20}
+                />
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -155,9 +189,14 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Confirm Password</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Confirm Password
+              </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-4 text-[#86868b]" size={20} />
+                <Lock
+                  className="absolute left-4 top-4 text-[#86868b]"
+                  size={20}
+                />
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
@@ -172,15 +211,24 @@ const VolunteerRegister = () => {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-4 top-4 text-[#86868b] hover:text-[#1d1d1f] transition-colors"
                 >
-                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showConfirmPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
                 </button>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Phone</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Phone
+              </label>
               <div className="relative">
-                <Phone className="absolute left-4 top-4 text-[#86868b]" size={20} />
+                <Phone
+                  className="absolute left-4 top-4 text-[#86868b]"
+                  size={20}
+                />
                 <input
                   type="tel"
                   name="phone"
@@ -194,7 +242,9 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Gender</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Gender
+              </label>
               <select
                 name="gender"
                 value={form.gender}
@@ -210,9 +260,14 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Date of Birth (DD/MM/YYYY)</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Date of Birth (DD/MM/YYYY)
+              </label>
               <div className="relative">
-                <Calendar className="absolute left-4 top-4 text-[#86868b]" size={20} />
+                <Calendar
+                  className="absolute left-4 top-4 text-[#86868b]"
+                  size={20}
+                />
                 <input
                   type="text"
                   name="dateOfBirth"
@@ -227,9 +282,14 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Address</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Address
+              </label>
               <div className="relative">
-                <MapPin className="absolute left-4 top-4 text-[#86868b]" size={20} />
+                <MapPin
+                  className="absolute left-4 top-4 text-[#86868b]"
+                  size={20}
+                />
                 <input
                   type="text"
                   name="address"
@@ -243,7 +303,9 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">PAN Number</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                PAN Number
+              </label>
               <input
                 type="text"
                 name="panNumber"
@@ -256,9 +318,14 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Skills (comma-separated)</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Skills (comma-separated)
+              </label>
               <div className="relative">
-                <Target className="absolute left-4 top-4 text-[#86868b]" size={20} />
+                <Target
+                  className="absolute left-4 top-4 text-[#86868b]"
+                  size={20}
+                />
                 <input
                   type="text"
                   name="skills"
@@ -272,7 +339,9 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Availability (hours/week)</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Availability (hours/week)
+              </label>
               <input
                 type="number"
                 name="availabilityHours"
@@ -285,7 +354,9 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Preferred Areas (optional)</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Preferred Areas (optional)
+              </label>
               <input
                 type="text"
                 name="preferredAreas"
@@ -297,7 +368,9 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Motivation (optional)</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Motivation (optional)
+              </label>
               <textarea
                 name="motivation"
                 value={form.motivation}
@@ -309,7 +382,9 @@ const VolunteerRegister = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">Profile Picture *</label>
+              <label className="text-[14px] font-bold text-[#1d1d1f] mb-2 uppercase tracking-tight ml-1">
+                Profile Picture *
+              </label>
               <div className="flex flex-col items-center justify-center border-2 border-dashed border-[#0071e3]/30 rounded-2xl p-6 bg-[#f5f5f7] transition-all hover:border-[#0071e3] group">
                 {avatarPreview ? (
                   <img
@@ -324,7 +399,7 @@ const VolunteerRegister = () => {
                 )}
                 <label className="cursor-pointer">
                   <span className="text-sm font-bold text-[#0071e3] hover:underline">
-                    {avatarPreview ? 'Change Photo' : 'Upload Photo'}
+                    {avatarPreview ? "Change Photo" : "Upload Photo"}
                   </span>
                   <input
                     type="file"
@@ -334,7 +409,9 @@ const VolunteerRegister = () => {
                     className="hidden"
                   />
                 </label>
-                <p className="text-xs text-[#86868b] mt-2">Required • JPG, PNG (Max 5MB)</p>
+                <p className="text-xs text-[#86868b] mt-2">
+                  Required • JPG, PNG (Max 5MB)
+                </p>
               </div>
             </div>
 
@@ -344,12 +421,19 @@ const VolunteerRegister = () => {
               className="w-full h-14 bg-[#1d1d1f] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 group pt-1"
             >
               {loading ? "Creating Account..." : "Create Account"}
-              {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
+              {!loading && (
+                <ArrowRight
+                  size={18}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+              )}
             </button>
 
             <div className="relative flex items-center justify-center py-2">
               <div className="absolute w-full border-t border-black/5"></div>
-              <span className="relative bg-white px-4 text-[13px] text-[#86868b] font-medium uppercase tracking-widest">or</span>
+              <span className="relative bg-white px-4 text-[13px] text-[#86868b] font-medium uppercase tracking-widest">
+                or
+              </span>
             </div>
 
             <button
@@ -381,7 +465,10 @@ const VolunteerRegister = () => {
           <div className="mt-8 text-center">
             <p className="text-[15px] text-[#86868b] font-medium">
               Already have an account?{" "}
-              <a href="/volunteer-login" className="text-[#0066cc] font-bold hover:underline">
+              <a
+                href="/volunteer-login"
+                className="text-[#0066cc] font-bold hover:underline"
+              >
                 Sign In
               </a>
             </p>
@@ -390,7 +477,9 @@ const VolunteerRegister = () => {
 
         <div className="mt-12 flex items-center justify-center gap-2 text-[#86868b]">
           <ShieldCheck size={16} />
-          <span className="text-[13px] font-medium">Secure registration with bank-grade encryption</span>
+          <span className="text-[13px] font-medium">
+            Secure registration with bank-grade encryption
+          </span>
         </div>
       </div>
     </main>

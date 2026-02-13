@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { Volunteer } from "../models/volunteer.model.js";
 import { Donor } from "../models/donor.model.js";
 import { Admin } from "../models/admin.model.js";
+import logger from "../utils/logger.js";
 
 export const verifyJWT = asyncHandler(async (req, _, next) => {
   try {
@@ -11,12 +12,12 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
       req.cookies?.accessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
 
-    // console.log(token);
+
     if (!token) {
       throw new ApiError(401, "Unauthorized request");
     }
 
-    // console.log("Verifying token:", token);
+
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
     let user = await Volunteer.findById(decodedToken?._id).select(
@@ -42,7 +43,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error("JWT Verification Error:", error);
+    logger.error("JWT Verification Error:", error);
     throw new ApiError(401, error?.message || "Invalid access token");
   }
 });

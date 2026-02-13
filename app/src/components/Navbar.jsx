@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Link } from "react-router-dom";
 import { Heart, ChevronDown, Menu, X, LogOut, ArrowRight } from "lucide-react";
+import { safeLocationRedirect } from "../utils/safeNavigate";
 import {
   isAuthenticated as isDonorAuthenticated,
   getDonorUser,
@@ -78,10 +79,10 @@ const Navbar = () => {
       } else {
         await logoutDonor();
       }
-      window.location.href = "/";
+      safeLocationRedirect("/");
     } catch (err) {
       console.error("Logout failed:", err);
-      window.location.href = "/";
+      safeLocationRedirect("/");
     }
   };
 

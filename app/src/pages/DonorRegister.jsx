@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { safeNavigate } from "../utils/safeNavigate";
 import { motion as Motion, AnimatePresence } from "motion/react";
 import {
   Mail,
@@ -80,9 +81,9 @@ const DonorRegister = () => {
 
   useEffect(() => {
     if (role === "donor" && isAuthenticated()) {
-      navigate("/donor-dashboard");
+      safeNavigate(navigate, "/donor-dashboard");
     } else if (role === "volunteer" && isVolunteerAuthenticated()) {
-      navigate("/volunteer-dashboard");
+      safeNavigate(navigate, "/volunteer-dashboard");
     }
   }, [navigate, role]);
 
@@ -103,38 +104,38 @@ const DonorRegister = () => {
     if (!touched[fieldName]) return null;
 
     switch (fieldName) {
-      case 'username':
+      case "username":
         return value.length >= 3;
-      case 'email':
+      case "email":
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-      case 'password':
+      case "password":
         return value.length >= 6;
-      case 'confirmPassword':
+      case "confirmPassword":
         return value === form.password && value.length >= 6;
-      case 'phone':
+      case "phone":
         return value.length >= 10;
-      case 'panNumber':
+      case "panNumber":
         return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(value);
-      case 'skills':
-      case 'availabilityHours':
-      case 'address':
+      case "skills":
+      case "availabilityHours":
+      case "address":
         return value.trim().length > 0;
-      case 'gender':
-      case 'dateOfBirth':
-        return value !== '';
+      case "gender":
+      case "dateOfBirth":
+        return value !== "";
       default:
         return value.length > 0;
     }
   };
 
   const handleDateChange = (e) => {
-    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
 
     if (value.length >= 2) {
-      value = value.slice(0, 2) + '/' + value.slice(2);
+      value = value.slice(0, 2) + "/" + value.slice(2);
     }
     if (value.length >= 5) {
-      value = value.slice(0, 5) + '/' + value.slice(5, 9);
+      value = value.slice(0, 5) + "/" + value.slice(5, 9);
     }
 
     setForm({ ...form, dateOfBirth: value });
@@ -143,10 +144,9 @@ const DonorRegister = () => {
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
-    console.log("Avatar file selected - type:", file?.type, "size:", file?.size, "name:", file?.name);
 
     // Validate file type
-    if (file && !file.type.startsWith('image/')) {
+    if (file && !file.type.startsWith("image/")) {
       alert("Please choose an image file (jpg, png, etc)");
       return;
     }
@@ -213,24 +213,21 @@ const DonorRegister = () => {
         }
         await registerDonor(formData);
       } else {
-        console.log("Submitting volunteer registration...");
-        console.log("Avatar state:", avatar);
-        console.log("FormData entries:");
-        for (let pair of formData.entries()) {
-          console.log(pair[0] + ', ' + pair[1]);
-        }
         await registerVolunteer(formData);
       }
       setSuccess(true);
       setTimeout(
         () =>
-          navigate(
+          safeNavigate(
+            navigate,
             role === "donor" ? "/donor-dashboard" : "/volunteer-dashboard",
           ),
         2000,
       );
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Registration failed");
+      setError(
+        err.response?.data?.message || err.message || "Registration failed",
+      );
     } finally {
       setLoading(false);
     }
@@ -293,15 +290,18 @@ const DonorRegister = () => {
                     : "volunteer registration"}
                 </p>
                 <div className="space-y-6 pt-4">
-                  {(role === "donor" ? [
-                    { id: 1, title: "Account", desc: "Credentials" },
-                    { id: 2, title: "Personal", desc: "Details" }
-                  ] : [
-                    { id: 1, title: "Account", desc: "Credentials" },
-                    { id: 2, title: "Basic Info", desc: "Personal" },
-                    { id: 3, title: "Skills", desc: "Expertise" },
-                    { id: 4, title: "Final", desc: "Motivation" }
-                  ]).map((step, index, arr) => (
+                  {(role === "donor"
+                    ? [
+                        { id: 1, title: "Account", desc: "Credentials" },
+                        { id: 2, title: "Personal", desc: "Details" },
+                      ]
+                    : [
+                        { id: 1, title: "Account", desc: "Credentials" },
+                        { id: 2, title: "Basic Info", desc: "Personal" },
+                        { id: 3, title: "Skills", desc: "Expertise" },
+                        { id: 4, title: "Final", desc: "Motivation" },
+                      ]
+                  ).map((step, index, arr) => (
                     <div key={step.id} className="flex gap-4 relative group">
                       {/* Connecting Line */}
                       {index !== arr.length - 1 && (
@@ -309,7 +309,7 @@ const DonorRegister = () => {
                           <Motion.div
                             initial={{ height: "0%" }}
                             animate={{
-                              height: currentStep > step.id ? "100%" : "0%"
+                              height: currentStep > step.id ? "100%" : "0%",
                             }}
                             transition={{ duration: 0.5, ease: "easeInOut" }}
                             className="w-full bg-primary"
@@ -321,11 +321,14 @@ const DonorRegister = () => {
                       <Motion.div
                         initial={false}
                         animate={{
-                          backgroundColor: currentStep >= step.id ? "var(--color-primary)" : "var(--color-muted)",
+                          backgroundColor:
+                            currentStep >= step.id
+                              ? "var(--color-primary)"
+                              : "var(--color-muted)",
                           scale: currentStep === step.id ? 1.1 : 1,
-                          opacity: currentStep < step.id ? 0.3 : 1
+                          opacity: currentStep < step.id ? 0.3 : 1,
                         }}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg relative z-10 ${currentStep >= step.id ? 'shadow-primary/30' : ''}`}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg relative z-10 ${currentStep >= step.id ? "shadow-primary/30" : ""}`}
                       >
                         {currentStep > step.id ? (
                           <CheckCircle2 size={20} />
@@ -335,7 +338,9 @@ const DonorRegister = () => {
                       </Motion.div>
 
                       {/* Step Content */}
-                      <div className={`pt-1 transition-opacity duration-300 ${currentStep === step.id ? 'opacity-100' : 'opacity-40'}`}>
+                      <div
+                        className={`pt-1 transition-opacity duration-300 ${currentStep === step.id ? "opacity-100" : "opacity-40"}`}
+                      >
                         <h4 className="text-sm font-black uppercase tracking-wider text-secondary">
                           {step.title}
                         </h4>
@@ -366,7 +371,10 @@ const DonorRegister = () => {
             {/* Progress Bar (Mobile) */}
             <div className="lg:hidden mb-10">
               <div className="flex items-center justify-between mb-4">
-                <Link to="/" className="text-primary p-2 -ml-2 hover:bg-muted/10 rounded-full transition-colors">
+                <Link
+                  to="/"
+                  className="text-primary p-2 -ml-2 hover:bg-muted/10 rounded-full transition-colors"
+                >
                   <ChevronLeft size={20} />
                 </Link>
                 <span className="text-[10px] font-black uppercase tracking-widest text-primary">
@@ -377,8 +385,9 @@ const DonorRegister = () => {
                 {Array.from({ length: totalSteps }).map((_, i) => (
                   <div
                     key={i}
-                    className={`h-1 flex-1 rounded-full transition-all duration-500 ${i + 1 <= currentStep ? 'bg-primary' : 'bg-secondary/10'
-                      }`}
+                    className={`h-1 flex-1 rounded-full transition-all duration-500 ${
+                      i + 1 <= currentStep ? "bg-primary" : "bg-secondary/10"
+                    }`}
                   />
                 ))}
               </div>
@@ -392,7 +401,7 @@ const DonorRegister = () => {
                 type="button"
                 onClick={() => {
                   setRole("donor");
-                  navigate("/donor-register");
+                  safeNavigate(navigate, "/donor-register");
                   setCurrentStep(1);
                   setError("");
                 }}
@@ -404,7 +413,7 @@ const DonorRegister = () => {
                 type="button"
                 onClick={() => {
                   setRole("volunteer");
-                  navigate("/donor-register?role=volunteer");
+                  safeNavigate(navigate, "/donor-register?role=volunteer");
                   setCurrentStep(1);
                   setError("");
                 }}
@@ -425,9 +434,7 @@ const DonorRegister = () => {
                     !
                   </div>
                   <div className="flex-1 mt-0.6">
-                    <p className="text-sm font-bold text-red-700">
-                      {error}
-                    </p>
+                    <p className="text-sm font-bold text-red-700">{error}</p>
                   </div>
                 </div>
               </Motion.div>
@@ -460,8 +467,8 @@ const DonorRegister = () => {
                       name="username"
                       value={form.username}
                       onChange={handleChange}
-                      onBlur={() => handleBlur('username')}
-                      isValid={getFieldValidation('username', form.username)}
+                      onBlur={() => handleBlur("username")}
+                      isValid={getFieldValidation("username", form.username)}
                       placeholder="your_username"
                     />
                     <Field
@@ -471,8 +478,8 @@ const DonorRegister = () => {
                       type="email"
                       value={form.email}
                       onChange={handleChange}
-                      onBlur={() => handleBlur('email')}
-                      isValid={getFieldValidation('email', form.email)}
+                      onBlur={() => handleBlur("email")}
+                      isValid={getFieldValidation("email", form.email)}
                       placeholder="you@example.com"
                     />
                     <div className="grid grid-cols-2 gap-4">
@@ -483,8 +490,8 @@ const DonorRegister = () => {
                         type={showPassword ? "text" : "password"}
                         value={form.password}
                         onChange={handleChange}
-                        onBlur={() => handleBlur('password')}
-                        isValid={getFieldValidation('password', form.password)}
+                        onBlur={() => handleBlur("password")}
+                        isValid={getFieldValidation("password", form.password)}
                         placeholder="••••••••"
                         toggleShow={() => setShowPassword(!showPassword)}
                         isShowing={showPassword}
@@ -567,7 +574,10 @@ const DonorRegister = () => {
                         Date of Birth (DD/MM/YYYY)
                       </label>
                       <div className="relative">
-                        <Calendar size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary/20" />
+                        <Calendar
+                          size={18}
+                          className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary/20"
+                        />
                         <input
                           type="text"
                           name="dateOfBirth"
@@ -586,18 +596,30 @@ const DonorRegister = () => {
                       <div className="relative">
                         <button
                           type="button"
-                          onClick={() => setIsGenderDropdownOpen(!isGenderDropdownOpen)}
-                          className={`w-full h-14 px-6 rounded-2xl bg-muted/20 border-2 transition-all flex items-center justify-between font-black text-base ${isGenderDropdownOpen ? 'border-primary ring-2 ring-primary/5' : 'border-transparent text-secondary'}`}
+                          onClick={() =>
+                            setIsGenderDropdownOpen(!isGenderDropdownOpen)
+                          }
+                          className={`w-full h-14 px-6 rounded-2xl bg-muted/20 border-2 transition-all flex items-center justify-between font-black text-base ${isGenderDropdownOpen ? "border-primary ring-2 ring-primary/5" : "border-transparent text-secondary"}`}
                         >
-                          <span className={form.gender ? 'text-secondary' : 'text-gray-300'}>
-                            {form.gender ? form.gender.charAt(0).toUpperCase() + form.gender.slice(1) : "Select Gender"}
+                          <span
+                            className={
+                              form.gender ? "text-secondary" : "text-gray-300"
+                            }
+                          >
+                            {form.gender
+                              ? form.gender.charAt(0).toUpperCase() +
+                                form.gender.slice(1)
+                              : "Select Gender"}
                           </span>
-                          <ChevronDown size={20} className={`text-secondary/20 transition-transform duration-300 ${isGenderDropdownOpen ? 'rotate-180' : ''}`} />
+                          <ChevronDown
+                            size={20}
+                            className={`text-secondary/20 transition-transform duration-300 ${isGenderDropdownOpen ? "rotate-180" : ""}`}
+                          />
                         </button>
 
                         {isGenderDropdownOpen && (
                           <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white border border-secondary/5 rounded-3xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                            {['male', 'female', 'other'].map((option) => (
+                            {["male", "female", "other"].map((option) => (
                               <button
                                 key={option}
                                 type="button"
@@ -606,7 +628,7 @@ const DonorRegister = () => {
                                   setIsGenderDropdownOpen(false);
                                   setError("");
                                 }}
-                                className={`w-full px-6 py-4 text-left text-sm font-black transition-all hover:bg-primary hover:text-white lowercase tracking-tight ${form.gender === option ? 'bg-primary/5 text-primary' : 'text-secondary/70'}`}
+                                className={`w-full px-6 py-4 text-left text-sm font-black transition-all hover:bg-primary hover:text-white lowercase tracking-tight ${form.gender === option ? "bg-primary/5 text-primary" : "text-secondary/70"}`}
                               >
                                 {option}
                               </button>
@@ -705,11 +727,14 @@ const DonorRegister = () => {
                             className="w-20 h-20 rounded-full object-cover mb-3 border-2 border-primary shadow-lg"
                           />
                         ) : (
-                          <Camera size={32} className="text-secondary/30 mb-3 group-hover:text-primary transition-colors" />
+                          <Camera
+                            size={32}
+                            className="text-secondary/30 mb-3 group-hover:text-primary transition-colors"
+                          />
                         )}
                         <label className="cursor-pointer">
                           <span className="text-[11px] font-black text-primary uppercase tracking-widest hover:underline">
-                            {avatarPreview ? 'Change Photo' : 'Upload Photo'}
+                            {avatarPreview ? "Change Photo" : "Upload Photo"}
                           </span>
                           <input
                             type="file"
@@ -719,7 +744,9 @@ const DonorRegister = () => {
                             required
                           />
                         </label>
-                        <p className="text-[9px] text-secondary/40 mt-2 uppercase tracking-wider">Required • JPG/PNG</p>
+                        <p className="text-[9px] text-secondary/40 mt-2 uppercase tracking-wider">
+                          Required • JPG/PNG
+                        </p>
                       </div>
                     </div>
                   </Motion.div>
@@ -786,8 +813,8 @@ const DonorRegister = () => {
 
 const Field = ({ label, icon, toggleShow, isShowing, isValid, ...props }) => {
   const getBorderColor = () => {
-    if (isValid === null || isValid === undefined) return 'border-transparent';
-    return isValid ? 'border-green-500' : 'border-red-500';
+    if (isValid === null || isValid === undefined) return "border-transparent";
+    return isValid ? "border-green-500" : "border-red-500";
   };
 
   return (

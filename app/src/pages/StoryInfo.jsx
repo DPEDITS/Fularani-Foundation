@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+<<<<<<< HEAD
 import { getContentById } from "../services/contentService";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+=======
+import { safeNavigate } from "../utils/safeNavigate";
+import { stories } from "../data/stories";
+>>>>>>> origin/Dutta
 import {
   ArrowLeft,
   Calendar,
@@ -68,7 +73,7 @@ const StoryInfo = () => {
             The story you are looking for does not exist.
           </p>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => safeNavigate(navigate, "/")}
             className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-colors"
           >
             Back to Home

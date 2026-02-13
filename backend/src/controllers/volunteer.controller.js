@@ -86,10 +86,6 @@ const registerVolunteer = asyncHandler(async (req, res) => {
     motivation,
   } = req.body;
 
-  // Debug logs to see what's arriving
-  console.log("Registration Request Body:", req.body);
-  console.log("Registration Request Files:", req.files);
-
   if (!username?.trim()) throw new ApiError(400, "Username is required");
   if (!email?.trim()) throw new ApiError(400, "Email is required");
   if (!password?.trim()) throw new ApiError(400, "Password is required");
@@ -136,7 +132,6 @@ const registerVolunteer = asyncHandler(async (req, res) => {
   }
 
   const avatarLocalPath = req.file?.path;
-  console.log("Avatar local path:", avatarLocalPath);
 
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar is required for volunteer registration");
