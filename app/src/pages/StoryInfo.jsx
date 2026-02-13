@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-<<<<<<< HEAD
 import { getContentById } from "../services/contentService";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-=======
 import { safeNavigate } from "../utils/safeNavigate";
-import { stories } from "../data/stories";
->>>>>>> origin/Dutta
 import {
   ArrowLeft,
   Calendar,
