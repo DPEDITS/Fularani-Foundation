@@ -180,7 +180,7 @@ const AddContent = () => {
                   className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium"
                   placeholder="Enter category"
                 />
-              </div>
+              </div> 
 
               {/* Author */}
               <div>
