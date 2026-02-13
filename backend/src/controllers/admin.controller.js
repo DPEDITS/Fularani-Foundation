@@ -35,12 +35,18 @@ const registerAdmin = asyncHandler(async (req, res) => {
         email,
         role,
         phone,
-        avatar: avatar?.url,
+        avatar: avatar
     });
+
+    const createdAdmin = await Admin.findById(admin._id).select("-password -refreshToken");
+
+    if (!createdAdmin) {
+        throw new ApiError(500, "Something went wrong while registering the admin");
+    }
 
     return res
         .status(201)
-        .json(new ApiResponse(201, admin, "Admin registered successfully"));
+        .json(new ApiResponse(201, createdAdmin, "Admin registered successfully"));
 });
 
 
@@ -57,10 +63,19 @@ const loginAdmin = asyncHandler(async (req, res) => {
     const accessToken = admin.generateAccessToken();
     const refreshToken = admin.generateRefreshToken();
     admin.refreshToken = refreshToken;
-    await admin.save({ validateBeforeSave: false });
+    const loggedInAdmin = await Admin.findById(admin._id).select("-password -refreshToken");
+
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict"
+    };
+
     return res
         .status(200)
-        .json(new ApiResponse(200, { admin, accessToken, refreshToken }, "Admin logged in successfully"));
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(new ApiResponse(200, { admin: loggedInAdmin, accessToken, refreshToken }, "Admin logged in successfully"));
 });
 
 const getAdminStats = asyncHandler(async (req, res) => {
