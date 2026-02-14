@@ -151,7 +151,7 @@ const Hero = () => {
               src="/0214.gif"
               alt="Fularani Foundation Impact"
               loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+              className="absolute inset-0 w-full h-full object-cover"
             />
             {/* Mask/Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-white via-white/20 to-transparent z-10 transition-opacity"></div>
