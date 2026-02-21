@@ -270,7 +270,7 @@ const AdminDashboard = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 text-sm font-black uppercase tracking-widest whitespace-nowrap pb-4 border-b-4 transition-all ${activeTab === tab.id ? "border-secondary text-secondary" : "border-transparent text-secondary/30 hover:text-secondary/60"}`}
+                className={`flex items-center gap-2 text-sm font-black uppercase tracking-widest whitespace-nowrap pb-4 border-b-4 transition-all focus:outline-none ${activeTab === tab.id ? "border-secondary text-secondary" : "border-transparent text-secondary/30 hover:text-secondary/60"}`}
               >
                 <tab.icon size={16} />
                 {tab.label}

@@ -20,7 +20,7 @@ const contentSchema = new Schema(
     },
     coverImage: {
       type: String,
-      required: true,
+      // required: true,
     },
     markdownFile: {
       type: String,

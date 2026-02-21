@@ -22,14 +22,7 @@ const createContent = asyncHandler(async (req, res) => {
   const coverImage = req.files?.coverImage?.[0]?.path;
   const images = req.files?.images; // Array of files
 
-  if (
-    !title ||
-    !shortDescription ||
-    !category ||
-    !markdown ||
-    !author ||
-    !coverImage
-  ) {
+  if (!title || !shortDescription || !category || !markdown || !author) {
     throw new ApiError(400, "Required fields missing");
   }
 
@@ -39,10 +32,10 @@ const createContent = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Markdown file upload failed");
   }
 
-  // Upload cover image
-  const coverImageUpload = await uploadOnCloudinary(coverImage);
-  if (!coverImageUpload) {
-    throw new ApiError(400, "Cover image upload failed");
+  // Upload cover image (optional)
+  let coverImageUpload = null;
+  if (coverImage) {
+    coverImageUpload = await uploadOnCloudinary(coverImage);
   }
 
   // Upload additional images
@@ -64,7 +57,7 @@ const createContent = asyncHandler(async (req, res) => {
     status,
     isPublished,
     markdownFile: markdownUpload.url,
-    coverImage: coverImageUpload.url,
+    coverImage: coverImageUpload?.url || "",
     images: imageUrls,
     createdBy: req.user?._id,
     author,

@@ -6,17 +6,14 @@ import {
   updateContent,
   deleteContent,
 } from "../controllers/content.controller.js";
-
 import { upload } from "../middlewares/multer.middleware.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT, verifyAdmin } from "../middlewares/auth.middleware.js";
 
 const contentRouter = Router();
 
-/*
-    CREATE CONTENT
-*/
 contentRouter.route("/create").post(
   verifyJWT,
+  verifyAdmin,
   upload.fields([
     {
       name: "markdownFile",
@@ -34,24 +31,16 @@ contentRouter.route("/create").post(
   createContent
 );
 
-/*
-    GET ALL CONTENT
-*/
 contentRouter.route("/").get(getAllContent);
 
-/*
-    GET CONTENT BY ID
-*/
 contentRouter.route("/:id").get(getContentById);
 
-/*
-    UPDATE CONTENT
-*/
 contentRouter.route("/update/:id").put(
   verifyJWT,
+  verifyAdmin,
   upload.fields([
     {
-      name: "markdownFile",   // <-- allow markdown update
+      name: "markdownFile",
       maxCount: 1,
     },
     {
@@ -65,6 +54,7 @@ contentRouter.route("/update/:id").put(
   ]),
   updateContent
 );
-contentRouter.route("/:id").delete(verifyJWT, deleteContent);
+
+contentRouter.route("/:id").delete(verifyJWT, verifyAdmin, deleteContent);
 
 export default contentRouter;

@@ -9,6 +9,44 @@ import logger from "./utils/logger.js";
 
 const app = express();
 
+// --- Security headers ---
+app.use(helmet());
+
+// --- Rate limiting ---
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,                  // 100 requests per window per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Rate limit exceeded for IP: ${req.ip}`);
+    res.status(429).json({ success: false, message: "Too many requests — please try again later" });
+  },
+});
+app.use(globalLimiter);
+
+const paymentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,                   // 10 payment attempts per 15 min per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Payment rate limit exceeded for IP: ${req.ip}`);
+    res.status(429).json({ success: false, message: "Too many payment attempts — please try again later" });
+  },
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,                   // 5 login/forgot-password attempts per 15 min per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Auth rate limit exceeded for IP: ${req.ip}`);
+    res.status(429).json({ success: false, message: "Too many attempts — please try again later" });
+  },
+});
+
 const allowedOrigins = [
   process.env.CORS_ORIGIN,
   "http://localhost:5173",
@@ -31,44 +69,21 @@ app.use(
     credentials: true,
   }),
 );
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
-// --- Security headers ---
-app.use(helmet());
-// app.use(mongoSanitize()); // Incompatible with Express 5 (req.query is read-only)
+// --- Sanitization & Compression ---
+app.use(mongoSanitize());
 app.use(compression());
 
-// --- Rate limiting ---
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requests per window per IP
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    logger.warn(`Rate limit exceeded for IP: ${req.ip}`);
-    res.status(429).json({
-      success: false,
-      message: "Too many requests — please try again later",
-    });
-  },
-});
-app.use(globalLimiter);
-
-const paymentLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100, // Increased for local development (set back to 10 for production)
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    logger.warn(`Payment rate limit exceeded for IP: ${req.ip}`);
-    res.status(429).json({
-      success: false,
-      message: "Too many payment attempts — please try again later",
-    });
-  },
-});
-app.use(express.json({ limit: "16kb" }));
-app.use(express.urlencoded({ extended: true, limit: "16kb" }));
-// app.use(express.static("public")); // Disable static serving of temp files for security
+// --- Static Files & Cookies ---
+app.use(express.static("public", {
+  setHeaders: (res, path) => {
+    if (path.includes("temp/")) {
+      res.set("Cache-Control", "no-store");
+    }
+  }
+}));
 app.use(cookieParser());
 
 //routes import
@@ -83,15 +98,15 @@ import paymentRouter from "./routes/payment.routes.js";
 import projectRouter from "./routes/project.routes.js";
 
 //routes declaration
-app.use("/api/volunteers", volunteerRouter);
-app.use("/api/donor", donorRouter);
-app.use("/api/v1/contact", contactRouter);
-app.use("/api/gallery", galleryRouter);
-app.use("/api/donations", paymentLimiter, donationRouter);
-app.use("/api/content", contentRouter);
-app.use("/api/admin", adminRouter);
-app.use("/api/payment", paymentLimiter, paymentRouter);
-app.use("/api/projects", projectRouter);
+app.use("/api/volunteers", volunteerRouter)
+app.use("/api/donor", authLimiter, donorRouter)
+app.use("/api/v1/contact", contactRouter)
+app.use("/api/gallery", galleryRouter)
+app.use("/api/donations", paymentLimiter, donationRouter)
+app.use("/api/content", contentRouter)
+app.use("/api/admin", authLimiter, adminRouter)
+app.use("/api/payment", paymentLimiter, paymentRouter)
+app.use("/api/projects", projectRouter)
 
 // error handler
 app.use((err, req, res, next) => {
@@ -99,10 +114,13 @@ app.use((err, req, res, next) => {
   const message = err.message || "Internal Server Error";
   const errors = err.errors || [];
 
+  const isProduction = process.env.NODE_ENV === "production";
+
   res.status(statusCode).json({
     success: false,
     message,
     errors,
+    stack: isProduction ? null : err.stack,
     data: null,
     stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
   });

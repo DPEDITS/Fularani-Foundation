@@ -29,52 +29,52 @@ const registerAdmin = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Admin already exists");
   }
 
-  const admin = await Admin.create({
-    username,
-    password,
-    email,
-    role,
-    phone,
-    avatar: avatar?.url,
-  });
+    const admin = await Admin.create({
+        username,
+        password,
+        email,
+        role,
+        phone,
+        avatar: avatar
+    });
 
-  const createdAdmin = await Admin.findById(admin._id).select(
-    "-password -refreshToken",
-  );
+    const createdAdmin = await Admin.findById(admin._id).select("-password -refreshToken");
 
-  return res
-    .status(201)
-    .json(new ApiResponse(201, createdAdmin, "Admin registered successfully"));
+    if (!createdAdmin) {
+        throw new ApiError(500, "Something went wrong while registering the admin");
+    }
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, createdAdmin, "Admin registered successfully"));
 });
 
 const loginAdmin = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  const admin = await Admin.findOne({ email });
-  if (!admin) {
-    throw new ApiError(404, "Admin not found");
-  }
-  const isPasswordCorrect = await admin.isPasswordCorrect(password);
-  if (!isPasswordCorrect) {
-    throw new ApiError(401, "Invalid password");
-  }
-  const accessToken = admin.generateAccessToken();
-  const refreshToken = admin.generateRefreshToken();
-  admin.refreshToken = refreshToken;
-  await admin.save({ validateBeforeSave: false });
+    const { email, password } = req.body;
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+        throw new ApiError(404, "Admin not found");
+    }
+    const isPasswordCorrect = await admin.isPasswordCorrect(password);
+    if (!isPasswordCorrect) {
+        throw new ApiError(401, "Invalid password");
+    }
+    const accessToken = admin.generateAccessToken();
+    const refreshToken = admin.generateRefreshToken();
+    admin.refreshToken = refreshToken;
+    const loggedInAdmin = await Admin.findById(admin._id).select("-password -refreshToken");
 
-  const loggedInAdmin = await Admin.findById(admin._id).select(
-    "-password -refreshToken",
-  );
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict"
+    };
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        { admin: loggedInAdmin, accessToken, refreshToken },
-        "Admin logged in successfully",
-      ),
-    );
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(new ApiResponse(200, { admin: loggedInAdmin, accessToken, refreshToken }, "Admin logged in successfully"));
 });
 
 const getAdminStats = asyncHandler(async (req, res) => {

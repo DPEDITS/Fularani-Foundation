@@ -47,3 +47,27 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     throw new ApiError(401, error?.message || "Invalid access token");
   }
 });
+
+export const verifyAdmin = asyncHandler(async (req, _, next) => {
+  if (!req.user) {
+    throw new ApiError(401, "Unauthorized: User not found");
+  }
+
+  if (req.user.role !== "ADMIN" && req.user.role !== "SUPER_ADMIN") {
+    throw new ApiError(403, "Forbidden: Admin access required");
+  }
+
+  next();
+});
+
+export const verifySuperAdmin = asyncHandler(async (req, _, next) => {
+  if (!req.user) {
+    throw new ApiError(401, "Unauthorized: User not found");
+  }
+
+  if (req.user.role !== "SUPER_ADMIN") {
+    throw new ApiError(403, "Forbidden: Super Admin access required");
+  }
+
+  next();
+});
