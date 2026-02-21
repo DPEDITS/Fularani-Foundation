@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT, verifyAdmin } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import {
     createProject,
@@ -14,11 +14,10 @@ import {
 const router = Router();
 
 // Admin routes (protected)
-// Ideally, you should have an isAdmin middleware. For now, we'll assume verifyJWT + check in controller or separate middleware
-router.route("/create").post(verifyJWT, createProject);
-router.route("/assign").post(verifyJWT, assignProject);
-router.route("/all").get(verifyJWT, getAllProjects); // Admin sees all
-router.route("/link-donation").post(verifyJWT, linkDonationToProject);
+router.route("/create").post(verifyJWT, verifyAdmin, createProject);
+router.route("/assign").post(verifyJWT, verifyAdmin, assignProject);
+router.route("/all").get(verifyJWT, verifyAdmin, getAllProjects); // Admin sees all
+router.route("/link-donation").post(verifyJWT, verifyAdmin, linkDonationToProject);
 
 // Volunteer routes
 router.route("/my-projects").get(verifyJWT, getVolunteerProjects);

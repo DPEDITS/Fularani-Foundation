@@ -274,11 +274,10 @@ const VolunteerDashboard = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`text - sm font - black uppercase tracking - widest whitespace - nowrap pb - 4 border - b - 4 transition - all ${
-  activeTab === tab.id
-    ? "border-primary text-secondary"
-    : "border-transparent text-secondary/30 hover:text-secondary/60"
-} `}
+                className={`text-sm font-black uppercase tracking-widest whitespace-nowrap pb-4 border-b-4 transition-all focus:outline-none ${activeTab === tab.id
+                    ? "border-primary text-secondary"
+                    : "border-transparent text-secondary/30 hover:text-secondary/60"
+                  } `}
               >
                 {tab.label}
               </button>
@@ -312,7 +311,7 @@ const VolunteerDashboard = () => {
       </div>
 
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
-      
+
       {isProofModalOpen && selectedTask && (
         <SubmitProofModal
           task={selectedTask}
@@ -325,188 +324,188 @@ const VolunteerDashboard = () => {
 };
 
 const VolunteerTasksTab = ({ tasks, onSubmitProof }) => {
-    return (
-        <div className="bg-white rounded-[40px] border border-secondary/10 shadow-2xl p-8 md:p-12 animate-in fade-in slide-in-from-bottom-6 duration-700">
-            <div className="flex justify-between items-center mb-10">
-                <h3 className="text-3xl font-black text-secondary tracking-tighter lowercase">assigned directives.</h3>
-                <span className="bg-secondary text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest">{tasks.length} Active</span>
-            </div>
+  return (
+    <div className="bg-white rounded-[40px] border border-secondary/10 shadow-2xl p-8 md:p-12 animate-in fade-in slide-in-from-bottom-6 duration-700">
+      <div className="flex justify-between items-center mb-10">
+        <h3 className="text-3xl font-black text-secondary tracking-tighter lowercase">assigned directives.</h3>
+        <span className="bg-secondary text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest">{tasks.length} Active</span>
+      </div>
 
-            <div className="grid grid-cols-1 gap-6">
-                {tasks.length === 0 ? (
-                    <div className="py-20 text-center text-secondary/40 font-bold uppercase tracking-widest text-xs">No active tasks assigned yet.</div>
-                ) : (
-                    tasks.map((task) => (
-                        <div key={task._id} className="p-8 rounded-[32px] border border-secondary/5 bg-secondary/5 hover:bg-white hover:shadow-xl hover:border-secondary/10 transition-all group relative overflow-hidden">
-                            <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className={`w - 2 h - 2 rounded - full ${ task.status === 'Completed' ? 'bg-green-500' : 'bg-blue-500 animate-pulse' } `}></div>
-                                        <span className={`text - [10px] font - black uppercase tracking - widest ${ task.status === 'Completed' ? 'text-green-600' : 'text-blue-600' } `}>{task.status}</span>
-                                        <span className="text-[10px] font-bold text-secondary/30">•</span>
-                                        <span className="text-[10px] font-bold text-secondary/40">{format(new Date(task.createdAt), "dd MMM yyyy")}</span>
-                                    </div>
-                                    <h4 className="text-xl font-black text-secondary tracking-tight mb-2">{task.title}</h4>
-                                    <p className="text-sm font-bold text-secondary/60 max-w-2xl">{task.description}</p>
-                                </div>
+      <div className="grid grid-cols-1 gap-6">
+        {tasks.length === 0 ? (
+          <div className="py-20 text-center text-secondary/40 font-bold uppercase tracking-widest text-xs">No active tasks assigned yet.</div>
+        ) : (
+          tasks.map((task) => (
+            <div key={task._id} className="p-8 rounded-[32px] border border-secondary/5 bg-secondary/5 hover:bg-white hover:shadow-xl hover:border-secondary/10 transition-all group relative overflow-hidden">
+              <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`w-2 h-2 rounded-full ${task.status === 'Completed' ? 'bg-green-500' : 'bg-blue-500 animate-pulse'} `}></div>
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${task.status === 'Completed' ? 'text-green-600' : 'text-blue-600'} `}>{task.status}</span>
+                    <span className="text-[10px] font-bold text-secondary/30">•</span>
+                    <span className="text-[10px] font-bold text-secondary/40">{format(new Date(task.createdAt), "dd MMM yyyy")}</span>
+                  </div>
+                  <h4 className="text-xl font-black text-secondary tracking-tight mb-2">{task.title}</h4>
+                  <p className="text-sm font-bold text-secondary/60 max-w-2xl">{task.description}</p>
+                </div>
 
-                                {task.status !== 'Completed' && (
-                                    <button
-                                        onClick={() => onSubmitProof(task)}
-                                        className="px-6 py-3 bg-secondary text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-secondary/20 flex items-center gap-2 whitespace-nowrap"
-                                    >
-                                        <Camera size={14} /> Submit Proof
-                                    </button>
-                                )}
-                                {task.status === 'Completed' && (
-                                    <div className="px-6 py-3 bg-green-100 text-green-700 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 whitespace-nowrap">
-                                        <Check size={14} /> Verified
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    ))
+                {task.status !== 'Completed' && (
+                  <button
+                    onClick={() => onSubmitProof(task)}
+                    className="px-6 py-3 bg-secondary text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-secondary/20 flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <Camera size={14} /> Submit Proof
+                  </button>
                 )}
+                {task.status === 'Completed' && (
+                  <div className="px-6 py-3 bg-green-100 text-green-700 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 whitespace-nowrap">
+                    <Check size={14} /> Verified
+                  </div>
+                )}
+              </div>
             </div>
-        </div>
-    );
+          ))
+        )}
+      </div>
+    </div>
+  );
 };
 
 const SubmitProofModal = ({ task, onClose, onSuccess }) => {
-    const [description, setDescription] = useState("");
-    const [images, setImages] = useState([]);
-    const [loading, setLoading] = useState(false);
+  const [description, setDescription] = useState("");
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    const handleFileChange = (e) => {
-        const files = Array.from(e.target.files);
-        if (files.length > 5) return alert("max 5 images allowed");
-        setImages(files);
-    };
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 5) return alert("max 5 images allowed");
+    setImages(files);
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (images.length === 0) return alert("Please upload at least one image.");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (images.length === 0) return alert("Please upload at least one image.");
 
-        setLoading(true);
-        const formData = new FormData();
-        formData.append("projectId", task._id);
-        formData.append("description", description);
-        images.forEach(img => formData.append("images", img));
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("projectId", task._id);
+    formData.append("description", description);
+    images.forEach(img => formData.append("images", img));
 
-        try {
-            const response = await submitProofOfWork(formData);
-            if (response.success) {
-                alert("Proof of work submitted successfully! 🎉");
-                onSuccess();
-                onClose();
-            }
-        } catch (error) {
-            console.error("Submit proof error:", error);
-            const errorMsg = error.response?.data?.message || error.message || "Upload failed.";
-            alert(`Failed to upload proof of work: ${ errorMsg } `);
-        } finally {
-            setLoading(false);
-        }
-    };
+    try {
+      const response = await submitProofOfWork(formData);
+      if (response.success) {
+        alert("Proof of work submitted successfully! 🎉");
+        onSuccess();
+        onClose();
+      }
+    } catch (error) {
+      console.error("Submit proof error:", error);
+      const errorMsg = error.response?.data?.message || error.message || "Upload failed.";
+      alert(`Failed to upload proof of work: ${errorMsg} `);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10">
-            <div className="absolute inset-0 bg-secondary/80 backdrop-blur-sm" onClick={onClose} />
-            <div className="relative w-full max-w-xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                <div className="p-10">
-                    <div className="flex justify-between items-start mb-10">
-                        <div>
-                            <h3 className="text-3xl font-black text-secondary tracking-tighter lowercase">Proof of Work.</h3>
-                            <p className="text-secondary/50 text-xs font-bold uppercase tracking-widest mt-1">Submitting evidence for: {task.title}</p>
-                        </div>
-                        <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-all"><CloseIcon size={24} /></button>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">Work Description</label>
-                            <textarea
-                                required
-                                rows={3}
-                                placeholder="Describe the work completed..."
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                className="w-full bg-muted/30 border-2 border-transparent focus:border-secondary transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none resize-none placeholder:text-secondary/20 font-bold"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">Visual Evidence</label>
-                            <div className="border-2 border-dashed border-secondary/20 rounded-[20px] p-8 text-center hover:bg-muted/30 transition-all cursor-pointer relative group">
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                />
-                                <div className="flex flex-col items-center gap-2 pointer-events-none">
-                                    <Camera size={32} className="text-secondary/40 group-hover:scale-110 transition-transform" />
-                                    <p className="text-xs font-bold text-secondary/60">
-                                        {images.length > 0 ? `${ images.length } files selected` : "Drag & drop or click to upload"}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button
-                            disabled={loading}
-                            type="submit"
-                            className="w-full py-5 bg-secondary text-white rounded-[20px] font-black uppercase tracking-[0.2em] text-xs hover:bg-black transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
-                        >
-                            {loading ? (
-                                <>
-                                    <Activity size={16} className="animate-spin" />
-                                    Uploading...
-                                </>
-                            ) : "Submit Proof"}
-                        </button>
-                    </form>
-                </div>
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-10">
+      <div className="absolute inset-0 bg-secondary/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="p-10">
+          <div className="flex justify-between items-start mb-10">
+            <div>
+              <h3 className="text-3xl font-black text-secondary tracking-tighter lowercase">Proof of Work.</h3>
+              <p className="text-secondary/50 text-xs font-bold uppercase tracking-widest mt-1">Submitting evidence for: {task.title}</p>
             </div>
+            <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-all"><CloseIcon size={24} /></button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">Work Description</label>
+              <textarea
+                required
+                rows={3}
+                placeholder="Describe the work completed..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full bg-muted/30 border-2 border-transparent focus:border-secondary transition-all rounded-[20px] px-6 py-4 text-sm font-bold text-secondary outline-none resize-none placeholder:text-secondary/20 font-bold"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-secondary/40 ml-1">Visual Evidence</label>
+              <div className="border-2 border-dashed border-secondary/20 rounded-[20px] p-8 text-center hover:bg-muted/30 transition-all cursor-pointer relative group">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                />
+                <div className="flex flex-col items-center gap-2 pointer-events-none">
+                  <Camera size={32} className="text-secondary/40 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-secondary/60">
+                    {images.length > 0 ? `${images.length} files selected` : "Drag & drop or click to upload"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              disabled={loading}
+              type="submit"
+              className="w-full py-5 bg-secondary text-white rounded-[20px] font-black uppercase tracking-[0.2em] text-xs hover:bg-black transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Activity size={16} className="animate-spin" />
+                  Uploading...
+                </>
+              ) : "Submit Proof"}
+            </button>
+          </form>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 function Check({ size, className }) {
-    return (
-        <svg
-            width={size}
-            height={size}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={className}
-        >
-            <polyline points="20 6 9 17 4 12" />
-        </svg>
-    );
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
 }
 
 function Activity({ size, className }) {
-    return (
-        <svg
-            width={size}
-            height={size}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={className}
-        >
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-        </svg>
-    );
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    </svg>
+  );
 }
 
 export default VolunteerDashboard;

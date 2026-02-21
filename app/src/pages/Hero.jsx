@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion as Motion, AnimatePresence } from "motion/react";
-import { ArrowRight, Play, Heart, ShieldCheck } from "lucide-react";
+import { ArrowRight, Heart, ShieldCheck } from "lucide-react";
 import heroBg from "../assets/missions1.jpeg";
 import { getRecentDonors } from "../services/donorService";
 
@@ -15,7 +15,6 @@ const Hero = () => {
   const [currentBadge, setCurrentBadge] = useState(0);
   const [recentDonors, setRecentDonors] = useState([]);
   const [totalDonorsCount, setTotalDonorsCount] = useState(5000);
-  const videoRef = React.useRef(null);
 
   useEffect(() => {
     const fetchDonors = async () => {
@@ -32,41 +31,7 @@ const Hero = () => {
     fetchDonors();
   }, []);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
 
-    const playVideo = async () => {
-      try {
-        video.muted = true; // Ensure muted for autoplay
-        await video.play();
-      } catch {
-        // Video autoplay may be blocked by the browser; this is expected
-      }
-    };
-
-    // Try to play when video can play
-    video.addEventListener("canplay", playVideo);
-
-    // Also try immediately
-    playVideo();
-
-    // Fallback: play on first user interaction (touch/click)
-    const handleInteraction = () => {
-      playVideo();
-      document.removeEventListener("touchstart", handleInteraction);
-      document.removeEventListener("click", handleInteraction);
-    };
-
-    document.addEventListener("touchstart", handleInteraction, { once: true });
-    document.addEventListener("click", handleInteraction, { once: true });
-
-    return () => {
-      video.removeEventListener("canplay", playVideo);
-      document.removeEventListener("touchstart", handleInteraction);
-      document.removeEventListener("click", handleInteraction);
-    };
-  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -181,20 +146,13 @@ const Hero = () => {
             </div>
           </div>
 
-          <div className="w-full h-full">
-            <video
-              ref={videoRef}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              poster={heroBg}
-              className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
-            >
-              <source src="/PXL_20230110_133736033.mp4" type="video/mp4" />
-            </video>
-
+          <div className="w-full h-full relative" style={{ backgroundImage: `url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <img
+              src="/0214.gif"
+              alt="Fularani Foundation Impact"
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
             {/* Mask/Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-white via-white/20 to-transparent z-10 transition-opacity"></div>
             <div className="absolute inset-0 bg-secondary/20 z-0"></div>
@@ -206,29 +164,30 @@ const Hero = () => {
               <div className="flex -space-x-3 mb-1">
                 {recentDonors.length > 0
                   ? recentDonors.map((donor, i) => (
-                      <div
-                        key={donor._id || i}
-                        className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-primary"
-                      >
-                        <img
-                          src={donor.avatar}
-                          alt={donor.username}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))
+                    <div
+                      key={donor._id || i}
+                      className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-primary"
+                    >
+                      <img
+                        src={donor.avatar}
+                        alt={donor.username}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))
                   : [1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        className={`w-10 h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[8px] font-black text-white`}
-                      >
-                        FF
-                      </div>
-                    ))}
+                    <div
+                      key={i}
+                      className={`w-10 h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[8px] font-black text-white`}
+                    >
+                      FF
+                    </div>
+                  ))}
                 <div className="w-10 h-10 rounded-full border-2 border-white bg-accent flex items-center justify-center text-[10px] font-black text-secondary">
                   +{totalDonorsCount > 5000 ? totalDonorsCount : "5k"}
                 </div>
               </div>
+
               <p className="text-sm font-black text-secondary leading-tight mt-2">
                 Join{" "}
                 {totalDonorsCount > 5000
