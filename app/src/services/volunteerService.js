@@ -108,6 +108,20 @@ export const forgotPasswordVolunteer = async (email, panNumber, newPassword) => 
     }
 };
 
+// Cashfree PAN Lite Verification (₹2/API)
+// Supports optional name + dob matching
+export const verifyPAN = async (panNumber, name = "", dob = "") => {
+    try {
+        const payload = { panNumber };
+        if (name?.trim()) payload.name = name.trim();
+        if (dob?.trim()) payload.dob = dob.trim();
+        const response = await api.post('/api/signzy/verify-pan', payload);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // Volunteer data API calls
 export const getVolunteerProfile = async () => {
     try {

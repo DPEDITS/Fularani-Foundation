@@ -67,6 +67,14 @@ const volunteerSchema = new Schema(
       type: String,
       required: true,
     },
+    panVerified: {
+      type: Boolean,
+      default: false,
+    },
+    panHolderName: {
+      type: String,
+      trim: true,
+    },
     idNumberEncrypted: {
       type: String,
     },

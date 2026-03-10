@@ -19,11 +19,15 @@ import {
   CheckCircle2,
   Target,
   ChevronDown,
+  ShieldCheck,
+  AlertCircle,
+  BadgeCheck,
 } from "lucide-react";
-import { registerDonor, isAuthenticated } from "../services/donorService";
+import { registerDonor, isAuthenticated, verifyPAN } from "../services/donorService";
 import {
   registerVolunteer,
   isVolunteerAuthenticated,
+  verifyPAN as verifyPANVolunteer,
 } from "../services/volunteerService";
 
 const DonorRegister = () => {
@@ -65,6 +69,12 @@ const DonorRegister = () => {
   const [touched, setTouched] = useState({});
   const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
 
+  // PAN Verification State
+  const [panVerified, setPanVerified] = useState(false);
+  const [panVerifying, setPanVerifying] = useState(false);
+  const [panHolderName, setPanHolderName] = useState("");
+  const [panError, setPanError] = useState("");
+
   const totalSteps = role === "donor" ? 2 : 4;
 
   // Sync role state with URL parameters
@@ -93,6 +103,55 @@ const DonorRegister = () => {
     // Remove immediate touched marking to prevent red borders while typing
     // setTouched({ ...touched, [name]: true });
     setError("");
+
+    // Reset PAN verification status when PAN number changes
+    if (name === "panNumber") {
+      setPanVerified(false);
+      setPanHolderName("");
+      setPanError("");
+    }
+  };
+
+  // PAN Verification Handler
+  const handleVerifyPAN = async () => {
+    const pan = form.panNumber?.trim().toUpperCase();
+    if (!pan) {
+      setPanError("Please enter a PAN number");
+      return;
+    }
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    if (!panRegex.test(pan)) {
+      setPanError("Invalid PAN format. Expected: ABCDE1234F");
+      return;
+    }
+
+    setPanVerifying(true);
+    setPanError("");
+    setPanHolderName("");
+    setPanVerified(false);
+
+    try {
+      // Call PAN Lite API — pass username for name matching
+      const verifyFn = role === "volunteer" ? verifyPANVolunteer : verifyPAN;
+      const response = await verifyFn(pan, form.username);
+      if (response?.data?.isValid) {
+        setPanVerified(true);
+        setPanHolderName(response.data.holderName || "Verified");
+        setPanError("");
+      } else {
+        setPanVerified(false);
+        setPanError(response?.message || "PAN verification failed — the PAN number is invalid");
+      }
+    } catch (err) {
+      setPanVerified(false);
+      const errMsg =
+        err.response?.data?.message ||
+        err.message ||
+        "PAN verification service unavailable. Please try again.";
+      setPanError(errMsg);
+    } finally {
+      setPanVerifying(false);
+    }
   };
 
   const handleBlur = (fieldName) => {
@@ -200,6 +259,9 @@ const DonorRegister = () => {
 
       const formData = new FormData();
       Object.keys(form).forEach((key) => formData.append(key, form[key]));
+      // Include PAN verification status in form data
+      formData.append("panVerified", panVerified);
+      formData.append("panHolderName", panHolderName || "");
       if (avatar) formData.append("avatar", avatar);
 
       if (role === "donor") {
@@ -211,8 +273,19 @@ const DonorRegister = () => {
           setLoading(false);
           return;
         }
+        if (!panVerified) {
+          setError("Please verify your PAN number before completing registration");
+          setLoading(false);
+          return;
+        }
         await registerDonor(formData);
       } else {
+        // Volunteer also requires PAN verification
+        if (!panVerified) {
+          setError("Please verify your PAN number before completing registration");
+          setLoading(false);
+          return;
+        }
         await registerVolunteer(formData);
       }
       setSuccess(true);
@@ -292,15 +365,15 @@ const DonorRegister = () => {
                 <div className="space-y-6 pt-4">
                   {(role === "donor"
                     ? [
-                        { id: 1, title: "Account", desc: "Credentials" },
-                        { id: 2, title: "Personal", desc: "Details" },
-                      ]
+                      { id: 1, title: "Account", desc: "Credentials" },
+                      { id: 2, title: "Personal", desc: "Details" },
+                    ]
                     : [
-                        { id: 1, title: "Account", desc: "Credentials" },
-                        { id: 2, title: "Basic Info", desc: "Personal" },
-                        { id: 3, title: "Skills", desc: "Expertise" },
-                        { id: 4, title: "Final", desc: "Motivation" },
-                      ]
+                      { id: 1, title: "Account", desc: "Credentials" },
+                      { id: 2, title: "Basic Info", desc: "Personal" },
+                      { id: 3, title: "Skills", desc: "Expertise" },
+                      { id: 4, title: "Final", desc: "Motivation" },
+                    ]
                   ).map((step, index, arr) => (
                     <div key={step.id} className="flex gap-4 relative group">
                       {/* Connecting Line */}
@@ -385,9 +458,8 @@ const DonorRegister = () => {
                 {Array.from({ length: totalSteps }).map((_, i) => (
                   <div
                     key={i}
-                    className={`h-1 flex-1 rounded-full transition-all duration-500 ${
-                      i + 1 <= currentStep ? "bg-primary" : "bg-secondary/10"
-                    }`}
+                    className={`h-1 flex-1 rounded-full transition-all duration-500 ${i + 1 <= currentStep ? "bg-primary" : "bg-secondary/10"
+                      }`}
                   />
                 ))}
               </div>
@@ -521,14 +593,94 @@ const DonorRegister = () => {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-5"
                   >
-                    <Field
-                      label="PAN Number"
-                      icon={<FileText size={18} />}
-                      name="panNumber"
-                      value={form.panNumber}
-                      onChange={handleChange}
-                      placeholder="ABCDE1234F"
-                    />
+                    {/* PAN Number with Cashfree Verification */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
+                        PAN Number
+                      </label>
+                      <div className="relative">
+                        <FileText
+                          size={18}
+                          className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary/20"
+                        />
+                        <input
+                          type="text"
+                          name="panNumber"
+                          value={form.panNumber}
+                          onChange={handleChange}
+                          onBlur={() => handleBlur("panNumber")}
+                          placeholder="ABCDE1234F"
+                          maxLength="10"
+                          className={`w-full h-14 pl-14 pr-32 rounded-2xl bg-muted/20 outline-none font-black text-base uppercase placeholder:normal-case placeholder:text-gray-300 transition-all focus:ring-2 focus:ring-primary/10 ${panVerified
+                            ? "border-2 border-green-500 ring-2 ring-green-100"
+                            : panError
+                              ? "border-2 border-red-400 ring-2 ring-red-50"
+                              : "border-none"
+                            }`}
+                        />
+                        {/* Verify Button */}
+                        <button
+                          type="button"
+                          onClick={handleVerifyPAN}
+                          disabled={panVerifying || panVerified || form.panNumber.length < 10}
+                          className={`absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${panVerified
+                            ? "bg-green-100 text-green-700 cursor-default"
+                            : panVerifying
+                              ? "bg-primary/10 text-primary/50 cursor-wait"
+                              : form.panNumber.length >= 10
+                                ? "bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20"
+                                : "bg-muted/30 text-secondary/20 cursor-not-allowed"
+                            }`}
+                        >
+                          {panVerifying ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : panVerified ? (
+                            <span className="flex items-center gap-1">
+                              <BadgeCheck size={14} /> Verified
+                            </span>
+                          ) : (
+                            "Verify"
+                          )}
+                        </button>
+                      </div>
+
+                      {/* PAN Verification Feedback */}
+                      <AnimatePresence mode="wait">
+                        {panVerified && panHolderName && (
+                          <Motion.div
+                            key="pan-success"
+                            initial={{ opacity: 0, y: -8, height: 0 }}
+                            animate={{ opacity: 1, y: 0, height: "auto" }}
+                            exit={{ opacity: 0, y: -8, height: 0 }}
+                            className="flex items-center gap-2 px-4 py-3 bg-green-50 border border-green-200 rounded-2xl"
+                          >
+                            <ShieldCheck size={18} className="text-green-600 shrink-0" />
+                            <div>
+                              <p className="text-xs font-black text-green-800 uppercase tracking-wide">
+                                PAN Verified
+                              </p>
+                              <p className="text-sm font-bold text-green-700 mt-0.5">
+                                {panHolderName}
+                              </p>
+                            </div>
+                          </Motion.div>
+                        )}
+                        {panError && (
+                          <Motion.div
+                            key="pan-error"
+                            initial={{ opacity: 0, y: -8, height: 0 }}
+                            animate={{ opacity: 1, y: 0, height: "auto" }}
+                            exit={{ opacity: 0, y: -8, height: 0 }}
+                            className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-2xl"
+                          >
+                            <AlertCircle size={18} className="text-red-500 shrink-0" />
+                            <p className="text-xs font-bold text-red-600">
+                              {panError}
+                            </p>
+                          </Motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                     <div className="flex flex-col items-center justify-center border-2 border-dashed border-muted rounded-3xl p-8 transition-colors hover:border-primary/20 group">
                       {avatarPreview ? (
                         <img
@@ -608,7 +760,7 @@ const DonorRegister = () => {
                           >
                             {form.gender
                               ? form.gender.charAt(0).toUpperCase() +
-                                form.gender.slice(1)
+                              form.gender.slice(1)
                               : "Select Gender"}
                           </span>
                           <ChevronDown
@@ -656,14 +808,92 @@ const DonorRegister = () => {
                       onChange={handleChange}
                       placeholder="Your City, District"
                     />
-                    <Field
-                      label="PAN Number"
-                      icon={<FileText size={18} />}
-                      name="panNumber"
-                      value={form.panNumber}
-                      onChange={handleChange}
-                      placeholder="ABCDE1234F"
-                    />
+                    {/* PAN Number with Cashfree Verification (Volunteer) */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
+                        PAN Number
+                      </label>
+                      <div className="relative">
+                        <FileText
+                          size={18}
+                          className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary/20"
+                        />
+                        <input
+                          type="text"
+                          name="panNumber"
+                          value={form.panNumber}
+                          onChange={handleChange}
+                          onBlur={() => handleBlur("panNumber")}
+                          placeholder="ABCDE1234F"
+                          maxLength="10"
+                          className={`w-full h-14 pl-14 pr-32 rounded-2xl bg-muted/20 outline-none font-black text-base uppercase placeholder:normal-case placeholder:text-gray-300 transition-all focus:ring-2 focus:ring-primary/10 ${panVerified
+                            ? "border-2 border-green-500 ring-2 ring-green-100"
+                            : panError
+                              ? "border-2 border-red-400 ring-2 ring-red-50"
+                              : "border-none"
+                            }`}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleVerifyPAN}
+                          disabled={panVerifying || panVerified || form.panNumber.length < 10}
+                          className={`absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${panVerified
+                            ? "bg-green-100 text-green-700 cursor-default"
+                            : panVerifying
+                              ? "bg-primary/10 text-primary/50 cursor-wait"
+                              : form.panNumber.length >= 10
+                                ? "bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20"
+                                : "bg-muted/30 text-secondary/20 cursor-not-allowed"
+                            }`}
+                        >
+                          {panVerifying ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : panVerified ? (
+                            <span className="flex items-center gap-1">
+                              <BadgeCheck size={14} /> Verified
+                            </span>
+                          ) : (
+                            "Verify"
+                          )}
+                        </button>
+                      </div>
+
+                      <AnimatePresence mode="wait">
+                        {panVerified && panHolderName && (
+                          <Motion.div
+                            key="pan-success"
+                            initial={{ opacity: 0, y: -8, height: 0 }}
+                            animate={{ opacity: 1, y: 0, height: "auto" }}
+                            exit={{ opacity: 0, y: -8, height: 0 }}
+                            className="flex items-center gap-2 px-4 py-3 bg-green-50 border border-green-200 rounded-2xl"
+                          >
+                            <ShieldCheck size={18} className="text-green-600 shrink-0" />
+                            <div>
+                              <p className="text-xs font-black text-green-800 uppercase tracking-wide">
+                                PAN Verified
+                              </p>
+                              <p className="text-sm font-bold text-green-700 mt-0.5">
+                                {panHolderName}
+                              </p>
+                            </div>
+                          </Motion.div>
+                        )}
+                        {panError && (
+                          <Motion.div
+                            key="pan-error"
+                            initial={{ opacity: 0, y: -8, height: 0 }}
+                            animate={{ opacity: 1, y: 0, height: "auto" }}
+                            exit={{ opacity: 0, y: -8, height: 0 }}
+                            className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-2xl"
+                          >
+                            <AlertCircle size={18} className="text-red-500 shrink-0" />
+                            <p className="text-xs font-bold text-red-600">
+                              {panError}
+                            </p>
+                          </Motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                     <Field
                       label="Skills (comma-separated)"
                       icon={<Target size={18} />}
