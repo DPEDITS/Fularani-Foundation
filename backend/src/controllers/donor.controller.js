@@ -33,6 +33,8 @@ const registerDonor = asyncHandler(async (req, res) => {
     phone,
     address,
     panNumber,
+    panVerified,
+    panHolderName,
     wants80GReceipt,
   } = req.body;
 
@@ -64,6 +66,8 @@ const registerDonor = asyncHandler(async (req, res) => {
     phone,
     address,
     panNumber,
+    panVerified: panVerified === true || panVerified === "true",
+    panHolderName: panHolderName || "",
     wants80GReceipt: wants80GReceipt || false,
   });
 

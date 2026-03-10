@@ -96,10 +96,11 @@ import contentRouter from "./routes/content.routes.js";
 import adminRouter from "./routes/admin.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
 import projectRouter from "./routes/project.routes.js";
+import signzyRouter from "./routes/signzy.routes.js";
 
 //routes declaration
 app.use("/api/volunteers", volunteerRouter)
-app.use("/api/donor", authLimiter, donorRouter)
+app.use("/api/donor", donorRouter)
 app.use("/api/v1/contact", contactRouter)
 app.use("/api/gallery", galleryRouter)
 app.use("/api/donations", paymentLimiter, donationRouter)
@@ -107,6 +108,7 @@ app.use("/api/content", contentRouter)
 app.use("/api/admin", authLimiter, adminRouter)
 app.use("/api/payment", paymentLimiter, paymentRouter)
 app.use("/api/projects", projectRouter)
+app.use("/api/signzy", signzyRouter)
 
 // error handler
 app.use((err, req, res, next) => {

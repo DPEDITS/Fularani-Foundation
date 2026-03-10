@@ -50,6 +50,14 @@ const donorSchema = new Schema(
       type: String,
       required: [true, "Pan number is required"]
     },
+    panVerified: {
+      type: Boolean,
+      default: false,
+    },
+    panHolderName: {
+      type: String,
+      trim: true,
+    },
     wants80GReceipt: {
       type: Boolean,
       default: false,
