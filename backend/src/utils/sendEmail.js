@@ -1,28 +1,29 @@
-import nodemailer from 'nodemailer';
-
 const sendEmail = async (options) => {
-  // Create a transporter
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USERNAME,
-      pass: process.env.EMAIL_PASSWORD,
+  const RESEND_API_KEY = "re_Gnc4m6HY_N21WaqSRdsVRyoYQFS3r9DfJ"; // Provided by user
+
+  // Call Resend's HTTP REST API to bypass Render's SMTP firewall
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify({
+      from: "Fularani Foundation <onboarding@resend.dev>", // Must use onboarding domain on free tier
+      to: options.email,
+      subject: options.subject,
+      html: options.html,
+    }),
   });
 
-  // Define the email options
-  const mailOptions = {
-    from: `Fularani Foundation <${process.env.EMAIL_USERNAME}>`,
-    to: options.email,
-    subject: options.subject,
-    text: options.message,
-    html: options.html,
-  };
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("Resend API Error:", errorData);
+    throw new Error(errorData.message || "Failed to send email with Resend");
+  }
 
-  // Actually send the email
-  await transporter.sendMail(mailOptions);
+  const data = await response.json();
+  return data;
 };
 
 export default sendEmail;
