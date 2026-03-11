@@ -21,13 +21,11 @@ import {
   loginDonor,
   isAuthenticated,
   forgotPasswordDonor,
-  verifyPAN,
 } from "../services/donorService";
 import {
   loginVolunteer,
   isVolunteerAuthenticated,
   forgotPasswordVolunteer,
-  verifyPAN as verifyPANVolunteer,
 } from "../services/volunteerService";
 import { loginAdmin } from "../services/adminService";
 
@@ -51,18 +49,10 @@ const DonorLogin = () => {
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotForm, setForgotForm] = useState({
     email: "",
-    panNumber: "",
-    newPassword: "",
   });
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [forgotError, setForgotError] = useState("");
-
-  // PAN Verification in Forgot Password
-  const [forgotPanVerified, setForgotPanVerified] = useState(false);
-  const [forgotPanVerifying, setForgotPanVerifying] = useState(false);
-  const [forgotPanHolderName, setForgotPanHolderName] = useState("");
-  const [forgotPanError, setForgotPanError] = useState("");
 
   useEffect(() => {
     if (role === "donor" && isAuthenticated()) {
@@ -117,85 +107,26 @@ const DonorLogin = () => {
   const handleForgotSubmit = async (e) => {
     e.preventDefault();
     setForgotError("");
-
-    // Require PAN verification before allowing password reset
-    if (!forgotPanVerified) {
-      setForgotError("Please verify your PAN number first");
-      return;
-    }
-
     setForgotLoading(true);
 
     try {
       if (role === "donor") {
-        await forgotPasswordDonor(
-          forgotForm.email,
-          forgotForm.panNumber,
-          forgotForm.newPassword,
-        );
+        await forgotPasswordDonor(forgotForm.email);
       } else {
-        await forgotPasswordVolunteer(
-          forgotForm.email,
-          forgotForm.panNumber,
-          forgotForm.newPassword,
-        );
+        await forgotPasswordVolunteer(forgotForm.email);
       }
       setForgotSuccess(true);
       setTimeout(() => {
         setShowForgotModal(false);
         setForgotSuccess(false);
-        setForgotForm({ email: "", panNumber: "", newPassword: "" });
-        setForgotPanVerified(false);
-        setForgotPanHolderName("");
-        setForgotPanError("");
-      }, 3000);
+        setForgotForm({ email: "" });
+      }, 5000);
     } catch (err) {
       setForgotError(
-        err.response?.data?.message || "Reset failed. Verify details.",
+        err.response?.data?.message || "Failed to send reset email. Try again.",
       );
     } finally {
       setForgotLoading(false);
-    }
-  };
-
-  // PAN Verification Handler for Forgot Password
-  const handleForgotVerifyPAN = async () => {
-    const pan = forgotForm.panNumber?.trim().toUpperCase();
-    if (!pan) {
-      setForgotPanError("Please enter a PAN number");
-      return;
-    }
-    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-    if (!panRegex.test(pan)) {
-      setForgotPanError("Invalid PAN format. Expected: ABCDE1234F");
-      return;
-    }
-
-    setForgotPanVerifying(true);
-    setForgotPanError("");
-    setForgotPanHolderName("");
-    setForgotPanVerified(false);
-
-    try {
-      const verifyFn = role === "volunteer" ? verifyPANVolunteer : verifyPAN;
-      const response = await verifyFn(pan);
-      if (response?.data?.isValid) {
-        setForgotPanVerified(true);
-        setForgotPanHolderName(response.data.holderName || "Verified");
-        setForgotPanError("");
-      } else {
-        setForgotPanVerified(false);
-        setForgotPanError(response?.message || "PAN verification failed");
-      }
-    } catch (err) {
-      setForgotPanVerified(false);
-      const errMsg =
-        err.response?.data?.message ||
-        err.message ||
-        "PAN verification service unavailable";
-      setForgotPanError(errMsg);
-    } finally {
-      setForgotPanVerifying(false);
     }
   };
 
@@ -293,7 +224,7 @@ const DonorLogin = () => {
                 </label>
                 <div className="relative">
                   <Mail
-                    className={`absolute left-5 top-1/2 -translate-y-1/2 transition-colors ${form.email ? (isEmailValid ? "text-primary" : "text-red-500") : "text-secondary/20"}`}
+                    className={`absolute left-5 top-1/2 -translate-y-1/2 transition-colors ${form.email ? "text-primary" : "text-secondary/20"}`}
                     size={20}
                   />
                   <input
@@ -400,11 +331,10 @@ const DonorLogin = () => {
                   <ShieldCheck size={40} className="text-green-500" />
                 </div>
                 <h3 className="text-2xl font-black text-secondary mb-2 lowercase tracking-tighter">
-                  password reset!
+                  link sent!
                 </h3>
                 <p className="text-secondary/60 text-sm font-bold">
-                  Your security is updated. You can now login with your new
-                  password.
+                  If an account exists with that email, we've sent a password reset link. Please check your inbox.
                 </p>
               </div>
             ) : (
@@ -441,104 +371,6 @@ const DonorLogin = () => {
                     />
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
-                      Verified PAN Number
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={forgotForm.panNumber}
-                        onChange={(e) => {
-                          setForgotForm({
-                            ...forgotForm,
-                            panNumber: e.target.value,
-                          });
-                          // Reset verification when PAN changes
-                          setForgotPanVerified(false);
-                          setForgotPanHolderName("");
-                          setForgotPanError("");
-                        }}
-                        required
-                        placeholder="ABCDE1234F"
-                        maxLength="10"
-                        className={`w-full h-12 px-6 pr-28 rounded-xl bg-muted/20 outline-none transition-all font-black text-sm uppercase ${
-                          forgotPanVerified
-                            ? "border-2 border-green-500 ring-2 ring-green-100"
-                            : forgotPanError
-                              ? "border-2 border-red-400 ring-2 ring-red-50"
-                              : "border-none focus:ring-2 focus:ring-primary/20"
-                        }`}
-                      />
-                      {/* Verify Button */}
-                      <button
-                        type="button"
-                        onClick={handleForgotVerifyPAN}
-                        disabled={forgotPanVerifying || forgotPanVerified || forgotForm.panNumber.length < 10}
-                        className={`absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${
-                          forgotPanVerified
-                            ? "bg-green-100 text-green-700 cursor-default"
-                            : forgotPanVerifying
-                              ? "bg-primary/10 text-primary/50 cursor-wait"
-                              : forgotForm.panNumber.length >= 10
-                                ? "bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20"
-                                : "bg-muted/30 text-secondary/20 cursor-not-allowed"
-                        }`}
-                      >
-                        {forgotPanVerifying ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : forgotPanVerified ? (
-                          <span className="flex items-center gap-1">
-                            <BadgeCheck size={12} /> Verified
-                          </span>
-                        ) : (
-                          "Verify"
-                        )}
-                      </button>
-                    </div>
-                    {/* PAN Verification Feedback */}
-                    {forgotPanVerified && forgotPanHolderName && (
-                      <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-xl">
-                        <ShieldCheck size={14} className="text-green-600 shrink-0" />
-                        <div>
-                          <p className="text-[9px] font-black text-green-800 uppercase tracking-wide">
-                            PAN Verified
-                          </p>
-                          <p className="text-xs font-bold text-green-700">
-                            {forgotPanHolderName}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    {forgotPanError && (
-                      <div className="flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-200 rounded-xl">
-                        <AlertCircle size={14} className="text-red-500 shrink-0" />
-                        <p className="text-[9px] font-bold text-red-600">
-                          {forgotPanError}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
-                      New Password
-                    </label>
-                    <input
-                      type="password"
-                      value={forgotForm.newPassword}
-                      onChange={(e) =>
-                        setForgotForm({
-                          ...forgotForm,
-                          newPassword: e.target.value,
-                        })
-                      }
-                      required
-                      placeholder="••••••••"
-                      className="w-full h-12 px-6 rounded-xl bg-muted/20 border-none focus:ring-2 focus:ring-primary/20 outline-none transition-all font-black text-sm"
-                    />
-                  </div>
-
                   <button
                     type="submit"
                     disabled={forgotLoading}
@@ -548,7 +380,7 @@ const DonorLogin = () => {
                       <Loader2 className="animate-spin" />
                     ) : (
                       <>
-                        Reset Password{" "}
+                        Send Reset Link{" "}
                         <Zap size={14} className="fill-accent text-accent" />
                       </>
                     )}

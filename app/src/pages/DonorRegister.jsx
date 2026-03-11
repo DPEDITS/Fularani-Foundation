@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   AlertCircle,
   BadgeCheck,
+  FileText,
 } from "lucide-react";
 import { registerDonor, isAuthenticated, verifyPAN } from "../services/donorService";
 import {
@@ -104,8 +105,8 @@ const DonorRegister = () => {
     // setTouched({ ...touched, [name]: true });
     setError("");
 
-    // Reset PAN verification status when PAN number changes
-    if (name === "panNumber") {
+    // Reset PAN verification status when PAN number or DOB changes
+    if (name === "panNumber" || name === "dateOfBirth") {
       setPanVerified(false);
       setPanHolderName("");
       setPanError("");
@@ -125,15 +126,21 @@ const DonorRegister = () => {
       return;
     }
 
+    // Validate DOB is provided
+    if (!form.dateOfBirth?.trim()) {
+      setPanError("Please enter your Date of Birth first");
+      return;
+    }
+
     setPanVerifying(true);
     setPanError("");
     setPanHolderName("");
     setPanVerified(false);
 
     try {
-      // Call PAN Lite API — pass username for name matching
+      // Call PAN Lite API — pass username for name matching + DOB for DOB matching
       const verifyFn = role === "volunteer" ? verifyPANVolunteer : verifyPAN;
-      const response = await verifyFn(pan, form.username);
+      const response = await verifyFn(pan, form.username, form.dateOfBirth);
       if (response?.data?.isValid) {
         setPanVerified(true);
         setPanHolderName(response.data.holderName || "Verified");
@@ -259,6 +266,7 @@ const DonorRegister = () => {
 
       const formData = new FormData();
       Object.keys(form).forEach((key) => formData.append(key, form[key]));
+      
       // Include PAN verification status in form data
       formData.append("panVerified", panVerified);
       formData.append("panHolderName", panHolderName || "");
@@ -534,14 +542,14 @@ const DonorRegister = () => {
                     className="space-y-5"
                   >
                     <Field
-                      label="Username"
+                      label="Username (Name on PAN)"
                       icon={<User size={18} />}
                       name="username"
                       value={form.username}
                       onChange={handleChange}
                       onBlur={() => handleBlur("username")}
                       isValid={getFieldValidation("username", form.username)}
-                      placeholder="your_username"
+                      placeholder="JOHN DOE"
                     />
                     <Field
                       label="Email"
@@ -593,6 +601,29 @@ const DonorRegister = () => {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-5"
                   >
+                    {/* Date of Birth Field */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
+                        Date of Birth (as on PAN)
+                      </label>
+                      <div className="relative">
+                        <Calendar
+                          size={18}
+                          className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary/20"
+                        />
+                        <input
+                          type="text"
+                          name="dateOfBirth"
+                          value={form.dateOfBirth}
+                          onChange={handleDateChange}
+                          onBlur={() => handleBlur("dateOfBirth")}
+                          placeholder="DD/MM/YYYY"
+                          maxLength="10"
+                          className="w-full h-14 pl-14 pr-6 rounded-2xl bg-muted/20 border-none focus:ring-2 focus:ring-primary/20 outline-none font-black text-base placeholder:text-gray-300 transition-all"
+                        />
+                      </div>
+                    </div>
+
                     {/* PAN Number with Cashfree Verification */}
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] ml-2">
@@ -1073,26 +1104,5 @@ const Field = ({ label, icon, toggleShow, isShowing, isValid, ...props }) => {
     </div>
   );
 };
-
-const FileText = ({ size, className }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-    <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-    <path d="M10 9H8" />
-    <path d="M16 13H8" />
-    <path d="M16 17H8" />
-  </svg>
-);
 
 export default DonorRegister;

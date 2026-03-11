@@ -95,9 +95,18 @@ export const refreshAccessToken = async () => {
     }
 };
 
-export const forgotPasswordDonor = async (email, panNumber, newPassword) => {
+export const forgotPasswordDonor = async (email) => {
     try {
-        const response = await api.post('/api/donor/forgot-password', { email, panNumber, newPassword });
+        const response = await api.post('/api/donor/forgot-password', { email });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const resetPasswordDonor = async (token, newPassword) => {
+    try {
+        const response = await api.put(`/api/donor/reset-password/${token}`, { newPassword });
         return response.data;
     } catch (error) {
         throw error;

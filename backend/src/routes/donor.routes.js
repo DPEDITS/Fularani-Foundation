@@ -11,6 +11,7 @@ import {
   updateDonorProfile,
   updateDonorAvatar,
   forgotPasswordDonor,
+  resetPasswordDonor,
   getRecentDonors,
 } from "../controllers/donor.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -52,6 +53,7 @@ donorRouter.route("/register").post(
 
 donorRouter.route("/login").post(authLimiter, loginDonor);
 donorRouter.route("/forgot-password").post(forgotPasswordLimiter, forgotPasswordDonor);
+donorRouter.route("/reset-password/:token").put(forgotPasswordLimiter, resetPasswordDonor);
 donorRouter.route("/recent-donors").get(getRecentDonors);
 
 // Protected routes (require authentication)

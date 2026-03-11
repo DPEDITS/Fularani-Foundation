@@ -19,6 +19,7 @@ import Footer from "./components/Footer";
 import CSRPartnership from "./pages/CSRPartnership";
 import AdminDashboard from "./pages/AdminDashboard";
 import AddContent from "./pages/AddContent";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () => {
   const location = useLocation();
@@ -27,9 +28,10 @@ const App = () => {
     "/donor-register",
     "/volunteer-login",
     "/volunteer-register",
+    "/reset-password"
   ];
 
-  const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
+  const shouldHideFooter = hideFooterRoutes.some(route => location.pathname.startsWith(route));
 
   return (
     <div className="min-h-screen bg-white">
@@ -52,6 +54,7 @@ const App = () => {
           <Route path="/donor-dashboard" element={<DonorDashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/add-content" element={<AddContent />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Routes>
       </main>
       {!shouldHideFooter && <Footer />}
