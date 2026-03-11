@@ -99,9 +99,18 @@ export const refreshVolunteerAccessToken = async () => {
     }
 };
 
-export const forgotPasswordVolunteer = async (email, panNumber, newPassword) => {
+export const forgotPasswordVolunteer = async (email) => {
     try {
-        const response = await api.post('/api/volunteers/forgot-password', { email, panNumber, newPassword });
+        const response = await api.post('/api/volunteers/forgot-password', { email });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const resetPasswordVolunteer = async (token, newPassword) => {
+    try {
+        const response = await api.put(`/api/volunteers/reset-password/${token}`, { newPassword });
         return response.data;
     } catch (error) {
         throw error;

@@ -1,6 +1,8 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { Donor } from "../models/donor.model.js";
+import { Volunteer } from "../models/volunteer.model.js";
 
 // ─── Cashfree PAN Lite Verification (₹2/API) ───────────────────────────────
 // Docs: https://docs.cashfree.com/reference/pan-lite-verification
@@ -12,12 +14,32 @@ const verifyPANLite = asyncHandler(async (req, res) => {
         throw new ApiError(400, "PAN Number is required");
     }
 
+    if (!name?.trim() || name.trim() === "VerifyUser") {
+        throw new ApiError(400, "Your full name (as on PAN) is required for verification");
+    }
+
+    if (!dob?.trim()) {
+        throw new ApiError(400, "Date of birth is required for verification");
+    }
+
     // Basic format validation before calling external API
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     const pan = panNumber.trim().toUpperCase();
 
     if (!panRegex.test(pan)) {
         throw new ApiError(400, "Invalid PAN Number format. Expected: ABCDE1234F");
+    }
+
+    // --- Prevent duplicate PAN registrations BEFORE calling Cashfree API ---
+    // This saves API costs and explicitly enforces one PAN per user account!
+    const existedDonorPan = await Donor.findOne({ panNumber: new RegExp(`^${pan}$`, 'i') });
+    if (existedDonorPan) {
+        throw new ApiError(409, "This PAN Number is already registered to an existing Donor account!");
+    }
+
+    const existedVolunteerPan = await Volunteer.findOne({ panNumber: new RegExp(`^${pan}$`, 'i') });
+    if (existedVolunteerPan) {
+        throw new ApiError(409, "This PAN Number is already registered to an existing Volunteer account!");
     }
 
     const clientId = process.env.CASHFREE_CLIENT_ID;
@@ -32,9 +54,9 @@ const verifyPANLite = asyncHandler(async (req, res) => {
     const requestBody = {
         verification_id: verificationId,
         pan: pan,
+        name: name?.trim() || "VerifyUser", // Cashfree now requires the name field
+        dob: "1990-01-01", // Default DOB since Cashfree now requires the dob field
     };
-
-    if (name?.trim()) requestBody.name = name.trim();
     if (dob?.trim()) {
         const ddmmyyyyRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
         const match = dob.trim().match(ddmmyyyyRegex);
@@ -159,11 +181,16 @@ const verifyPANLite = asyncHandler(async (req, res) => {
 
     // PAN is valid when pan_status is "E" (exists/valid) or "EC" (valid, marked Acquisition)
     const validStatuses = ["E", "EC"];
-    const isValid = validStatuses.includes(data.pan_status) || data.status === "VALID";
-    const holderName = data.name || null;
-    const dateOfBirth = data.dob || null;
+    const isPanValid = validStatuses.includes(data.pan_status) || data.status === "VALID";
+    
     const nameMatched = data.name_match === "Y";
     const dobMatched = data.dob_match === "Y";
+
+    // Enforce Strict Name + DOB Double-Lock Matching
+    const isValid = isPanValid && nameMatched && dobMatched;
+
+    const holderName = data.name || null;
+    const dateOfBirth = data.dob || null;
 
     // Map pan_status codes to human-readable descriptions
     const panStatusMap = {
@@ -198,7 +225,9 @@ const verifyPANLite = asyncHandler(async (req, res) => {
             },
             isValid
                 ? "PAN verified successfully"
-                : `PAN verification failed — ${panStatusDesc}`
+                : (isPanValid && (!nameMatched || !dobMatched)
+                    ? "PAN verification failed — The provided details do not match the PAN records."
+                    : `PAN verification failed — ${panStatusDesc}`)
         )
     );
 });

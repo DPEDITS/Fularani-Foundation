@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 const volunteerSchema = new Schema(
   {
@@ -109,6 +110,8 @@ const volunteerSchema = new Schema(
     approvedAt: {
       type: Date,
     },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
   { timestamps: true },
 );
@@ -147,6 +150,19 @@ volunteerSchema.methods.generateRefreshToken = function () {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     },
   );
+};
+
+volunteerSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+
+  return resetToken;
 };
 
 export const Volunteer = mongoose.model("Volunteer", volunteerSchema);

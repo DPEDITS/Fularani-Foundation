@@ -1,9 +1,12 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Volunteer } from "../models/volunteer.model.js";
+import { Donor } from "../models/donor.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
+import sendEmail from "../utils/sendEmail.js";
+import crypto from "crypto";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
@@ -126,11 +129,24 @@ const registerVolunteer = asyncHandler(async (req, res) => {
   if (!dateOfBirth) throw new ApiError(400, "Date of birth is required");
 
   const existedUser = await Volunteer.findOne({
-    $or: [{ username }, { email }],
+    $or: [
+      { username }, 
+      { email },
+      { panNumber: new RegExp(`^${panNumber}$`, 'i') }
+    ],
   });
 
   if (existedUser) {
+    if (existedUser.panNumber && existedUser.panNumber.toLowerCase() === panNumber.toLowerCase()) {
+      throw new ApiError(409, "PAN Number is already registered with another account");
+    }
     throw new ApiError(409, "User with email or username already exists");
+  }
+
+  // Also prevent cross-role PAN sharing
+  const existedDonor = await Donor.findOne({ panNumber: new RegExp(`^${panNumber}$`, 'i') });
+  if (existedDonor) {
+    throw new ApiError(409, "PAN Number is already registered to a donor account");
   }
 
   const avatarLocalPath = req.file?.path;
@@ -220,8 +236,13 @@ const loginVolunteer = asyncHandler(async (req, res) => {
     throw new ApiError(400, "username or email is required");
   }
 
+  const queryIdentifier = (email || username).trim();
+
   const user = await Volunteer.findOne({
-    $or: [{ username }, { email }],
+    $or: [
+      { username: queryIdentifier.toLowerCase() }, 
+      { email: queryIdentifier.toLowerCase() }
+    ],
   });
 
   if (!user) {
@@ -307,28 +328,87 @@ const getVolunteerStats = asyncHandler(async (req, res) => {
 });
 
 const forgotPasswordVolunteer = asyncHandler(async (req, res) => {
-  const { email, panNumber, newPassword } = req.body;
+  const { email } = req.body;
 
-  if (!email || !panNumber || !newPassword) {
-    throw new ApiError(400, "Email, PAN Number and New Password are required");
+  if (!email) {
+    throw new ApiError(400, "Please provide your email address");
   }
 
   const user = await Volunteer.findOne({ email });
 
   if (!user) {
-    throw new ApiError(404, "User with this email does not exist");
+    // Return generic success to prevent email enumeration
+    return res.status(200).json(
+      new ApiResponse(200, {}, "If an account with that email exists, we have sent a password reset link.")
+    );
   }
 
-  if (user.panNumber.toUpperCase() !== panNumber.toUpperCase()) {
-    throw new ApiError(401, "Invalid PAN Number for this account");
-  }
-
-  user.password = newPassword;
+  // Get reset token
+  const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "Password reset successfully"));
+  // Create reset url based on where the request came from
+  const frontendUrl = req.headers.origin || process.env.FRONTEND_URL || "http://localhost:5173";
+  const resetUrl = `${frontendUrl}/reset-password/${resetToken}?role=volunteer`;
+
+  const message = `
+    <h1>Password Reset Requested</h1>
+    <p>Hi ${user.username || 'User'},</p>
+    <p>We received a request to reset your password for your Fularani Foundation volunteer account.</p>
+    <p>Please click on the link below to set a new password. This link is only valid for 15 minutes.</p>
+    <a href="${resetUrl}" style="display:inline-block;padding:10px 20px;background-color:#007bff;color:#fff;text-decoration:none;border-radius:5px;margin:20px 0;">Reset Password</a>
+    <p>If you did not request a password reset, please ignore this email.</p>
+  `;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Fularani Foundation - Password Reset",
+      html: message,
+    });
+
+    res.status(200).json(
+      new ApiResponse(200, {}, "If an account with that email exists, we have sent a password reset link.")
+    );
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    console.error("Email send error:", error);
+    throw new ApiError(500, "There was an error sending the reset email. Please try again later.");
+  }
+});
+
+const resetPasswordVolunteer = asyncHandler(async (req, res) => {
+  // Hash token to compare with database
+  const resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await Volunteer.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new ApiError(400, "Password reset token is invalid or has expired");
+  }
+
+  const { newPassword } = req.body;
+
+  if (!newPassword || newPassword.length < 6) {
+    throw new ApiError(400, "New Password is required and must be at least 6 characters");
+  }
+
+  // Set new password
+  user.password = newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  res.status(200).json(new ApiResponse(200, {}, "Password reset successfully. You can now login."));
 });
 
 export {
@@ -337,5 +417,6 @@ export {
   getVolunteerProfile,
   getVolunteerStats,
   refreshAccessToken,
-  forgotPasswordVolunteer
+  forgotPasswordVolunteer,
+  resetPasswordVolunteer
 };
