@@ -1,5 +1,5 @@
 const sendEmail = async (options) => {
-  const RESEND_API_KEY = "re_Gnc4m6HY_N21WaqSRdsVRyoYQFS3r9DfJ"; // Provided by user
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
   // Call Resend's HTTP REST API to bypass Render's SMTP firewall
   const response = await fetch("https://api.resend.com/emails", {
