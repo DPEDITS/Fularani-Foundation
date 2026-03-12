@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { User, Phone, MapPin, FileText, Edit2, Check, ShieldCheck } from "lucide-react";
+import { User, Phone, MapPin, FileText, Edit2, Check, ShieldCheck, Search, Loader2 } from "lucide-react";
+import { verifyPAN } from "../../services/donorService";
 
 const ProfileField = ({
     icon: Icon,
@@ -10,13 +11,17 @@ const ProfileField = ({
     type = "text",
     placeholder,
     isReadOnly = false,
+    action = null,
 }) => (
     <div className="flex items-start gap-5">
         <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center shrink-0">
             <Icon size={20} className="text-secondary/60" />
         </div>
         <div className="flex-1">
-            <p className="text-secondary/40 text-[10px] font-black uppercase tracking-widest mb-2">{label}</p>
+            <div className="flex justify-between items-center mb-2">
+                <p className="text-secondary/40 text-[10px] font-black uppercase tracking-widest">{label}</p>
+                {action && isEditing && !isReadOnly && action}
+            </div>
             {isEditing && !isReadOnly ? (
                 <input
                     type={type}
@@ -50,6 +55,12 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
         wants80GReceipt: user?.wants80GReceipt || false,
     });
 
+    // Verification States
+    const [panVerified, setPanVerified] = useState(user?.panVerified || false);
+    const [verifying, setVerifying] = useState(false);
+    const [panError, setPanError] = useState("");
+    const [panMatchName, setPanMatchName] = useState("");
+
     // Sync form data when user prop changes (after successful update)
     useEffect(() => {
         if (user && !isEditing) {
@@ -60,11 +71,50 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
                 panNumber: user.panNumber || "",
                 wants80GReceipt: !!user.wants80GReceipt,
             });
+            setPanVerified(user.panVerified || false);
+            setPanError("");
         }
     }, [user, isEditing]);
 
+    const handleVerifyPAN = async () => {
+        if (!formData.panNumber) return;
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
+        if (!panRegex.test(formData.panNumber)) {
+            setPanError("Invalid PAN format (e.g. ABCDE1234F)");
+            return;
+        }
+
+        setVerifying(true);
+        setPanError("");
+        try {
+            const res = await verifyPAN(formData.panNumber);
+            if (res.data?.isValid) {
+                setPanVerified(true);
+                setPanMatchName(res.data.holderName);
+                setPanError("");
+            } else {
+                setPanError(res.message || "PAN is invalid");
+            }
+        } catch (err) {
+            setPanError(err.response?.data?.message || "Verification failed");
+        } finally {
+            setVerifying(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // If PAN was modified from PENDING/missing, it MUST be verified
+        const originalPan = user?.panNumber || "";
+        const panChanged = formData.panNumber.toUpperCase() !== originalPan.toUpperCase();
+        const wasPendingOrEmpty = !originalPan || originalPan === "PENDING";
+        
+        if (panChanged && wasPendingOrEmpty && !panVerified) {
+            alert("Please verify your PAN number before saving.");
+            return;
+        }
+
         try {
             await onUpdate(formData);
             setIsEditing(false);
@@ -167,8 +217,42 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
                             isEditing={isEditing}
                             isReadOnly={user?.panNumber && user?.panNumber !== "PENDING" && user?.panVerified}
                             placeholder="ABCDE1234F"
-                            onChange={(val) => setFormData({ ...formData, panNumber: val })}
+                            onChange={(val) => {
+                                setFormData({ ...formData, panNumber: val.toUpperCase() });
+                                setPanVerified(false); // Reset verification on change
+                            }}
+                            action={
+                                <button
+                                    onClick={handleVerifyPAN}
+                                    disabled={verifying || panVerified || !formData.panNumber}
+                                    className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter transition-all ${
+                                        panVerified 
+                                        ? "bg-green-100 text-green-700 pointer-events-none" 
+                                        : "bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                                    }`}
+                                >
+                                    {verifying ? (
+                                        <Loader2 size={10} className="animate-spin" />
+                                    ) : panVerified ? (
+                                        <ShieldCheck size={10} />
+                                    ) : (
+                                        <Search size={10} />
+                                    )}
+                                    {panVerified ? "Verified" : verifying ? "Checking" : "Verify"}
+                                </button>
+                            }
                         />
+
+                        {panError && (
+                            <p className="text-[10px] font-bold text-red-500 mt-1 ml-17 px-3 py-1 bg-red-50 rounded-lg inline-block">
+                                {panError}
+                            </p>
+                        )}
+                        {panVerified && panMatchName && !panError && (
+                            <p className="text-[10px] font-bold text-green-600 mt-1 ml-17 px-3 py-1 bg-green-50 rounded-lg inline-block">
+                                Matches: {panMatchName}
+                            </p>
+                        )}
 
                         <div className="pt-4 mt-2 border-t border-secondary/10">
                             <label className="flex items-start gap-4 cursor-pointer group select-none">

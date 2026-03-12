@@ -410,6 +410,13 @@ const DonorRegister = () => {
           // New donor - do NOT log in yet, just pre-fill and move to PAN step
           const profile = result.data.googleProfile || {};
           const tempPassword = "Google_" + Math.random().toString(36).slice(2, 14);
+          console.log("New user detected, ensuring clean slate (prev auth cleared)");
+          // Clear any existing auth data to prevent Navbar showing a user incorrectly
+          localStorage.removeItem('donor_access_token');
+          localStorage.removeItem('donor_refresh_token');
+          localStorage.removeItem('donor_user');
+          window.dispatchEvent(new Event("storage"));
+
           setGoogleCredential(credential);
           setForm((prev) => ({
             ...prev,
@@ -440,6 +447,13 @@ const DonorRegister = () => {
           // New volunteer - do NOT log in yet, just pre-fill and move to step 2
           const profile = result.data.googleProfile;
           const tempPassword = "Google_" + Math.random().toString(36).slice(2, 14);
+          
+          // Clear any existing auth data to prevent Navbar showing a user incorrectly
+          localStorage.removeItem('donor_access_token');
+          localStorage.removeItem('donor_refresh_token');
+          localStorage.removeItem('donor_user');
+          window.dispatchEvent(new Event("storage"));
+
           setGoogleCredential(credential);
           setForm((prev) => ({
             ...prev,
