@@ -327,8 +327,29 @@ const updateDonorProfile = asyncHandler(async (req, res) => {
   
   // Allow updating panNumber ONLY if it's currently PENDING or missing
   if (panNumber && (!req.user.panNumber || req.user.panNumber === "PENDING")) {
-    updateFields.panNumber = panNumber;
-    // If it's being updated here, we assume it went through frontend validation/verification
+    const trimmedPan = panNumber.trim().toUpperCase();
+    
+    // Basic PAN validation
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    if (!panRegex.test(trimmedPan)) {
+      throw new ApiError(400, "Invalid PAN format. Expected: ABCDE1234F");
+    }
+
+    // Uniqueness check
+    const existingPanDonor = await Donor.findOne({ 
+      panNumber: new RegExp(`^${trimmedPan}$`, 'i'),
+      _id: { $ne: req.user._id }
+    });
+    if (existingPanDonor) {
+      throw new ApiError(409, "PAN Number is already registered with another donor account");
+    }
+
+    const existingPanVolunteer = await Volunteer.findOne({ panNumber: new RegExp(`^${trimmedPan}$`, 'i') });
+    if (existingPanVolunteer) {
+      throw new ApiError(409, "PAN Number is already registered to a volunteer account");
+    }
+
+    updateFields.panNumber = trimmedPan;
     updateFields.panVerified = true; 
   }
 
@@ -526,6 +547,7 @@ const googleAuthDonor = asyncHandler(async (req, res) => {
 
   if (existingDonor) {
     // Existing Google user - just login
+    console.log("Existing Google user found, logging in:", email);
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(existingDonor._id);
     const loggedInUser = await Donor.findById(existingDonor._id).select("-password -refreshToken");
 
@@ -550,6 +572,7 @@ const googleAuthDonor = asyncHandler(async (req, res) => {
 
   if (existingDonor) {
     // Link Google account to existing user
+    console.log("Existing email found, linking Google account:", email);
     existingDonor.googleId = googleId;
     existingDonor.ssoProvider = "google";
     if (!existingDonor.avatar && picture) {
@@ -629,6 +652,7 @@ const googleAuthDonor = asyncHandler(async (req, res) => {
   // New user - Google Sign Up
   // Return the Google profile info so the frontend can pre-fill the registration form
   // We do NOT create any account here until PAN is verified and submitted
+  console.log("New Google user detected (no tokens sent):", email);
   return res
     .status(200)
     .json(
