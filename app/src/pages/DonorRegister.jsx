@@ -98,18 +98,21 @@ const DonorRegister = () => {
   }, [googleName, googleEmail]);
 
   // If in Google PAN mode (donor), skip to step 2
+  // If in Google mode, skip to step 2
+  const isGoogleVolunteerMode = searchParams.get("googleVolunteer") === "true";
   useEffect(() => {
-    if (isGooglePanMode && role === "donor") {
+    if ((isGooglePanMode && role === "donor") || (isGoogleVolunteerMode && role === "volunteer")) {
       setCurrentStep(2);
     }
-  }, [isGooglePanMode, role]);
+  }, [isGooglePanMode, isGoogleVolunteerMode, role]);
 
   const totalSteps = role === "donor" ? 2 : 4;
 
   // Sync role state with URL parameters
   useEffect(() => {
     const roleParam = searchParams.get("role");
-    const newRole = roleParam === "volunteer" ? "volunteer" : "donor";
+    const isVolunteerPath = window.location.pathname.includes("volunteer");
+    const newRole = (roleParam === "volunteer" || isVolunteerPath) ? "volunteer" : "donor";
 
     if (newRole !== role) {
       setRole(newRole);
@@ -382,6 +385,15 @@ const DonorRegister = () => {
         const result = await googleAuthDonor(credential);
         if (result.data?.needsPanVerification || result.needsPanVerification) {
           // Account created, now collect PAN
+          const profile = result.data.googleProfile || {};
+          const tempPassword = "Google_" + Math.random().toString(36).slice(2, 14);
+          setForm((prev) => ({
+            ...prev,
+            username: profile.name || prev.username,
+            email: profile.email || prev.email,
+            password: tempPassword,
+            confirmPassword: tempPassword,
+          }));
           setCurrentStep(2);
           // Update URL to reflect PAN mode
           safeNavigate(navigate, "/donor-register?googlePan=true");
@@ -392,16 +404,22 @@ const DonorRegister = () => {
       } else {
         const result = await googleAuthVolunteer(credential);
         if (result.data?.isNewUser) {
-          // Pre-fill form with Google data
+          // Pre-fill form with Google data and skip to step 2
           const profile = result.data.googleProfile;
+          const tempPassword = "Google_" + Math.random().toString(36).slice(2, 14);
           setForm((prev) => ({
             ...prev,
             username: profile.name || prev.username,
             email: profile.email || prev.email,
+            password: tempPassword,
+            confirmPassword: tempPassword,
           }));
           if (profile.picture) {
             setAvatarPreview(profile.picture);
           }
+          // Skip credentials step
+          setCurrentStep(2);
+          safeNavigate(navigate, "/donor-register?role=volunteer&googleVolunteer=true");
         } else {
           setSuccess(true);
           setTimeout(() => safeNavigate(navigate, "/volunteer-dashboard"), 2000);
