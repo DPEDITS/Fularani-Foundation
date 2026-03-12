@@ -79,6 +79,7 @@ const DonorRegister = () => {
   const [panHolderName, setPanHolderName] = useState("");
   const [panError, setPanError] = useState("");
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleCredential, setGoogleCredential] = useState(null);
 
   // Check for Google PAN completion mode
   const isGooglePanMode = searchParams.get("googlePan") === "true";
@@ -317,7 +318,17 @@ const DonorRegister = () => {
           setLoading(false);
           return;
         }
-        await registerDonor(formData);
+
+        if (googleCredential && role === "donor") {
+          // Special case: completing registration for a NEW Google user
+          await googleAuthDonor(googleCredential, {
+            panNumber: form.panNumber,
+            panVerified: true,
+            panHolderName: panHolderName || form.username,
+          });
+        } else {
+          await registerDonor(formData);
+        }
       } else {
         // Volunteer also requires PAN verification
         if (!panVerified) {
@@ -395,29 +406,11 @@ const DonorRegister = () => {
         const result = await googleAuthDonor(credential);
         console.log("Donor Google Auth Result:", result);
         
-        if (result.data?.needsPanVerification || result.needsPanVerification) {
+        if (result.data?.isNewUser) {
+          // New donor - do NOT log in yet, just pre-fill and move to PAN step
           const profile = result.data.googleProfile || {};
           const tempPassword = "Google_" + Math.random().toString(36).slice(2, 14);
-          setForm((prev) => ({
-            ...prev,
-            username: profile.name || prev.username,
-            email: profile.email || prev.email,
-            password: tempPassword,
-            confirmPassword: tempPassword,
-          }));
-          setCurrentStep(2);
-          safeNavigate(navigate, "/donor-register?googlePan=true");
-        } else {
-          setSuccess(true);
-          setTimeout(() => safeNavigate(navigate, "/donor-dashboard"), 2000);
-        }
-      } else {
-        const result = await googleAuthVolunteer(credential);
-        console.log("Volunteer Google Auth Result:", result);
-        
-        if (result.data?.isNewUser) {
-          const profile = result.data.googleProfile;
-          const tempPassword = "Google_" + Math.random().toString(36).slice(2, 14);
+          setGoogleCredential(credential);
           setForm((prev) => ({
             ...prev,
             username: profile.name || prev.username,
@@ -429,7 +422,36 @@ const DonorRegister = () => {
             setAvatarPreview(profile.picture);
           }
           setCurrentStep(2);
-          safeNavigate(navigate, "/donor-register?role=volunteer&googleVolunteer=true");
+          setError(""); // Clear any previous errors
+        } else if (result.data?.needsPanVerification || result.needsPanVerification) {
+          // Existing user with missing PAN (unlikely but possible)
+          setCurrentStep(2);
+          safeNavigate(navigate, "/donor-register?googlePan=true");
+        } else {
+          // Existing user, fully verified
+          setSuccess(true);
+          setTimeout(() => safeNavigate(navigate, "/donor-dashboard"), 2000);
+        }
+      } else {
+        const result = await googleAuthVolunteer(credential);
+        console.log("Volunteer Google Auth Result:", result);
+        
+        if (result.data?.isNewUser) {
+          // New volunteer - do NOT log in yet, just pre-fill and move to step 2
+          const profile = result.data.googleProfile;
+          const tempPassword = "Google_" + Math.random().toString(36).slice(2, 14);
+          setGoogleCredential(credential);
+          setForm((prev) => ({
+            ...prev,
+            username: profile.name || prev.username,
+            email: profile.email || prev.email,
+            password: tempPassword,
+            confirmPassword: tempPassword,
+          }));
+          if (profile.picture) {
+            setAvatarPreview(profile.picture);
+          }
+          setCurrentStep(2);
         } else {
           setSuccess(true);
           setTimeout(() => safeNavigate(navigate, "/volunteer-dashboard"), 2000);

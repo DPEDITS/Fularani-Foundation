@@ -165,7 +165,7 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
                             name="panNumber"
                             value={formData.panNumber}
                             isEditing={isEditing}
-                            isReadOnly={true}
+                            isReadOnly={user?.panNumber && user?.panNumber !== "PENDING" && user?.panVerified}
                             placeholder="ABCDE1234F"
                             onChange={(val) => setFormData({ ...formData, panNumber: val })}
                         />
