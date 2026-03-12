@@ -131,6 +131,25 @@ export const verifyPAN = async (panNumber, name = "", dob = "") => {
     }
 };
 
+// Google OAuth Authentication for Volunteers
+export const googleAuthVolunteer = async (credential) => {
+    try {
+        const response = await api.post('/api/volunteers/google-auth', { credential });
+        const data = response.data.data;
+
+        // If existing user, save auth tokens
+        if (data.accessToken && data.refreshToken) {
+            setAuthTokens(data.accessToken, data.refreshToken);
+            setVolunteerUser(data.user);
+            window.dispatchEvent(new Event("storage"));
+        }
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // Volunteer data API calls
 export const getVolunteerProfile = async () => {
     try {

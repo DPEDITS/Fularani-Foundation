@@ -9,6 +9,7 @@ import sendEmail from "../utils/sendEmail.js";
 import crypto from "crypto";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import { OAuth2Client } from "google-auth-library";
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -411,6 +412,101 @@ const resetPasswordVolunteer = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, {}, "Password reset successfully. You can now login."));
 });
 
+// Google OAuth Authentication for Volunteers
+const googleAuthVolunteer = asyncHandler(async (req, res) => {
+  const { credential } = req.body;
+
+  if (!credential) {
+    throw new ApiError(400, "Google credential is required");
+  }
+
+  // Verify Google token
+  const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+  let payload;
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    payload = ticket.getPayload();
+  } catch (error) {
+    throw new ApiError(401, "Invalid Google credential");
+  }
+
+  const { sub: googleId, email, name, picture, email_verified } = payload;
+
+  if (!email) {
+    throw new ApiError(400, "Google account does not have an email");
+  }
+
+  // Check if user already exists with this SSO ID
+  let existingVolunteer = await Volunteer.findOne({ ssoId: googleId });
+
+  if (existingVolunteer) {
+    // Existing Google user - just login
+    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(existingVolunteer._id);
+    const loggedInUser = await Volunteer.findById(existingVolunteer._id).select("-password -refreshToken");
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, { httpOnly: true, secure: true })
+      .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
+      .json(
+        new ApiResponse(200, {
+          user: loggedInUser,
+          accessToken,
+          refreshToken,
+        }, "Logged in with Google successfully")
+      );
+  }
+
+  // Check if a user exists with this email
+  existingVolunteer = await Volunteer.findOne({ email: email.toLowerCase() });
+
+  if (existingVolunteer) {
+    // Link Google account to existing user
+    existingVolunteer.ssoId = googleId;
+    existingVolunteer.ssoProvider = "google";
+    existingVolunteer.emailVerified = email_verified || false;
+    if (!existingVolunteer.avatar && picture) {
+      existingVolunteer.avatar = picture;
+    }
+    await existingVolunteer.save({ validateBeforeSave: false });
+
+    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(existingVolunteer._id);
+    const loggedInUser = await Volunteer.findById(existingVolunteer._id).select("-password -refreshToken");
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, { httpOnly: true, secure: true })
+      .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
+      .json(
+        new ApiResponse(200, {
+          user: loggedInUser,
+          accessToken,
+          refreshToken,
+        }, "Google account linked and logged in successfully")
+      );
+  }
+
+  // New user — volunteer registration requires many fields
+  // Return the Google profile info so the frontend can pre-fill the registration form
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, {
+        isNewUser: true,
+        googleProfile: {
+          googleId,
+          name,
+          email,
+          picture,
+          emailVerified: email_verified,
+        },
+      }, "New user — please complete volunteer registration")
+    );
+});
+
 export {
   registerVolunteer,
   loginVolunteer,
@@ -418,5 +514,6 @@ export {
   getVolunteerStats,
   refreshAccessToken,
   forgotPasswordVolunteer,
-  resetPasswordVolunteer
+  resetPasswordVolunteer,
+  googleAuthVolunteer
 };

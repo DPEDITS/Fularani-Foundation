@@ -21,13 +21,16 @@ import {
   loginDonor,
   isAuthenticated,
   forgotPasswordDonor,
+  googleAuthDonor,
 } from "../services/donorService";
 import {
   loginVolunteer,
   isVolunteerAuthenticated,
   forgotPasswordVolunteer,
+  googleAuthVolunteer,
 } from "../services/volunteerService";
 import { loginAdmin } from "../services/adminService";
+import GoogleSignInButton from "../components/GoogleSignInButton";
 
 const DonorLogin = () => {
   const navigate = useNavigate();
@@ -45,6 +48,7 @@ const DonorLogin = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotForm, setForgotForm] = useState({
@@ -128,6 +132,50 @@ const DonorLogin = () => {
     } finally {
       setForgotLoading(false);
     }
+  };
+
+  // Google Sign-In handler
+  const handleGoogleSuccess = async (credential) => {
+    setGoogleLoading(true);
+    setError("");
+    try {
+      if (role === "donor") {
+        const result = await googleAuthDonor(credential);
+        if (result.data?.needsPanVerification || result.needsPanVerification) {
+          // Need PAN verification — redirect to register page with flag
+          safeNavigate(navigate, "/donor-register?googlePan=true");
+        } else {
+          safeNavigate(navigate, "/donor-dashboard");
+        }
+      } else {
+        const result = await googleAuthVolunteer(credential);
+        if (result.data?.isNewUser) {
+          // New volunteer — redirect to register with Google profile pre-filled
+          const profile = result.data.googleProfile;
+          const params = new URLSearchParams({
+            role: "volunteer",
+            googleName: profile.name || "",
+            googleEmail: profile.email || "",
+            googlePicture: profile.picture || "",
+            googleId: profile.googleId || "",
+          });
+          safeNavigate(navigate, `/donor-register?${params.toString()}`);
+        } else {
+          safeNavigate(navigate, "/volunteer-dashboard");
+        }
+      }
+    } catch (err) {
+      console.error("Google auth error:", err);
+      setError(
+        err.response?.data?.message || "Google sign-in failed. Please try again."
+      );
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleError = (errorMsg) => {
+    setError(errorMsg || "Google sign-in failed");
   };
 
   const isEmailValid = form.email.includes("@") && form.email.includes(".");
@@ -216,6 +264,30 @@ const DonorLogin = () => {
                 {error}
               </div>
             )}
+
+            {/* Google Sign-In Button */}
+            <div className="mb-2">
+              {googleLoading ? (
+                <div className="w-full h-12 flex items-center justify-center bg-muted/20 rounded-2xl">
+                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                  <span className="ml-2 text-xs font-bold text-secondary/60 uppercase tracking-wider">Signing in with Google...</span>
+                </div>
+              ) : (
+                <GoogleSignInButton
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  disabled={loading}
+                  text={"signin_with"}
+                />
+              )}
+            </div>
+
+            {/* Divider */}
+            <div className="flex items-center gap-4 my-2">
+              <div className="flex-1 h-[1px] bg-secondary/10"></div>
+              <span className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em]">or</span>
+              <div className="flex-1 h-[1px] bg-secondary/10"></div>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
