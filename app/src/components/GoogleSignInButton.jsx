@@ -3,14 +3,22 @@ import { useEffect, useRef, useCallback } from "react";
 const GoogleSignInButton = ({ onSuccess, onError, disabled = false, text = "continue_with" }) => {
   const buttonRef = useRef(null);
   const isInitialized = useRef(false);
+  
+  const onSuccessRef = useRef(onSuccess);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+    onErrorRef.current = onError;
+  }, [onSuccess, onError]);
 
   const handleCredentialResponse = useCallback((response) => {
     if (response.credential) {
-      onSuccess(response.credential);
+      onSuccessRef.current(response.credential);
     } else {
-      onError?.("Google sign-in failed — no credential received");
+      onErrorRef.current?.("Google sign-in failed — no credential received");
     }
-  }, [onSuccess, onError]);
+  }, []);
 
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
