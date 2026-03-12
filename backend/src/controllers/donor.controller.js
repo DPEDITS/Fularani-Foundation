@@ -324,7 +324,13 @@ const updateDonorProfile = asyncHandler(async (req, res) => {
   if (phone) updateFields.phone = phone;
   if (address) updateFields.address = address;
   if (wants80GReceipt !== undefined) updateFields.wants80GReceipt = wants80GReceipt;
-  // Note: panNumber is removed from here to make it immutable after registration.
+  
+  // Allow updating panNumber ONLY if it's currently PENDING or missing
+  if (panNumber && (!req.user.panNumber || req.user.panNumber === "PENDING")) {
+    updateFields.panNumber = panNumber;
+    // If it's being updated here, we assume it went through frontend validation/verification
+    updateFields.panVerified = true; 
+  }
 
   const donor = await Donor.findByIdAndUpdate(
     req.user._id,
@@ -620,32 +626,21 @@ const googleAuthDonor = asyncHandler(async (req, res) => {
       );
   }
 
-  // No PAN yet - create partial account, frontend will collect PAN
-  const newDonor = await Donor.create({
-    username,
-    email: email.toLowerCase(),
-    avatar: picture || "",
-    googleId,
-    ssoProvider: "google",
-    panNumber: "PENDING",
-    panVerified: false,
-  });
-
-  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(newDonor._id);
-  const createdDonor = await Donor.findById(newDonor._id).select("-password -refreshToken");
-
+  // New user - Google Sign Up
+  // Return the Google profile info so the frontend can pre-fill the registration form
+  // We do NOT create any account here until PAN is verified and submitted
   return res
-    .status(201)
-    .cookie("accessToken", accessToken, { httpOnly: true, secure: true })
-    .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
+    .status(200)
     .json(
-      new ApiResponse(201, {
-        user: createdDonor,
-        accessToken,
-        refreshToken,
-        needsPanVerification: true,
-        googleProfile: { name, email, picture },
-      }, "Google account created — please complete PAN verification")
+      new ApiResponse(200, {
+        isNewUser: true,
+        googleProfile: {
+          googleId,
+          name,
+          email: email.toLowerCase(),
+          picture,
+        },
+      }, "New user — please complete registration including PAN verification")
     );
 });
 
