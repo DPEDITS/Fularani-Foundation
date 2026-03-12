@@ -127,6 +127,43 @@ export const verifyPAN = async (panNumber, name = "", dob = "") => {
     }
 };
 
+// Google OAuth Authentication
+export const googleAuthDonor = async (credential, panData = null) => {
+    try {
+        const payload = { credential };
+        if (panData) {
+            payload.panNumber = panData.panNumber;
+            payload.panVerified = panData.panVerified;
+            payload.panHolderName = panData.panHolderName;
+        }
+        const response = await api.post('/api/donor/google-auth', payload);
+        const { user, accessToken, refreshToken, needsPanVerification } = response.data.data;
+        if (accessToken && refreshToken) {
+            setAuthTokens(accessToken, refreshToken);
+            setDonorUser(user);
+            window.dispatchEvent(new Event("storage"));
+        }
+        return { ...response.data, needsPanVerification };
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Complete PAN verification for Google-signed-up donors
+export const completePanVerification = async (panData) => {
+    try {
+        const response = await api.post('/api/donor/complete-pan', panData, {
+            headers: authHeader()
+        });
+        const updatedUser = response.data.data;
+        setDonorUser(updatedUser);
+        window.dispatchEvent(new Event("storage"));
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // Donor data API calls
 export const getDonorProfile = async () => {
     try {

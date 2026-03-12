@@ -38,7 +38,9 @@ const volunteerSchema = new Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: function () {
+        return !this.ssoId; // Password not required for SSO users
+      },
     },
     refreshToken: {
       type: String,
@@ -117,11 +119,12 @@ const volunteerSchema = new Schema(
 );
 
 volunteerSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+  if (!this.isModified("password") || !this.password) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
 
 volunteerSchema.methods.isPasswordCorrect = async function (password) {
+  if (!this.password) return false; // SSO users have no password
   return await bcrypt.compare(password, this.password);
 };
 

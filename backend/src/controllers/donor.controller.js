@@ -9,6 +9,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import sendEmail from "../utils/sendEmail.js";
 import crypto from "crypto";
+import { OAuth2Client } from "google-auth-library";
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -468,13 +469,7 @@ const getRecentDonors = asyncHandler(async (req, res) => {
   for (const donation of recentDonations) {
     if (uniqueDonors.length >= 4) break;
 
-    // Check if donor exists and hasn't been added yet
-    // Also skip if donor was deleted (donorId would be null) or avatar is missing/empty if that's a requirement
-    // The previous code required avatar, so let's keep that preference but maybe relax it if we want names
     if (donation.donorId && !seenDonorIds.has(donation.donorId._id.toString())) {
-      // Optional: Filter out if no avatar, or keep?
-      // The prompt wants specific usernames. Let's assume valid donors.
-      // If we strictly follow "avatar: { $exists: true, $ne: "" }" from before:
       if (donation.donorId.avatar) {
         seenDonorIds.add(donation.donorId._id.toString());
         uniqueDonors.push({
@@ -493,6 +488,221 @@ const getRecentDonors = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { donors: uniqueDonors, totalDonors }, "Recent donors fetched successfully"));
 });
 
+// Google OAuth Authentication for Donors
+const googleAuthDonor = asyncHandler(async (req, res) => {
+  const { credential, panNumber, panVerified, panHolderName } = req.body;
+
+  if (!credential) {
+    throw new ApiError(400, "Google credential is required");
+  }
+
+  // Verify Google token
+  const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+  let payload;
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    payload = ticket.getPayload();
+  } catch (error) {
+    throw new ApiError(401, "Invalid Google credential");
+  }
+
+  const { sub: googleId, email, name, picture, email_verified } = payload;
+
+  if (!email) {
+    throw new ApiError(400, "Google account does not have an email");
+  }
+
+  // Check if user already exists with this Google ID
+  let existingDonor = await Donor.findOne({ googleId });
+
+  if (existingDonor) {
+    // Existing Google user - just login
+    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(existingDonor._id);
+    const loggedInUser = await Donor.findById(existingDonor._id).select("-password -refreshToken");
+
+    const needsPan = !existingDonor.panNumber || !existingDonor.panVerified;
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, { httpOnly: true, secure: true })
+      .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
+      .json(
+        new ApiResponse(200, {
+          user: loggedInUser,
+          accessToken,
+          refreshToken,
+          needsPanVerification: needsPan,
+        }, "Logged in with Google successfully")
+      );
+  }
+
+  // Check if a user exists with this email (regular signup)
+  existingDonor = await Donor.findOne({ email: email.toLowerCase() });
+
+  if (existingDonor) {
+    // Link Google account to existing user
+    existingDonor.googleId = googleId;
+    existingDonor.ssoProvider = "google";
+    if (!existingDonor.avatar && picture) {
+      existingDonor.avatar = picture;
+    }
+    await existingDonor.save({ validateBeforeSave: false });
+
+    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(existingDonor._id);
+    const loggedInUser = await Donor.findById(existingDonor._id).select("-password -refreshToken");
+
+    const needsPan = !existingDonor.panNumber || !existingDonor.panVerified;
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, { httpOnly: true, secure: true })
+      .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
+      .json(
+        new ApiResponse(200, {
+          user: loggedInUser,
+          accessToken,
+          refreshToken,
+          needsPanVerification: needsPan,
+        }, "Google account linked and logged in successfully")
+      );
+  }
+
+  // New user - Google Sign Up
+  // Generate a unique username from Google name
+  let baseUsername = (name || email.split("@")[0]).toLowerCase().replace(/[^a-z0-9]/g, "");
+  let username = baseUsername;
+  let counter = 1;
+  while (await Donor.findOne({ username })) {
+    username = `${baseUsername}${counter}`;
+    counter++;
+  }
+
+  // If PAN details are provided (completing registration), create full account
+  if (panNumber && panVerified === true) {
+    // Check if PAN already registered
+    const existingPan = await Donor.findOne({ panNumber: new RegExp(`^${panNumber}$`, 'i') });
+    if (existingPan) {
+      throw new ApiError(409, "PAN Number is already registered with another account");
+    }
+    const existedVolunteer = await Volunteer.findOne({ panNumber: new RegExp(`^${panNumber}$`, 'i') });
+    if (existedVolunteer) {
+      throw new ApiError(409, "PAN Number is already registered to a volunteer account");
+    }
+
+    const newDonor = await Donor.create({
+      username,
+      email: email.toLowerCase(),
+      avatar: picture || "",
+      googleId,
+      ssoProvider: "google",
+      panNumber,
+      panVerified: true,
+      panHolderName: panHolderName || name || "",
+    });
+
+    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(newDonor._id);
+    const createdDonor = await Donor.findById(newDonor._id).select("-password -refreshToken");
+
+    return res
+      .status(201)
+      .cookie("accessToken", accessToken, { httpOnly: true, secure: true })
+      .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
+      .json(
+        new ApiResponse(201, {
+          user: createdDonor,
+          accessToken,
+          refreshToken,
+          needsPanVerification: false,
+        }, "Donor registered with Google successfully")
+      );
+  }
+
+  // No PAN yet - create partial account, frontend will collect PAN
+  const newDonor = await Donor.create({
+    username,
+    email: email.toLowerCase(),
+    avatar: picture || "",
+    googleId,
+    ssoProvider: "google",
+    panNumber: "PENDING",
+    panVerified: false,
+  });
+
+  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(newDonor._id);
+  const createdDonor = await Donor.findById(newDonor._id).select("-password -refreshToken");
+
+  return res
+    .status(201)
+    .cookie("accessToken", accessToken, { httpOnly: true, secure: true })
+    .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
+    .json(
+      new ApiResponse(201, {
+        user: createdDonor,
+        accessToken,
+        refreshToken,
+        needsPanVerification: true,
+        googleProfile: { name, email, picture },
+      }, "Google account created — please complete PAN verification")
+    );
+});
+
+// Complete PAN verification for Google-signed-up donors
+const completePanVerification = asyncHandler(async (req, res) => {
+  const { panNumber, panVerified, panHolderName, username } = req.body;
+  const userId = req.user._id;
+
+  if (!panNumber?.trim()) {
+    throw new ApiError(400, "PAN Number is required");
+  }
+
+  // Check if PAN already registered
+  const existingPanDonor = await Donor.findOne({
+    panNumber: new RegExp(`^${panNumber}$`, 'i'),
+    _id: { $ne: userId },
+  });
+  if (existingPanDonor) {
+    throw new ApiError(409, "PAN Number is already registered with another donor account");
+  }
+
+  const existingPanVolunteer = await Volunteer.findOne({ panNumber: new RegExp(`^${panNumber}$`, 'i') });
+  if (existingPanVolunteer) {
+    throw new ApiError(409, "PAN Number is already registered to a volunteer account");
+  }
+
+  const updateFields = {
+    panNumber,
+    panVerified: panVerified === true || panVerified === "true",
+    panHolderName: panHolderName || "",
+  };
+
+  // Allow updating username if provided (from Google name validation)
+  if (username?.trim()) {
+    const newUsername = username.trim().toLowerCase();
+    const existingUsername = await Donor.findOne({ username: newUsername, _id: { $ne: userId } });
+    if (existingUsername) {
+      throw new ApiError(409, "Username already taken");
+    }
+    updateFields.username = newUsername;
+  }
+
+  const donor = await Donor.findByIdAndUpdate(
+    userId,
+    { $set: updateFields },
+    { new: true, runValidators: true }
+  ).select("-password -refreshToken");
+
+  if (!donor) {
+    throw new ApiError(404, "Donor not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, donor, "PAN verification completed successfully"));
+});
+
 export {
   registerDonor,
   loginDonor,
@@ -506,5 +716,7 @@ export {
   updateDonorAvatar,
   forgotPasswordDonor,
   resetPasswordDonor,
-  getRecentDonors
+  getRecentDonors,
+  googleAuthDonor,
+  completePanVerification
 };

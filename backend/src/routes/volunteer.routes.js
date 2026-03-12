@@ -7,6 +7,7 @@ import {
   refreshAccessToken,
   forgotPasswordVolunteer,
   resetPasswordVolunteer,
+  googleAuthVolunteer,
 } from "../controllers/volunteer.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -30,6 +31,7 @@ const forgotPasswordLimiter = rateLimit({
 });
 
 router.route("/login").post(loginVolunteer);
+router.route("/google-auth").post(googleAuthVolunteer);
 router
   .route("/forgot-password")
   .post(forgotPasswordLimiter, forgotPasswordVolunteer);
@@ -42,3 +44,4 @@ router.route("/stats").get(verifyJWT, getVolunteerStats);
 router.route("/refresh-token").post(refreshAccessToken);
 
 export default router;
+

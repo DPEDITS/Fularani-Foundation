@@ -25,7 +25,17 @@ const donorSchema = new Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required"]
+      required: function () {
+        return !this.googleId; // Password not required for Google auth users
+      },
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true, // Allow null values without conflict
+    },
+    ssoProvider: {
+      type: String, // 'google'
     },
     refreshToken: {
       type: String,
@@ -78,12 +88,13 @@ const donorSchema = new Schema(
 );
 
 donorSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+  if (!this.isModified("password") || !this.password) return;
 
   this.password = await bcrypt.hash(this.password, 10);
 });
 
 donorSchema.methods.isPasswordCorrect = async function (password) {
+  if (!this.password) return false; // Google auth users have no password
   return await bcrypt.compare(password, this.password);
 };
 

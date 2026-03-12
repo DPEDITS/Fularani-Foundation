@@ -13,6 +13,8 @@ import {
   forgotPasswordDonor,
   resetPasswordDonor,
   getRecentDonors,
+  googleAuthDonor,
+  completePanVerification,
 } from "../controllers/donor.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -52,6 +54,7 @@ donorRouter.route("/register").post(
 );
 
 donorRouter.route("/login").post(authLimiter, loginDonor);
+donorRouter.route("/google-auth").post(authLimiter, googleAuthDonor);
 donorRouter.route("/forgot-password").post(forgotPasswordLimiter, forgotPasswordDonor);
 donorRouter.route("/reset-password/:token").put(forgotPasswordLimiter, resetPasswordDonor);
 donorRouter.route("/recent-donors").get(getRecentDonors);
@@ -64,5 +67,7 @@ donorRouter.route("/donations").get(verifyJWT, getDonorDonations);
 donorRouter.route("/stats").get(verifyJWT, getDonorStats);
 donorRouter.route("/update-profile").patch(verifyJWT, updateDonorProfile);
 donorRouter.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateDonorAvatar);
+donorRouter.route("/complete-pan").post(verifyJWT, completePanVerification);
 
 export default donorRouter;
+
