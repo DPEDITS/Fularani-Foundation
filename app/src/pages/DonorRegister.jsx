@@ -380,11 +380,20 @@ const DonorRegister = () => {
   const handleGoogleSuccess = async (credential) => {
     setGoogleLoading(true);
     setError("");
+    
+    // Robust role detection: check both state and URL
+    const urlRole = searchParams.get("role");
+    const isVolunteerPath = window.location.pathname.includes("volunteer");
+    const effectiveRole = urlRole === "volunteer" || isVolunteerPath ? "volunteer" : role;
+    
+    console.log("Google Sign-In starting for role:", effectiveRole);
+
     try {
-      if (role === "donor") {
+      if (effectiveRole === "donor") {
         const result = await googleAuthDonor(credential);
+        console.log("Donor Google Auth Result:", result);
+        
         if (result.data?.needsPanVerification || result.needsPanVerification) {
-          // Account created, now collect PAN
           const profile = result.data.googleProfile || {};
           const tempPassword = "Google_" + Math.random().toString(36).slice(2, 14);
           setForm((prev) => ({
@@ -395,7 +404,6 @@ const DonorRegister = () => {
             confirmPassword: tempPassword,
           }));
           setCurrentStep(2);
-          // Update URL to reflect PAN mode
           safeNavigate(navigate, "/donor-register?googlePan=true");
         } else {
           setSuccess(true);
@@ -403,8 +411,9 @@ const DonorRegister = () => {
         }
       } else {
         const result = await googleAuthVolunteer(credential);
+        console.log("Volunteer Google Auth Result:", result);
+        
         if (result.data?.isNewUser) {
-          // Pre-fill form with Google data and skip to step 2
           const profile = result.data.googleProfile;
           const tempPassword = "Google_" + Math.random().toString(36).slice(2, 14);
           setForm((prev) => ({
@@ -417,7 +426,6 @@ const DonorRegister = () => {
           if (profile.picture) {
             setAvatarPreview(profile.picture);
           }
-          // Skip credentials step
           setCurrentStep(2);
           safeNavigate(navigate, "/donor-register?role=volunteer&googleVolunteer=true");
         } else {
