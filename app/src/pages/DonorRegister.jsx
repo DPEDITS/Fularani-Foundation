@@ -381,12 +381,14 @@ const DonorRegister = () => {
     setGoogleLoading(true);
     setError("");
     
-    // Robust role detection: check both state and URL
+    // Robust role detection: check URL and path strictly
     const urlRole = searchParams.get("role");
     const isVolunteerPath = window.location.pathname.includes("volunteer");
-    const effectiveRole = urlRole === "volunteer" || isVolunteerPath ? "volunteer" : role;
     
-    console.log("Google Sign-In starting for role:", effectiveRole);
+    // Default to donor unless explicitly on a volunteer path/param
+    const effectiveRole = (urlRole === "volunteer" || isVolunteerPath) ? "volunteer" : "donor";
+    
+    console.log("Google Sign-In executing for role:", effectiveRole);
 
     try {
       if (effectiveRole === "donor") {
