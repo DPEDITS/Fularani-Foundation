@@ -1,7 +1,9 @@
 import { ArrowRight, Heart } from "lucide-react";
+import missionHealthcareImg from "../assets/missionHealthcare.png";
+
 import { Link } from "react-router-dom";
 
-const MissionPeriod = () => (
+const MissionHealthcare = () => (
   <section className="apple-card group overflow-hidden">
     <div className="grid md:grid-cols-2 gap-12 p-8 md:p-12 items-center">
       {/* TEXT */}
@@ -14,16 +16,16 @@ const MissionPeriod = () => (
         </span>
 
         <h3 className="text-[32px] font-bold text-[#1d1d1f] leading-tight mb-4">
-          Mission Period Pride
+          Mission Healthcare
         </h3>
 
         <p className="text-[17px] text-[#86868b] leading-relaxed max-w-md font-medium">
-          Breaking taboos and promoting menstrual hygiene through education,
-          resource distribution, and supportive community initiatives.
+          Providing essential healthcare services and support to individuals
+          with physical challenges, restoring independence and dignity.
         </p>
 
         <Link
-          to="/missions/period-pride"
+          to="/missions/healthcare"
           className="inline-flex items-center gap-1.5 mt-8 text-[#0066cc] hover:underline font-medium text-[17px] group"
         >
           Explore program{" "}
@@ -35,13 +37,15 @@ const MissionPeriod = () => (
       </div>
 
       {/* VISUAL */}
-      <div className="h-64 rounded-2xl bg-[#f5f5f7] flex items-center justify-center overflow-hidden">
-        <div className="w-full h-full bg-gradient-to-br from-red-50 to-rose-50 flex items-center justify-center">
-          <Heart size={64} className="text-[#ff3b30]/20" />
-        </div>
+      <div className="h-64 rounded-2xl bg-[#f5f5f7] overflow-hidden">
+        <img
+          src={missionHealthcareImg}
+          alt="Mission Healthcare"
+          className="w-full h-full object-cover"
+        />
       </div>
     </div>
   </section>
 );
 
-export default MissionPeriod;
+export default MissionHealthcare;

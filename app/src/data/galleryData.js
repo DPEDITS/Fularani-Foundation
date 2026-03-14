@@ -13,7 +13,7 @@ export const galleryItems = [
   {
     id: 2,
     title: "Free Health Checkup",
-    category: "Mission Period Pride",
+    category: "Mission Healthcare",
     uploadedBy: "Dr. Anjali Gupta",
     src: missionImg,
     description:
@@ -39,7 +39,7 @@ export const galleryItems = [
   {
     id: 5,
     title: "Skill Development Workshop",
-    category: "Mission Mobility",
+    category: "Mission Healthcare",
     uploadedBy: "Meera Reddy",  
     src: missionImg,
     description:
@@ -56,7 +56,7 @@ export const galleryItems = [
   {
     id: 7,
     title: "Eye Checkup Camp",
-    category: "Mission Period Pride",
+    category: "Mission Healthcare",
     uploadedBy: "Dr. Raj Malhotra",
     src: missionImg,
     description: "Specialized eye care camp for cataract screening.",
@@ -83,7 +83,6 @@ export const categories = [
   "All",
   "Mission Education for all",
   "Mission Green",
-  "Mission Period Pride",
-  "Mission Mobility",
+  "Mission Healthcare",
   "Mission Thalassemia",
 ];

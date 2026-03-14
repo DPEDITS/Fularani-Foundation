@@ -22,8 +22,7 @@ const Footer = () => {
     work: [
       { label: "Mission Education", href: "/missions" },
       { label: "Mission Green", href: "/missions" },
-      { label: "Mission Mobility", href: "/missions" },
-      { label: "Mission Period Pride", href: "/missions" },
+      { label: "Mission Healthcare", href: "/missions" },
       { label: "Health & Nutrition", href: "/missions" },
     ],
     transparency: [

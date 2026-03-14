@@ -83,7 +83,7 @@ const Contact = () => {
                     <Mail size={22} className="text-secondary" />
                   </div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-2">Email Us</p>
-                  <p className="text-xl font-black text-white">contact@fularani.org</p>
+                  <p className="text-xl font-black text-white">connect@fularanifoundation.org</p>
                 </div>
                 <ArrowUpRight className="text-white/30 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" size={24} />
               </div>
@@ -100,7 +100,7 @@ const Contact = () => {
                     <Phone size={22} className="text-primary" />
                   </div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-white/70 mb-2">Call Us</p>
-                  <p className="text-xl font-black text-white">+91 123 456 7890</p>
+                  <p className="text-xl font-black text-white">+91 94396 65220</p>
                 </div>
                 <ArrowUpRight className="text-white/50 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" size={24} />
               </div>

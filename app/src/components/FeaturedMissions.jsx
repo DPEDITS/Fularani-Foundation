@@ -1,4 +1,4 @@
-import { ArrowRight, Droplets, Leaf, Accessibility, GraduationCap, Heart } from "lucide-react";
+import { ArrowRight, Droplets, Leaf, HeartPulse, GraduationCap, Heart } from "lucide-react";
 
 const missions = [
     {
@@ -16,11 +16,11 @@ const missions = [
         color: "bg-green-50"
     },
     {
-        title: "Mission Mobility",
-        description: "Empowering differently-abled individuals with mobility aids and accessible resources.",
-        icon: <Accessibility className="text-blue-500" size={32} />,
+        title: "Mission Healthcare",
+        description: "Providing essential healthcare services, menstrual hygiene support, and mobility aids to restore independence and dignity.",
+        icon: <HeartPulse className="text-red-500" size={32} />,
         link: "/missions",
-        color: "bg-blue-50"
+        color: "bg-red-50"
     },
     {
         title: "Education for All",
@@ -28,13 +28,6 @@ const missions = [
         icon: <GraduationCap className="text-orange-500" size={32} />,
         link: "/missions",
         color: "bg-orange-50"
-    },
-    {
-        title: "Mission Period Pride",
-        description: "Promoting menstrual hygiene and awareness to empower women and girls with dignity.",
-        icon: <Heart className="text-pink-500" size={32} />,
-        link: "/missions",
-        color: "bg-pink-50"
     }
 ];
 

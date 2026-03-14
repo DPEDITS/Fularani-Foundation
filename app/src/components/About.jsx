@@ -54,16 +54,16 @@ const About = () => {
       ],
     },
     {
-      title: "#MissionMobility",
-      subtitle: "Paving the Path to Healing",
-      icon: Car,
+      title: "#MissionHealthcare",
+      subtitle: "Healthcare, Dignity & Empowerment",
+      icon: Heart,
       color: "blue",
       description:
-        "Our commitment to ensuring inclusivity in healthcare access. We offer free, eco-friendly transportation to patients and their families, alleviating the financial strain of reaching district hospitals.",
+        "Providing essential healthcare services, eco-friendly transportation to hospitals, and menstrual hygiene awareness — restoring independence, dignity, and empowerment.",
       highlights: [
-        "Free eco-friendly transportation",
-        "Zero-emission electric vehicles",
-        "Removing financial barriers to healthcare",
+        "Free eco-friendly transportation to hospitals",
+        "Mobility aids and physiotherapy support",
+        "Menstrual health education and pad distribution",
       ],
     },
     {
@@ -77,19 +77,6 @@ const About = () => {
         "Redefining traditions with tree planting",
         "Community tree planting ceremonies",
         "Fostering environmental preservation",
-      ],
-    },
-    {
-      title: "#MissionPeriodPride",
-      subtitle: "Support Women's Health and Equality",
-      icon: Sparkles,
-      color: "purple",
-      description:
-        "Empowering change through menstrual health awareness, advocating for paid periods, and ensuring accessible healthcare for women's specific health needs.",
-      highlights: [
-        "Advocating for paid menstrual leave",
-        "Menstrual health education programs",
-        "Promoting gender equality",
       ],
     },
   ];
@@ -179,9 +166,9 @@ const About = () => {
               color: "rose",
             },
             {
-              icon: Car,
-              value: "#MissionMobility",
-              label: "Healthcare Access",
+              icon: Heart,
+              value: "#MissionHealthcare",
+              label: "Healthcare & Dignity",
               color: "blue",
             },
             {
@@ -189,12 +176,6 @@ const About = () => {
               value: "#MissionGreen",
               label: "Environmental Care",
               color: "green",
-            },
-            {
-              icon: Sparkles,
-              value: "#MissionPeriodPride",
-              label: "Women's Health",
-              color: "purple",
             },
           ].map((stat, index) => (
             <motion.div
@@ -268,21 +249,17 @@ const About = () => {
                 <p>
                   Our foundation is rooted in compassion and unwavering
                   commitment, propelling us forward on a journey encapsulating
-                  four impactful verticals:{" "}
+                  three impactful verticals:{" "}
                   <strong className="text-green-600">#MissionGreen</strong>,{" "}
-                  <strong className="text-blue-600">#MissionMobility</strong>,{" "}
-                  <strong className="text-rose-600">#EducationForAll</strong>,
+                  <strong className="text-blue-600">#MissionHealthcare</strong>,{" "}
                   and{" "}
-                  <strong className="text-purple-600">
-                    #MissionPeriodPride
-                  </strong>
+                  <strong className="text-rose-600">#EducationForAll</strong>
                   .
                 </p>
                 <p>
                   Every contribution, regardless of size, powers our efforts to
-                  create accessible transportation, inclusive education,
-                  environmental conservation, and menstrual health awareness and
-                  empowerment.
+                  create inclusive healthcare, quality education,
+                  environmental conservation, and community empowerment.
                 </p>
               </div>
 

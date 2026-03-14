@@ -1,7 +1,7 @@
 import MissionGreen from "../components/MissionGreen";
-import MissionMobility from "../components/MissionMobility";
+
 import MissionEducation from "../components/MissionEducation";
-import MissionPeriod from "../components/MissionPeriod";
+import MissionHealthcare from "../components/MissionHealthcare";
 import MissionThalassemia from "../components/MissionThalassemia";
 import { useEffect, useState } from "react";
 import { motion as Motion } from "motion/react";
@@ -23,7 +23,7 @@ const Missions = () => {
       <div className="absolute top-1/2 left-0 w-64 h-64 bg-accent/5 rounded-full blur-[120px] -translate-x-1/2"></div>
 
       {/* PAGE HEADER */}
-      <section className="pt-40 pb-20 px-6 relative z-10">
+      <section className="pt-25 pb-20 px-6 relative z-10">
         <div className="max-w-[1200px] mx-auto">
           <Motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -47,15 +47,15 @@ const Missions = () => {
             </p>
           </Motion.div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-32">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <StatCard
-              end={1500}
+              end={1200}
               suffix="+"
               label="Meals Served"
               icon={<Heart size={24} />}
             />
             <StatCard
-              end={10000}
+              end={500}
               suffix="+"
               label="Trees Planted"
               icon={<Leaf size={24} />}
@@ -77,7 +77,7 @@ const Missions = () => {
       </section>
 
       {/* MISSIONS GRID */}
-      <section className="py-24 px-6 bg-muted/10 border-y border-secondary/5 relative z-10">
+      <section className="py-12 px-6 bg-muted/10 border-y border-secondary/5 relative z-10">
         <div className="max-w-[1200px] mx-auto space-y-32">
           <Motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -113,7 +113,7 @@ const Missions = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              <MissionPeriod />
+              <MissionHealthcare />
             </Motion.div>
             <Motion.div
               initial={{ opacity: 0, y: 40 }}
@@ -122,14 +122,6 @@ const Missions = () => {
               transition={{ delay: 0.3 }}
             >
               <MissionGreen />
-            </Motion.div>
-            <Motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-            >
-              <MissionMobility />
             </Motion.div>
           </div>
         </div>
@@ -184,7 +176,7 @@ const Missions = () => {
               </span>
             </h2>
             <p className="text-xl md:text-2xl text-white/80 mb-16 max-w-[700px] mx-auto font-bold leading-tight">
-              Join our community of 5,000+ volunteers and donors. Together, we
+              Join our community of 1000+ volunteers and donors. Together, we
               can reach more people and transform more lives.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">

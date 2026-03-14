@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   ArrowRight,
   GraduationCap,
@@ -7,6 +8,7 @@ import {
   HeartPulse,
 } from "lucide-react";
 import missionsBg from "../assets/missions1.jpeg";
+import greenBg from "../assets/GreenImage.jpg";
 
 const BentoGrid = () => {
   const focusAreas = [
@@ -92,29 +94,34 @@ const BentoGrid = () => {
                 Empowering the next generation in India with quality
                 resources, digital tools, and emotional support.
               </p>
-              <a
-                href="/missions"
+              <Link
+                to="/missions"
                 className="inline-flex items-center gap-3 bg-white text-secondary px-8 py-4 rounded-xl font-black uppercase tracking-tight text-sm hover:bg-primary transition-all"
               >
                 Explore Mission <ArrowRight size={18} />
-              </a>
+              </Link>
             </div>
           </div>
 
           {/* Secondary Cards */}
           <div className="relative group overflow-hidden bg-primary p-6 md:p-10 shadow-2xl flex flex-col justify-between">
-            <div className="space-y-4">
+            <div
+              className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105 opacity-30"
+              style={{ backgroundImage: `url(${greenBg})` }}
+            ></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/60 to-primary/40"></div>
+            <div className="space-y-4 relative z-10">
               <Leaf size={40} className="text-white" />
               <h3 className="text-3xl font-black text-white tracking-tighter leading-none lowercase">
                 mission <br /> <span className="text-accent">green.</span>
               </h3>
             </div>
-            <a
-              href="/missions"
-              className="mt-8 flex items-center gap-2 font-black uppercase tracking-tight text-sm text-white group-hover:translate-x-2 transition-transform"
+            <Link
+              to="/missions/green"
+              className="mt-8 flex items-center gap-2 font-black uppercase tracking-tight text-sm text-white group-hover:translate-x-2 transition-transform relative z-10"
             >
               Read Story <ArrowRight size={18} />
-            </a>
+            </Link>
           </div>
 
           <div className="relative group overflow-hidden bg-muted p-6 md:p-10 shadow-2xl flex flex-col justify-between border border-secondary/5">
@@ -125,12 +132,12 @@ const BentoGrid = () => {
                 <span className="text-accent underline">access.</span>
               </h3>
             </div>
-            <a
-              href="/missions"
+            <Link
+              to="/missions/healthcare"
               className="mt-8 flex items-center gap-2 font-black uppercase tracking-tight text-sm text-secondary group-hover:translate-x-2 transition-transform"
             >
               Learn More <ArrowRight size={18} />
-            </a>
+            </Link>
           </div>
         </div>
       </div>

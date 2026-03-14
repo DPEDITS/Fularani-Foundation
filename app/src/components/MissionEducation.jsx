@@ -1,4 +1,5 @@
 import { ArrowRight, School } from "lucide-react";
+import missionEducationImg from "../assets/missionEducation.jpeg";
 import { Link } from "react-router-dom";
 
 const MissionEducation = () => (
@@ -36,10 +37,12 @@ const MissionEducation = () => (
       </div>
 
       {/* VISUAL */}
-      <div className="h-64 rounded-2xl bg-[#f5f5f7] flex items-center justify-center overflow-hidden">
-        <div className="w-full h-full bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
-          <School size={64} className="text-[#0071e3]/20" />
-        </div>
+      <div className="h-64 rounded-2xl bg-[#f5f5f7] overflow-hidden">
+        <img
+          src={missionEducationImg}
+          alt="Education For All"
+          className="w-full h-full object-cover"
+        />
       </div>
     </div>
   </section>

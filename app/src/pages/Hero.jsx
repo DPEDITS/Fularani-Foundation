@@ -9,8 +9,7 @@ const Hero = () => {
     { text: "Urgent: Support Education", color: "#ffc20e" }, // accent
     { text: "Help: Mission Thalassemia", color: "#e11d48" }, // rose-600
     { text: "Action: Mission Green", color: "#059669" }, // emerald-600
-    { text: "Care: Mission Mobility", color: "#0284c7" }, // sky-600
-    { text: "Pride: Mission Period Pride", color: "#db2777" }, // pink-600
+    { text: "Care: Mission Healthcare", color: "#dc2626" }, // red-600
   ];
   const [currentBadge, setCurrentBadge] = useState(0);
   const [recentDonors, setRecentDonors] = useState([]);
@@ -94,7 +93,7 @@ const Hero = () => {
             </div>
 
             {/* Trust Badges */}
-            <div className="mt-6 lg:mt-14 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-muted pt-4 lg:pt-8">
+            <div className="mt-6 lg:mt-8 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-muted pt-4 lg:pt-8">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={24} className="text-primary" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-secondary/60">
