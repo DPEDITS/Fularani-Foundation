@@ -12,9 +12,8 @@ export const Banner = () => {
   const toRotate = [
     "Mission Thalassemia",
     "Mission Green",
-    "Mission Mobility",
+    "Mission Healthcare",
     "Education for All",
-    "Mission Period Pride",
   ];
 
   useEffect(() => {

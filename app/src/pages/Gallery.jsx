@@ -65,8 +65,7 @@ const Gallery = () => {
     "All",
     "Mission Education",
     "Mission Green",
-    "Mission Period",
-    "Mission Mobility",
+    "Mission Healthcare",
     "Mission Thalassemia",
   ];
 
@@ -183,7 +182,7 @@ const Gallery = () => {
     <div className="min-h-screen bg-white text-secondary overflow-x-hidden">
       <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2 z-0 hidden lg:block"></div>
 
-      <section className="relative pt-40 pb-20 px-6 z-10">
+      <section className="relative pt-30 pb-20 px-6 z-10">
         <div className="max-w-[1200px] mx-auto">
           <Motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center md:text-left">
             <div className="inline-block bg-accent px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-6">Visual Chronicles</div>

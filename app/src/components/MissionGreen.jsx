@@ -1,5 +1,6 @@
 import { ArrowRight, Leaf } from "lucide-react";
 import { Link } from "react-router-dom";
+import missionGreenImg from "../assets/missionGreen.jpeg";
 
 const MissionGreen = () => (
   <section className="apple-card group overflow-hidden">
@@ -36,12 +37,14 @@ const MissionGreen = () => (
       </div>
 
       {/* VISUAL */}
-      <div className="h-64 rounded-2xl bg-[#f5f5f7] flex items-center justify-center overflow-hidden">
-        <div className="w-full h-full bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center">
-          <Leaf size={64} className="text-[#34c759]/20" />
-        </div>
-      </div>
-    </div>
+            <div className="h-64 rounded-2xl bg-[#f5f5f7] overflow-hidden">
+              <img
+                src={missionGreenImg}
+                alt="Education For All"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
   </section>
 );
 

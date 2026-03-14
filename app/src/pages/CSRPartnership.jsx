@@ -96,7 +96,7 @@ const CSRPartnership = () => {
       <div className="absolute top-1/2 left-0 w-64 h-64 bg-accent/5 rounded-full blur-[120px] -translate-x-1/2"></div>
 
       {/* Hero Section */}
-      <div className="relative pt-40 pb-20 px-6 z-10">
+      <div className="relative pt-25 pb-20 px-6 z-10">
         <div className="max-w-[1200px] mx-auto">
           <Motion.div
             initial="hidden"

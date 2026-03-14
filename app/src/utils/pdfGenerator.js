@@ -173,7 +173,7 @@ export const generateDonationReceipt = async (donation, user) => {
         addRow("Bearing ID No and Type", `${user?.panNumber || "N/A"}, PAN`);
         addRow("the sum of Rs.", `${typeof donation.amount === 'number' ? donation.amount.toLocaleString("en-IN") : donation.amount}/-`);
         addRow("in words", numberToWords(donation.amount).toUpperCase());
-        addRow("towards", "Mission Mobility & Mission Period Pride");
+        addRow("towards", "Mission Healthcare");
         addRow("by mode of", `${donation.paymentGateway || "Online Transaction"} #${donation.paymentId || "N/A"}`);
         addRow("Remarks", donation.remarks || "N/A");
         addRow("eligible for deduction under section", "Section 80G of the Income Tax Act, 1961.");

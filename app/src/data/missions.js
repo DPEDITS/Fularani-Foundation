@@ -55,46 +55,25 @@ export const missions = [
     },
   },
   {
-    id: "mobility",
-    title: "Mission Mobility",
-    subtitle: "Empowering Movement",
-    icon: Accessibility,
+    id: "healthcare",
+    title: "Mission Healthcare",
+    subtitle: "Dignity & Health",
+    icon: Heart,
     description:
-      "Providing essential mobility aids and support to individuals with physical challenges, restoring independence and dignity.",
+      "Providing essential healthcare services, promoting menstrual hygiene, and supporting individuals with physical challenges — restoring independence and dignity.",
     longDescription:
-      "Mobility is a fundamental human right. Through Mission Mobility, we identify individuals with physical disabilities who lack access to assistive devices. We provide wheelchairs, crutches, and prosthetics, along with physiotherapy support, to help them regain their independence and participate fully in society.",
+      "Healthcare is a fundamental human right. Through Mission Healthcare, we provide wheelchairs, crutches, and prosthetics along with physiotherapy support. We also break menstrual hygiene taboos through education, distribute sanitary pads to women and girls in need, and conduct workshops on menstrual health management — empowering communities to live with dignity.",
     stats: [
       {
-        label: "Mobility Aids Distributed",
+        label: "Healthcare Aids Distributed",
         value: "300+",
         icon: Accessibility,
       },
       { label: "Lives Impacted", value: "500+", icon: Heart },
-    ],
-    galleryCategory: "Mission Mobility",
-    theme: {
-      primary: "text-[#0071e3]",
-      bg: "bg-blue-50",
-      accent: "bg-sky-50",
-      gradient: "from-blue-50 to-sky-50",
-      iconColor: "text-[#0071e3]",
-      color: "#0071e3",
-    },
-  },
-  {
-    id: "period-pride",
-    title: "Mission Period Pride",
-    subtitle: "Dignity & Health",
-    icon: Heart,
-    description:
-      "Breaking taboos and promoting menstrual hygiene through education, resource distribution, and supportive community initiatives.",
-    longDescription:
-      "Menstrual hygiene is a critical issue that is often shrouded in silence. Mission Period Pride aims to break these taboos through open conversations and education. We distribute sanitary pads to women and girls in need and conduct workshops on menstrual health management, empowering them to manage their periods with dignity.",
-    stats: [
       { label: "Pads Distributed", value: "50,000+", icon: Heart },
       { label: "Workshops Held", value: "100+", icon: Globe },
     ],
-    galleryCategory: "Mission Period Pride",
+    galleryCategory: "Mission Healthcare",
     theme: {
       primary: "text-[#ff3b30]",
       bg: "bg-red-50",
@@ -104,6 +83,7 @@ export const missions = [
       color: "#ff3b30",
     },
   },
+
   {
     id: "thalassemia",
     title: "Mission Thalassemia",
