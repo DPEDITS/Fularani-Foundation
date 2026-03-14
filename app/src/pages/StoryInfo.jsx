@@ -132,15 +132,15 @@ const StoryInfo = () => {
             <span className="text-sm font-bold text-secondary mr-2">
               Share:
             </span>
-            <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-blue-600 transition-colors">
+            <a href="https://www.facebook.com/fularaniorg" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-[#1877F2] transition-colors">
               <Facebook size={18} />
-            </button>
-            <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-blue-400 transition-colors">
+            </a>
+            <a href="https://x.com/fularaniorg" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-black transition-colors">
               <Twitter size={18} />
-            </button>
-            <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-blue-700 transition-colors">
+            </a>
+            <a href="https://in.linkedin.com/company/fularanifoundation" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-[#0A66C2] transition-colors">
               <Linkedin size={18} />
-            </button>
+            </a>
             <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 text-secondary transition-colors">
               <Share2 size={18} />
             </button>

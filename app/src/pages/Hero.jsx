@@ -67,7 +67,7 @@ const Hero = () => {
 
             <p className="text-base md:text-xl text-muted-foreground max-w-xl mb-6 lg:mb-12 font-bold leading-tight">
               A systemic approach to Education, Sustainability, and Healthcare
-              in Bhadrak. Join the Fularani movement today.
+              in India. Join the Fularani movement today.
             </p>
 
             <div className="hidden sm:flex sm:flex-row gap-3 sm:gap-4">
@@ -193,7 +193,7 @@ const Hero = () => {
                 {totalDonorsCount > 5000
                   ? totalDonorsCount.toLocaleString()
                   : "5,000"}
-                + donors making a real difference in Bhadrak.
+                + donors making a real difference in India.
               </p>
             </div>
           </div>

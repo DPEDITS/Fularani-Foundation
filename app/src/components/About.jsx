@@ -49,7 +49,7 @@ const About = () => {
         "We champion inclusive education that transcends boundaries. Our programs cater to the underprivileged of all age groups, offering basic literacy for adults and comprehensive schooling for children.",
       highlights: [
         "Inclusive education for all age groups",
-        "Learning centers in Bhadrak District, Odisha",
+        "Learning centers in India District, Odisha",
         "Vision to expand across all districts in Odisha",
       ],
     },

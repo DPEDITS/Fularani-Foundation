@@ -408,15 +408,15 @@ export const stories = [
   {
   id: "mission-mobility",
   category: "Community Support",
-  title: "Mission Mobility: Driving Change in Bhadrak",
+  title: "Mission Mobility: Driving Change in India",
   subtitle: "How Baggu Dada became the face of sustainable transport and community care.",
   coverImage: "/stories/mission-mobility/cover.jpg",
   author: "Fularani Foundation",
   date: "February 10, 2026",
 
   seo: {
-    metaTitle: "Mission Mobility | Sustainable Free Transport Initiative in Bhadrak",
-    metaDescription: "Discover how Mission Mobility empowered Baggu Dada and transformed transportation in Bhadrak through eco-friendly electric rickshaws and free community services.",
+    metaTitle: "Mission Mobility | Sustainable Free Transport Initiative in India",
+    metaDescription: "Discover how Mission Mobility empowered Baggu Dada and transformed transportation in India through eco-friendly electric rickshaws and free community services.",
     keywords: [
       "Mission Mobility",
       "Baggu Dada",
@@ -424,11 +424,11 @@ export const stories = [
       "Electric rickshaw initiative",
       "Free transport NGO",
       "Sustainable mobility project",
-      "Bhadrak community support",
+      "India community support",
       "Eco-friendly transport initiative"
     ],
     canonicalUrl: "https://yourdomain.com/stories/mission-mobility",
-    ogTitle: "Mission Mobility: Driving Change in Bhadrak",
+    ogTitle: "Mission Mobility: Driving Change in India",
     ogDescription: "An inspiring story of compassion and sustainability bringing free electric transport to school children and elderly citizens.",
     ogImage: "/stories/mission-mobility/cover.jpg",
     twitterCard: "summary_large_image"
@@ -437,7 +437,7 @@ export const stories = [
   content: [
     {
       type: "paragraph",
-      text: "In the heart of Bhadrak, a town vibrant yet challenged by limited mobility options, a 57-year-old man named Baggu Dada found himself searching for purpose. Unemployed and uncertain about his future, he longed to contribute meaningfully to his community."
+      text: "In the heart of India, a town vibrant yet challenged by limited mobility options, a 57-year-old man named Baggu Dada found himself searching for purpose. Unemployed and uncertain about his future, he longed to contribute meaningfully to his community."
     },
     {
       type: "paragraph",
@@ -454,7 +454,7 @@ export const stories = [
     },
     {
       type: "paragraph",
-      text: "With excitement and determination, Baggu Dada took on his new role. As he began navigating the streets of Bhadrak, his electric rickshaw became more than a vehicle — it became a symbol of sustainability and social care."
+      text: "With excitement and determination, Baggu Dada took on his new role. As he began navigating the streets of India, his electric rickshaw became more than a vehicle — it became a symbol of sustainability and social care."
     },
     {
       type: "paragraph",
@@ -496,7 +496,7 @@ export const stories = [
     },
     {
       type: "paragraph",
-      text: "Today, as Baggu Dada continues his daily journeys through Bhadrak, he embodies the spirit of Mission Mobility — compassion in action, sustainability in motion, and a steadfast commitment to uplifting the community."
+      text: "Today, as Baggu Dada continues his daily journeys through India, he embodies the spirit of Mission Mobility — compassion in action, sustainability in motion, and a steadfast commitment to uplifting the community."
     }
   ]
   },
@@ -795,12 +795,12 @@ export const stories = [
     },
     {
       type: "paragraph",
-      text: "Collaborating with the administration of Bhadrak Autonomous College, the Foundation proposed using survey findings to advocate for better access to menstrual health resources and address gender disparities."
+      text: "Collaborating with the administration of India Autonomous College, the Foundation proposed using survey findings to advocate for better access to menstrual health resources and address gender disparities."
     },
     {
       type: "image",
       src: "/stories/mission-health-life-4/photo1.jpg",
-      caption: "Student engagement and survey initiative at Bhadrak Autonomous College"
+      caption: "Student engagement and survey initiative at India Autonomous College"
     },
     {
       type: "heading",
