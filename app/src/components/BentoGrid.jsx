@@ -89,7 +89,7 @@ const BentoGrid = () => {
                 <span className="text-primary">learning.</span>
               </h3>
               <p className="text-white/60 text-lg font-bold mb-8 max-w-lg leading-tight">
-                Empowering the next generation in Bhadrak with quality
+                Empowering the next generation in India with quality
                 resources, digital tools, and emotional support.
               </p>
               <a

@@ -13,7 +13,7 @@ const CTASection = () => {
             </span>
           </h2>
           <p className="text-xl font-bold text-muted-foreground leading-tight">
-            Together, we can build a resilient Bhadrak. Choose your way of
+            Together, we can build a resilient India. Choose your way of
             making an impact today.
           </p>
         </div>

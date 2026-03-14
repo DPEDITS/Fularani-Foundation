@@ -94,7 +94,7 @@ const Missions = () => {
             </h2>
             <p className="text-xl text-muted-foreground font-bold max-w-[600px] leading-tight">
               Tailored programs designed to address specific social needs and
-              drive sustainable change in the heart of Bhadrak.
+              drive sustainable change in the heart of India.
             </p>
           </Motion.div>
 

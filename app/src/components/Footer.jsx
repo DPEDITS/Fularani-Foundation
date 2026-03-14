@@ -55,15 +55,15 @@ const Footer = () => {
             </div>
 
             <p className="text-[11px] md:text-xs font-bold text-white/60 leading-relaxed max-w-xs">
-              Building a resilient Bhadrak through education, climate action,
+              Building a resilient India through education, climate action,
               and healthcare.
             </p>
 
             <div className="flex gap-2 pt-1">
-              <SocialIcon icon={<Facebook size={14} />} />
-              <SocialIcon icon={<Twitter size={14} />} />
-              <SocialIcon icon={<Instagram size={14} />} />
-              <SocialIcon icon={<Linkedin size={14} />} />
+              <SocialIcon icon={<Facebook size={14} />} href="https://www.facebook.com/fularaniorg" target="_blank" rel="noopener noreferrer" />
+              <SocialIcon icon={<Twitter size={14} />} href="https://x.com/fularaniorg" target="_blank" rel="noopener noreferrer" />
+              <SocialIcon icon={<Instagram size={14} />} href="https://www.instagram.com/fularanifoundation/" target="_blank" rel="noopener noreferrer" />
+              <SocialIcon icon={<Linkedin size={14} />} href="https://in.linkedin.com/company/fularanifoundation" target="_blank" rel="noopener noreferrer" />
             </div>
           </div>
 
@@ -80,7 +80,7 @@ const Footer = () => {
               <ShieldCheck className="text-primary w-4 h-4 md:w-5 md:h-5" />
             }
             text="Verified NGO"
-            subtext="Bhadrak"
+            subtext="India"
           />
           <Badge
             icon={<Award className="text-primary w-4 h-4 md:w-5 md:h-5" />}
@@ -115,7 +115,7 @@ const Footer = () => {
 
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 italic">
             Made with <Heart size={10} className="text-accent fill-accent" />{" "}
-            for Bhadrak.
+            for India.
           </div>
         </div>
       </div>
@@ -164,9 +164,10 @@ const FooterColumn = ({ title, links }) => {
   );
 };
 
-const SocialIcon = ({ icon, href = "#" }) => (
+const SocialIcon = ({ icon, href = "#", ...props }) => (
   <a
     href={href}
+    {...props}
     className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/60 hover:bg-primary hover:text-secondary transition-all shadow-sm"
   >
     {icon}
