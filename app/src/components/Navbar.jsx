@@ -167,7 +167,7 @@ const Navbar = () => {
                 )}
               </div>
             ))}
-            {currentUser?.email?.toLowerCase() === "admin@gmail.com" && (
+            {currentUser?.email?.toLowerCase() === "debashishparida75@gmail.com" && (
               <Link
                 to="/add-content"
                 className="text-[14px] font-bold text-secondary/70 hover:text-secondary hover:text-primary transition-colors uppercase tracking-tight"

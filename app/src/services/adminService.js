@@ -5,6 +5,17 @@ const REFRESH_TOKEN_KEY = 'admin_refresh_token';
 const USER_KEY = 'admin_user';
 
 export const setAuthTokens = (accessToken, refreshToken) => {
+    // Clear other roles to avoid dashboard confusion
+    localStorage.removeItem('accessToken'); // Donor/General
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('volunteer_access_token');
+    localStorage.removeItem('volunteer_refresh_token');
+    localStorage.removeItem('volunteer_user');
+    localStorage.removeItem('donor_access_token');
+    localStorage.removeItem('donor_refresh_token');
+    localStorage.removeItem('donor_user');
+
     localStorage.setItem(TOKEN_KEY, accessToken);
     localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 };
@@ -39,6 +50,18 @@ const authHeader = () => {
 export const loginAdmin = async (email, password) => {
     try {
         const response = await api.post('/api/admin/login', { email, password });
+        const { admin, accessToken, refreshToken } = response.data.data;
+        setAuthTokens(accessToken, refreshToken);
+        setAdminUser(admin);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const googleAuthAdmin = async (credential) => {
+    try {
+        const response = await api.post('/api/admin/google-auth', { credential });
         const { admin, accessToken, refreshToken } = response.data.data;
         setAuthTokens(accessToken, refreshToken);
         setAdminUser(admin);
