@@ -2,14 +2,15 @@ import { ContactMessage } from "../models/contact.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import sendEmail from "../utils/sendEmail.js";
 
 // Create new contact message
 const createContact = asyncHandler(async (req, res) => {
     const { name, email, phone, subject, message } = req.body;
 
     // Validation
-    if (!name || !email || !phone || !subject || !message) {
-        throw new ApiError(400, "All fields are required");
+    if (!name || !email) {
+        throw new ApiError(400, "Name and Email are required");
     }
 
     // Create contact message
@@ -17,17 +18,35 @@ const createContact = asyncHandler(async (req, res) => {
         name,
         email,
         phone,
-        subject,
-        message
+        subject: subject || "No Subject",
+        message: message || "No Message"
     });
 
     if (!contactMessage) {
         throw new ApiError(500, "Failed to save contact message");
     }
 
-    // TODO: Send email notification here
-    // You can use nodemailer or similar service
-    // await sendEmailNotification(contactMessage);
+    // Send email notification to Admin
+    try {
+        await sendEmail({
+            email: process.env.EMAIL_USERNAME, // Admin email
+            subject: `New Inquiry: ${subject || "Contact Form"} from ${name}`,
+            html: `
+                <div style="font-family: sans-serif; padding: 20px; color: #333;">
+                    <h2 style="color: #0071e3;">New Contact Form Submission</h2>
+                    <p><strong>From:</strong> ${name} (${email})</p>
+                    <p><strong>Phone:</strong> ${phone || "Not provided"}</p>
+                    <p><strong>Subject:</strong> ${subject || "N/A"}</p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+                    <p><strong>Message:</strong></p>
+                    <p style="background: #f5f5f7; padding: 15px; rounded: 10px;">${message || "N/A"}</p>
+                </div>
+            `,
+        });
+    } catch (error) {
+        console.error("Email notification failed:", error);
+        // We don't throw error here to not block the response since message is saved in DB
+    }
 
     return res
         .status(201)

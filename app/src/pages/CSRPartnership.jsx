@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion as Motion, AnimatePresence } from "motion/react";
 import {
   Users,
@@ -16,7 +16,11 @@ import {
   ShieldCheck,
   Globe,
   Award,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
+import { submitContactForm } from "../services/contactService";
 
 const CSRPartnership = () => {
   const fadeIn = {
@@ -36,6 +40,46 @@ const CSRPartnership = () => {
         staggerChildren: 0.1,
       },
     },
+  };
+
+  const [form, setForm] = useState({
+    companyName: "",
+    email: "",
+    phone: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.companyName || !form.email) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    try {
+      await submitContactForm({
+        name: form.companyName,
+        email: form.email,
+        phone: form.phone || "N/A",
+        subject: "CSR Partnership Interest",
+        message: `CSR Interest Form submitted by ${form.companyName}.`,
+      });
+      setSuccess(true);
+      setForm({ companyName: "", email: "", phone: "" });
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to submit request. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const collabWays = [
@@ -292,29 +336,124 @@ const CSRPartnership = () => {
               </div>
             </div>
 
-            <div className="w-full lg:w-[400px]">
-              <div className="bg-white p-10 rounded-[32px] shadow-2xl relative">
-                <h3 className="text-3xl font-black text-secondary mb-2 tracking-tight lowercase">
-                  Interest Form
-                </h3>
-                <p className="text-muted-foreground font-bold mb-8 uppercase text-[10px] tracking-widest">
-                  Let's start a conversation
-                </p>
-                <div className="space-y-4">
-                  <input
-                    type="text"
-                    placeholder="Company Name"
-                    className="w-full h-14 px-6 bg-muted/30 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold placeholder:text-gray-400"
-                  />
-                  <input
-                    type="email"
-                    placeholder="Work Email"
-                    className="w-full h-14 px-6 bg-muted/30 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold placeholder:text-gray-400"
-                  />
-                  <button className="w-full h-16 bg-secondary text-white rounded-2xl font-black uppercase tracking-tight shadow-xl shadow-secondary/10 hover:bg-black transition-all mt-4">
-                    Submit Request
-                  </button>
-                </div>
+            <div className="w-full lg:w-[440px]">
+              <div className="bg-white dark:bg-[#1d1d1f] p-10 rounded-[40px] shadow-[0_32px_64px_rgba(0,0,0,0.1)] border border-black/5 dark:border-white/5 relative overflow-hidden">
+                {/* Accent line */}
+                <div className="absolute top-0 left-0 w-full h-2 bg-accent"></div>
+                
+                <AnimatePresence mode="wait">
+                  {success ? (
+                    <Motion.div
+                      key="success"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="text-center py-10"
+                    >
+                      <div className="w-24 h-24 bg-green-50 dark:bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-8 text-green-500">
+                        <CheckCircle2 size={48} />
+                      </div>
+                      <h3 className="text-3xl font-black text-secondary dark:text-white mb-4 lowercase">Received!</h3>
+                      <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
+                        Our CSR team will review <br /> your request and reach out.
+                      </p>
+                      <button 
+                        onClick={() => setSuccess(false)}
+                        className="mt-10 px-8 py-3 rounded-xl text-xs font-black text-primary uppercase tracking-[0.2em] border border-primary hover:bg-primary hover:text-white transition-all"
+                      >
+                        Send another
+                      </button>
+                    </Motion.div>
+                  ) : (
+                    <Motion.div 
+                      key="form" 
+                      initial={{ opacity: 0, y: 10 }} 
+                      animate={{ opacity: 1, y: 0 }} 
+                      exit={{ opacity: 0, y: -10 }}
+                      className="text-secondary dark:text-white"
+                    >
+                      <div className="mb-8">
+                        <h3 className="text-4xl font-black mb-3 tracking-tighter lowercase">
+                          Interest Form
+                        </h3>
+                        <p className="text-muted-foreground font-bold uppercase text-[11px] tracking-[0.2em] opacity-60">
+                          Let's start a conversation
+                        </p>
+                      </div>
+
+                      {error && (
+                        <Motion.div 
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="mb-6 p-4 bg-red-50 dark:bg-red-500/10 text-red-600 rounded-2xl flex items-center gap-3 border border-red-100 dark:border-red-500/20"
+                        >
+                          <AlertCircle size={18} />
+                          <span className="text-[11px] font-black uppercase tracking-wider">{error}</span>
+                        </Motion.div>
+                      )}
+
+                      <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">Company Name</label>
+                          <input
+                            type="text"
+                            name="companyName"
+                            value={form.companyName}
+                            onChange={handleChange}
+                            placeholder="Your Company Inc."
+                            className="w-full h-16 px-6 bg-muted/30 dark:bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold placeholder:text-gray-400 dark:placeholder:text-gray-600 text-secondary dark:text-white"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">Work Email</label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            placeholder="name@company.com"
+                            className="w-full h-16 px-6 bg-muted/30 dark:bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold placeholder:text-gray-400 dark:placeholder:text-gray-600 text-secondary dark:text-white"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">Phone Number</label>
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={form.phone}
+                            onChange={handleChange}
+                            placeholder="+91 00000 00000"
+                            className="w-full h-16 px-6 bg-muted/30 dark:bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold placeholder:text-gray-400 dark:placeholder:text-gray-600 text-secondary dark:text-white"
+                          />
+                        </div>
+
+                        <button 
+                          type="submit"
+                          disabled={loading}
+                          className="w-full h-18 bg-secondary dark:bg-accent dark:text-secondary text-white rounded-2xl font-black uppercase tracking-[0.1em] text-sm shadow-2xl shadow-secondary/20 dark:shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-3 disabled:opacity-50"
+                        >
+                          {loading ? (
+                            <>
+                              <Loader2 size={20} className="animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              Submit Request
+                              <ArrowRight size={20} />
+                            </>
+                          )}
+                        </button>
+                      </form>
+                      
+                      <p className="mt-8 text-center text-[10px] font-bold text-muted-foreground opacity-40 uppercase tracking-widest leading-relaxed">
+                        By submitting, you agree to our <br /> partnership terms and privacy policy.
+                      </p>
+                    </Motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
