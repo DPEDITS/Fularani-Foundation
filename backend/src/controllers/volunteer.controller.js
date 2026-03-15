@@ -420,25 +420,6 @@ const googleAuthVolunteer = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Google credential is required");
   }
 
-  // Verify Google token
-  const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-  let payload;
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    payload = ticket.getPayload();
-  } catch (error) {
-    throw new ApiError(401, "Invalid Google credential");
-  }
-
-  const { sub: googleId, email, name, picture, email_verified } = payload;
-
-  if (!email) {
-    throw new ApiError(400, "Google account does not have an email");
-  }
-
   // Check if user already exists with this SSO ID
   let existingVolunteer = await Volunteer.findOne({ ssoId: googleId });
 

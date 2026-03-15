@@ -533,7 +533,8 @@ const googleAuthDonor = asyncHandler(async (req, res) => {
     });
     payload = ticket.getPayload();
   } catch (error) {
-    throw new ApiError(401, "Invalid Google credential");
+    console.error("Google verifyIdToken error (Donor):", error);
+    throw new ApiError(401, "Invalid Google credential: " + error.message);
   }
 
   const { sub: googleId, email, name, picture, email_verified } = payload;
