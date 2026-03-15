@@ -17,35 +17,42 @@ const promoteToAdmin = async () => {
         const db = mongoose.connection.db;
 
         const volunteerColl = db.collection('volunteers');
+        const donorColl = db.collection('donors');
         const adminColl = db.collection('admins');
 
-        const volunteer = await volunteerColl.findOne({ email: 'admin@gmail.com' });
+        const targetEmail = 'debashishparida75@gmail.com';
+        let userData = await volunteerColl.findOne({ email: targetEmail });
+        
+        if (!userData) {
+            console.log(`User "${targetEmail}" not found in volunteers, checking donors...`);
+            userData = await donorColl.findOne({ email: targetEmail });
+        }
 
-        if (!volunteer) {
-            console.log('Volunteer "admin@gmail.com" not found.');
+        if (!userData) {
+            console.log(`User "${targetEmail}" not found in any collection.`);
             await mongoose.disconnect();
             return;
         }
 
-        console.log('Found volunteer:', volunteer.email);
+        console.log('Found user records for:', userData.email);
 
-        const existingAdmin = await adminColl.findOne({ email: 'admin@gmail.com' });
+        const existingAdmin = await adminColl.findOne({ email: 'debashishparida75@gmail.com' });
         if (existingAdmin) {
             console.log('Admin record already exists for this email.');
         } else {
             const adminData = {
-                username: volunteer.username || 'admin',
-                email: volunteer.email,
-                password: volunteer.password, // Use the same hashed password
+                username: userData.username || 'admin',
+                email: userData.email,
+                password: userData.password, // Use the same hashed password
                 role: 'SUPER_ADMIN',
-                phone: volunteer.phone || '0000000000',
-                avatar: volunteer.avatar || '',
+                phone: userData.phone || '0000000000',
+                avatar: userData.avatar || '',
                 createdAt: new Date(),
                 updatedAt: new Date()
             };
 
             await adminColl.insertOne(adminData);
-            console.log('Successfully promoted "admin@gmail.com" to Admin collection.');
+            console.log('Successfully promoted "debashishparida75@gmail.com" to Admin collection.');
         }
 
         await mongoose.disconnect();

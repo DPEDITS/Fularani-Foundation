@@ -43,7 +43,7 @@ const Gallery = () => {
   const volunteer = getVolunteerUser();
   const admin = getAdminUser();
   const currentUser = donor || volunteer || admin;
-  const isAuthorizedUser = currentUser?.email === "admin@gmail.com";
+  const isAuthorizedUser = currentUser?.email === "debashishparida75@gmail.com";
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [activeCategory, setActiveCategory] = useState("All");

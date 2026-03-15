@@ -26,7 +26,9 @@ import {
   verifyRazorpayPayment,
   getActiveSubscriptions,
   cancelSubscription,
+  clearAuthData,
 } from "../services/donorService";
+import { isAdminAuthenticated } from "../services/adminService";
 import { generateDonationReceipt } from "../utils/pdfGenerator";
 
 // Extracted Components
@@ -66,6 +68,10 @@ const DonorDashboard = () => {
   const [activeSubscriptions, setActiveSubscriptions] = useState([]);
 
   useEffect(() => {
+    if (isAdminAuthenticated()) {
+      safeNavigate(navigate, "/admin-dashboard");
+      return;
+    }
     if (!isAuthenticated()) {
       safeNavigate(navigate, "/donor-login");
       return;
@@ -90,7 +96,10 @@ const DonorDashboard = () => {
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
       setError("Failed to load dashboard data. Please try again.");
-      if (err.response?.status === 401) safeNavigate(navigate, "/donor-login");
+      if (err.response?.status === 401 || err.response?.status === 404) {
+        clearAuthData();
+        safeNavigate(navigate, "/donor-login");
+      }
     } finally {
       setLoading(false);
     }

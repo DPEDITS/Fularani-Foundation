@@ -28,7 +28,9 @@ import {
   getVolunteerUser,
   getMyProjects,
   submitProofOfWork,
+  clearAuthData,
 } from "../services/volunteerService";
+import { isAdminAuthenticated } from "../services/adminService";
 
 // Extracted Components
 import VolunteerOverviewTab from "../components/dashboard/VolunteerOverviewTab";
@@ -52,6 +54,10 @@ const VolunteerDashboard = () => {
   const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
+    if (isAdminAuthenticated()) {
+      safeNavigate(navigate, "/admin-dashboard");
+      return;
+    }
     if (!isVolunteerAuthenticated()) {
       safeNavigate(navigate, "/volunteer-login");
       return;
@@ -77,7 +83,8 @@ const VolunteerDashboard = () => {
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
       setError("Failed to load dashboard data. Please try again.");
-      if (err.response?.status === 401) {
+      if (err.response?.status === 401 || err.response?.status === 404) {
+        clearAuthData();
         safeNavigate(navigate, "/volunteer-login");
       }
     } finally {
@@ -105,9 +112,11 @@ const VolunteerDashboard = () => {
   const handleLogout = async () => {
     try {
       await logoutVolunteer();
+      clearAuthData(); // Force clear
       safeNavigate(navigate, "/volunteer-login");
     } catch (err) {
       console.error("Logout error:", err);
+      clearAuthData();
       safeNavigate(navigate, "/volunteer-login");
     }
   };

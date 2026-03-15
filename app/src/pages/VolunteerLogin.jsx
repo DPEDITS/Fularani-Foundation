@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { safeNavigate } from "../utils/safeNavigate";
 import {
@@ -11,8 +11,8 @@ import {
   ShieldCheck,
   Loader2,
 } from "lucide-react";
-import { loginVolunteer, googleAuthVolunteer } from "../services/volunteerService";
-import { loginAdmin } from "../services/adminService";
+import { loginVolunteer, googleAuthVolunteer, isVolunteerAuthenticated } from "../services/volunteerService";
+import { loginAdmin, googleAuthAdmin, isAdminAuthenticated } from "../services/adminService";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
 const VolunteerLogin = () => {
@@ -23,6 +23,14 @@ const VolunteerLogin = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    if (isAdminAuthenticated()) {
+      safeNavigate(navigate, "/admin-dashboard");
+    } else if (isVolunteerAuthenticated()) {
+      safeNavigate(navigate, "/volunteer-dashboard");
+    }
+  }, [navigate]);
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -32,24 +40,25 @@ const VolunteerLogin = () => {
     setError("");
 
     try {
-      const isSystemAdmin =
-        form.email.trim().toLowerCase() === "admin@gmail.com";
+      const isAdminEmail = form.email.trim().toLowerCase() === "debashishparida75@gmail.com";
 
-      if (isSystemAdmin) {
+      if (isAdminEmail) {
         const response = await loginAdmin(
           form.email.trim().toLowerCase(),
           form.password,
         );
         if (response.success) {
           safeNavigate(navigate, "/admin-dashboard");
-          return;
+        } else {
+          setError(response.message || "Admin login failed");
         }
-      } else {
-        const response = await loginVolunteer(form.email, form.password);
-        if (response.success) {
-          safeNavigate(navigate, "/volunteer-dashboard");
-          return;
-        }
+        return; // ALWAYS return for admin email
+      }
+
+      const response = await loginVolunteer(form.email, form.password);
+      if (response.success) {
+        safeNavigate(navigate, "/volunteer-dashboard");
+        return;
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -69,6 +78,22 @@ const VolunteerLogin = () => {
     setGoogleLoading(true);
     setError("");
     try {
+      // Decode JWT to check email before calling backend
+      const base64Url = credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      
+      const payload = JSON.parse(jsonPayload);
+      const email = payload.email?.toLowerCase();
+
+      if (email === "debashishparida75@gmail.com") {
+        await googleAuthAdmin(credential);
+        safeNavigate(navigate, "/admin-dashboard");
+        return;
+      }
+
       const result = await googleAuthVolunteer(credential);
       if (result.data?.isNewUser) {
         // New volunteer — redirect to register with Google profile pre-filled
