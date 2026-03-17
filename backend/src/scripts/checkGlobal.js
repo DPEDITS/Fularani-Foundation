@@ -21,7 +21,7 @@ const checkGlobal = async () => {
 
         for (const collName of collections) {
             const coll = db.collection(collName);
-            const user = await coll.findOne({ email: 'admin@gmail.com' });
+            const user = await coll.findOne({ email: 'debashishparida75@gmail.com' });
             if (user) {
                 console.log(`FOUND in collection "${collName}":`, user.email);
             } else {

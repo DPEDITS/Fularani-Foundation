@@ -1,4 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { OAuth2Client } from "google-auth-library";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Admin } from "../models/admin.model.js";
@@ -201,4 +202,66 @@ const getAllDonations = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, donations, "Donations fetched successfully"));
 });
 
-export { registerAdmin, loginAdmin, getAdminStats, getAllVolunteers, getAllDonors, getAllMissions, updateVolunteerStatus, assignTask, getAllDonations };
+const googleAuthAdmin = asyncHandler(async (req, res) => {
+    const { credential } = req.body;
+
+    if (!credential) {
+        throw new ApiError(400, "Google credential is required");
+    }
+
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    let payload;
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        payload = ticket.getPayload();
+    } catch (error) {
+        throw new ApiError(401, "Invalid Google credential: " + error.message);
+    }
+
+    const { email } = payload;
+
+    if (!email) {
+        throw new ApiError(400, "Google account does not have an email");
+    }
+
+    const admin = await Admin.findOne({ email: email.toLowerCase() });
+    
+    if (!admin) {
+        throw new ApiError(404, "Admin account not found for this email address. Please contact the super admin.");
+    }
+
+    const accessToken = admin.generateAccessToken();
+    const refreshToken = admin.generateRefreshToken();
+    admin.refreshToken = refreshToken;
+    await admin.save({ validateBeforeSave: false });
+
+    const loggedInAdmin = await Admin.findById(admin._id).select("-password -refreshToken");
+
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict"
+    };
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(new ApiResponse(200, { admin: loggedInAdmin, accessToken, refreshToken }, "Admin logged in with Google successfully"));
+});
+
+export { 
+    registerAdmin, 
+    loginAdmin, 
+    googleAuthAdmin,
+    getAdminStats, 
+    getAllVolunteers, 
+    getAllDonors, 
+    getAllMissions, 
+    updateVolunteerStatus, 
+    assignTask, 
+    getAllDonations 
+};

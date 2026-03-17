@@ -1,62 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getContentById } from "../services/contentService";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { storyData } from "../data/storyData";
 import { safeNavigate } from "../utils/safeNavigate";
 import {
   ArrowLeft,
+  ArrowRight,
   Calendar,
   User,
   Share2,
   Facebook,
   Twitter,
   Linkedin,
-  ArrowRight,
 } from "lucide-react";
 
 const StoryInfo = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [story, setStory] = useState(null);
-  const [markdownContent, setMarkdownContent] = useState("");
-  const [loading, setLoading] = useState(true);
+
+  const story = storyData.find((s) => s.id === id);
+  const storyIndex = storyData.findIndex((s) => s.id === id);
+  const prevStory = storyIndex > 0 ? storyData[storyIndex - 1] : null;
+  const nextStory =
+    storyIndex < storyData.length - 1 ? storyData[storyIndex + 1] : null;
 
   useEffect(() => {
-    const fetchStory = async () => {
-      try {
-        const response = await getContentById(id);
-        if (response.success) {
-          setStory(response.data);
-          // Fetch markdown content
-          if (response.data.markdownFile) {
-            const mdResponse = await fetch(response.data.markdownFile);
-            const text = await mdResponse.text();
-            setMarkdownContent(text);
-          }
-        } else {
-          console.error(response.message);
-        }
-      } catch (error) {
-        console.error("Failed to fetch story", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchStory();
-      window.scrollTo(0, 0);
-    }
+    window.scrollTo(0, 0);
   }, [id]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-xl font-bold text-secondary">Loading...</div>
-      </div>
-    );
-  }
 
   if (!story) {
     return (
@@ -79,15 +48,19 @@ const StoryInfo = () => {
     );
   }
 
-  const { title, shortDescription, category, coverImage, author, createdAt } =
-    story;
-
-  // Format date
-  const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const {
+    title,
+    subtitle,
+    shortDescription,
+    description,
+    category,
+    coverImage,
+    author,
+    date,
+    tags,
+    images,
+    content,
+  } = story;
 
   return (
     <article className="min-h-screen bg-white pt-24 pb-20">
@@ -110,7 +83,7 @@ const StoryInfo = () => {
             {title}
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground font-medium leading-relaxed max-w-3xl border-l-4 border-primary pl-6">
-            {shortDescription}
+            {shortDescription || subtitle}
           </p>
         </header>
 
@@ -123,7 +96,7 @@ const StoryInfo = () => {
             <div>
               <div className="text-sm font-bold text-secondary">{author}</div>
               <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <Calendar size={14} /> {formattedDate}
+                <Calendar size={14} /> {date}
               </div>
             </div>
           </div>
@@ -132,13 +105,28 @@ const StoryInfo = () => {
             <span className="text-sm font-bold text-secondary mr-2">
               Share:
             </span>
-            <a href="https://www.facebook.com/fularaniorg" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-[#1877F2] transition-colors">
+            <a
+              href="https://www.facebook.com/fularaniorg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-[#1877F2] transition-colors"
+            >
               <Facebook size={18} />
             </a>
-            <a href="https://x.com/fularaniorg" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-black transition-colors">
+            <a
+              href="https://x.com/fularaniorg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-black transition-colors"
+            >
               <Twitter size={18} />
             </a>
-            <a href="https://in.linkedin.com/company/fularanifoundation" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-[#0A66C2] transition-colors">
+            <a
+              href="https://in.linkedin.com/company/fularanifoundation"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-[#0A66C2] transition-colors"
+            >
               <Linkedin size={18} />
             </a>
             <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 text-secondary transition-colors">
@@ -158,72 +146,81 @@ const StoryInfo = () => {
           </div>
         )}
 
+        {/* LONG DESCRIPTION */}
+        {description && (
+          <div className="mx-auto mb-16">
+            {description.split("\n\n").map((para, i) => (
+              <p
+                key={i}
+                className="text-lg md:text-xl text-secondary/80 leading-relaxed mb-6"
+              >
+                {para.split(/(\*\*.*?\*\*)/).map((segment, j) => {
+                  if (segment.startsWith("**") && segment.endsWith("**")) {
+                    return (
+                      <strong key={j} className="font-bold text-secondary">
+                        {segment.slice(2, -2)}
+                      </strong>
+                    );
+                  }
+                  return segment;
+                })}
+              </p>
+            ))}
+          </div>
+        )}
+
         {/* CONTENT BODY */}
         <div className="prose prose-lg md:prose-xl prose-slate mx-auto text-secondary/80 leading-relaxed font-serif">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              h1: ({ node, ...props }) => (
-                <h1
-                  className="text-4xl md:text-5xl font-black text-secondary tracking-tight mt-12 mb-6 font-sans"
-                  {...props}
-                />
-              ),
-              h2: ({ node, ...props }) => (
-                <h2
-                  className="text-3xl md:text-4xl font-black text-secondary tracking-tight mt-12 mb-6 font-sans border-b-2 border-primary/20 pb-2 inline-block"
-                  {...props}
-                />
-              ),
-              h3: ({ node, ...props }) => (
-                <h3
-                  className="text-2xl md:text-3xl font-bold text-secondary mt-8 mb-4 font-sans"
-                  {...props}
-                />
-              ),
-              p: ({ node, ...props }) => <p className="mb-6" {...props} />,
-              blockquote: ({ node, ...props }) => (
-                <blockquote
-                  className="my-10 pl-8 border-l-8 border-primary bg-gray-50 py-8 pr-8 rounded-r-xl italic text-2xl text-secondary font-medium relative"
-                  {...props}
-                >
-                  <span className="absolute top-4 left-4 text-6xl text-primary/20 font-black pointer-events-none">
-                    “
-                  </span>
-                  {props.children}
-                </blockquote>
-              ),
-              img: ({ node, ...props }) => (
-                <figure className="my-10 rounded-2xl overflow-hidden shadow-lg not-prose">
-                  <img className="w-full h-auto object-cover" {...props} />
-                  {props.title && (
-                    <figcaption className="text-center text-sm font-medium text-muted-foreground py-3 px-4 bg-gray-50/80">
-                      {props.title}
-                    </figcaption>
-                  )}
-                </figure>
-              ),
-              ul: ({ node, ...props }) => (
-                <ul className="list-disc pl-6 mb-6" {...props} />
-              ),
-              ol: ({ node, ...props }) => (
-                <ol className="list-decimal pl-6 mb-6" {...props} />
-              ),
-              li: ({ node, ...props }) => <li className="mb-2" {...props} />,
-            }}
-          >
-            {markdownContent}
-          </ReactMarkdown>
+          {content &&
+            content.map((block, index) => {
+              if (block.type === "heading") {
+                return (
+                  <h2
+                    key={index}
+                    className="text-3xl md:text-4xl font-black text-secondary tracking-tight mt-12 mb-6 font-sans border-b-2 border-primary/20 pb-2 inline-block"
+                  >
+                    {block.text}
+                  </h2>
+                );
+              }
+              if (block.type === "paragraph") {
+                return (
+                  <p key={index} className="mb-6">
+                    {block.text}
+                  </p>
+                );
+              }
+              if (block.type === "image") {
+                return (
+                  <figure
+                    key={index}
+                    className="my-10 rounded-2xl overflow-hidden shadow-lg not-prose"
+                  >
+                    <img
+                      src={block.src}
+                      alt={block.caption || ""}
+                      className="w-full h-auto object-cover"
+                    />
+                    {block.caption && (
+                      <figcaption className="text-center text-sm font-medium text-muted-foreground py-3 px-4 bg-gray-50/80">
+                        {block.caption}
+                      </figcaption>
+                    )}
+                  </figure>
+                );
+              }
+              return null;
+            })}
         </div>
 
         {/* GALLERY SECTION */}
-        {story.images && story.images.length > 0 && (
+        {images && images.length > 0 && (
           <div className="mt-16 mb-16">
             <h3 className="text-2xl font-black text-secondary mb-6 border-l-4 border-primary pl-4">
               Gallery
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {story.images.map((img, index) => (
+              {images.map((img, index) => (
                 <div
                   key={index}
                   className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
@@ -239,17 +236,63 @@ const StoryInfo = () => {
           </div>
         )}
 
-        {/* TAGS (Optional placeholder) */}
+        {/* TAGS */}
         <div className="mt-16 pt-8 border-t border-gray-100 flex flex-wrap gap-2">
-          <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-bold text-gray-600 uppercase tracking-wider">
-            Impact
-          </span>
-          <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-bold text-gray-600 uppercase tracking-wider">
-            {category}
-          </span>
-          <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-bold text-gray-600 uppercase tracking-wider">
-            Success Story
-          </span>
+          {tags &&
+            tags.map((tag, index) => (
+              <span
+                key={index}
+                className="bg-gray-100 px-3 py-1 rounded-full text-xs font-bold text-gray-600 uppercase tracking-wider"
+              >
+                {tag}
+              </span>
+            ))}
+        </div>
+
+        {/* PREV / NEXT NAVIGATION */}
+        <div className="mt-16 pt-8 border-t border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {prevStory ? (
+            <Link
+              to={`/stories/${prevStory.id}`}
+              className="group flex items-start gap-4 p-6 rounded-2xl border border-gray-100 hover:border-primary/30 hover:shadow-lg transition-all"
+            >
+              <ArrowLeft
+                size={20}
+                className="mt-1 text-muted-foreground group-hover:text-primary transition-colors shrink-0"
+              />
+              <div>
+                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Previous Story
+                </span>
+                <p className="text-lg font-black text-secondary mt-1 leading-tight group-hover:text-primary transition-colors">
+                  {prevStory.title}
+                </p>
+              </div>
+            </Link>
+          ) : (
+            <div />
+          )}
+          {nextStory ? (
+            <Link
+              to={`/stories/${nextStory.id}`}
+              className="group flex items-start gap-4 p-6 rounded-2xl border border-gray-100 hover:border-primary/30 hover:shadow-lg transition-all text-right md:justify-end"
+            >
+              <div>
+                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Next Story
+                </span>
+                <p className="text-lg font-black text-secondary mt-1 leading-tight group-hover:text-primary transition-colors">
+                  {nextStory.title}
+                </p>
+              </div>
+              <ArrowRight
+                size={20}
+                className="mt-1 text-muted-foreground group-hover:text-primary transition-colors shrink-0"
+              />
+            </Link>
+          ) : (
+            <div />
+          )}
         </div>
       </div>
     </article>

@@ -57,16 +57,12 @@ const registerDonor = asyncHandler(async (req, res) => {
 
   if (existedDonor) {
     if (existedDonor.panNumber && existedDonor.panNumber.toLowerCase() === panNumber.toLowerCase()) {
-      throw new ApiError(409, "PAN Number is already registered with another account");
+      throw new ApiError(409, "PAN Number is already registered with another donor account");
     }
     throw new ApiError(409, "Donor with email or username already exists");
   }
 
-  // Also prevent cross-role PAN sharing
-  const existedVolunteer = await Volunteer.findOne({ panNumber: new RegExp(`^${panNumber}$`, 'i') });
-  if (existedVolunteer) {
-    throw new ApiError(409, "PAN Number is already registered to a volunteer account");
-  }
+
 
   const avatarLocalPath = req.files?.avatar?.[0]?.path;
   let avatar;
@@ -533,7 +529,8 @@ const googleAuthDonor = asyncHandler(async (req, res) => {
     });
     payload = ticket.getPayload();
   } catch (error) {
-    throw new ApiError(401, "Invalid Google credential");
+    console.error("Google verifyIdToken error (Donor):", error);
+    throw new ApiError(401, "Invalid Google credential: " + error.message);
   }
 
   const { sub: googleId, email, name, picture, email_verified } = payload;
@@ -614,12 +611,9 @@ const googleAuthDonor = asyncHandler(async (req, res) => {
     // Check if PAN already registered
     const existingPan = await Donor.findOne({ panNumber: new RegExp(`^${panNumber}$`, 'i') });
     if (existingPan) {
-      throw new ApiError(409, "PAN Number is already registered with another account");
+      throw new ApiError(409, "PAN Number is already registered with another donor account");
     }
-    const existedVolunteer = await Volunteer.findOne({ panNumber: new RegExp(`^${panNumber}$`, 'i') });
-    if (existedVolunteer) {
-      throw new ApiError(409, "PAN Number is already registered to a volunteer account");
-    }
+
 
     const newDonor = await Donor.create({
       username,
@@ -686,10 +680,7 @@ const completePanVerification = asyncHandler(async (req, res) => {
     throw new ApiError(409, "PAN Number is already registered with another donor account");
   }
 
-  const existingPanVolunteer = await Volunteer.findOne({ panNumber: new RegExp(`^${panNumber}$`, 'i') });
-  if (existingPanVolunteer) {
-    throw new ApiError(409, "PAN Number is already registered to a volunteer account");
-  }
+
 
   const updateFields = {
     panNumber,

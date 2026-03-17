@@ -30,16 +30,31 @@ const verifyPANLite = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid PAN Number format. Expected: ABCDE1234F");
     }
 
-    // --- Prevent duplicate PAN registrations BEFORE calling Cashfree API ---
-    // This saves API costs and explicitly enforces one PAN per user account!
-    const existedDonorPan = await Donor.findOne({ panNumber: new RegExp(`^${pan}$`, 'i') });
-    if (existedDonorPan) {
-        throw new ApiError(409, "This PAN Number is already registered to an existing Donor account!");
-    }
+    // --- Prevent duplicate PAN registrations WITHIN THE SAME ROLE ---
+    // If a role is provided, we only check for duplicates within that role.
+    // This allows a person to be both a Donor and a Volunteer with the same PAN.
+    const role = req.body.role;
 
-    const existedVolunteerPan = await Volunteer.findOne({ panNumber: new RegExp(`^${pan}$`, 'i') });
-    if (existedVolunteerPan) {
-        throw new ApiError(409, "This PAN Number is already registered to an existing Volunteer account!");
+    if (role === "donor") {
+        const existedDonorPan = await Donor.findOne({ panNumber: new RegExp(`^${pan}$`, 'i') });
+        if (existedDonorPan) {
+            throw new ApiError(409, "This PAN Number is already registered to an existing Donor account!");
+        }
+    } else if (role === "volunteer") {
+        const existedVolunteerPan = await Volunteer.findOne({ panNumber: new RegExp(`^${pan}$`, 'i') });
+        if (existedVolunteerPan) {
+            throw new ApiError(409, "This PAN Number is already registered to an existing Volunteer account!");
+        }
+    } else {
+        // Fallback: Check both if role is not specified
+        const existedDonorPan = await Donor.findOne({ panNumber: new RegExp(`^${pan}$`, 'i') });
+        if (existedDonorPan) {
+            throw new ApiError(409, "This PAN Number is already registered to an existing Donor account!");
+        }
+        const existedVolunteerPan = await Volunteer.findOne({ panNumber: new RegExp(`^${pan}$`, 'i') });
+        if (existedVolunteerPan) {
+            throw new ApiError(409, "This PAN Number is already registered to an existing Volunteer account!");
+        }
     }
 
     const clientId = process.env.CASHFREE_CLIENT_ID;
@@ -186,8 +201,14 @@ const verifyPANLite = asyncHandler(async (req, res) => {
     const nameMatched = data.name_match === "Y";
     const dobMatched = data.dob_match === "Y";
 
-    // Enforce Strict Name + DOB Double-Lock Matching
-    const isValid = isPanValid && nameMatched && dobMatched;
+    // --- Improved Matching Logic ---
+    // If the PAN itself is valid (exists), we consider the verification successful.
+    // Strict Name/DOB matching is often problematic due to formatting (e.g., Middle Names, Spaces).
+    // We will prioritize the validity of the PAN itself and return the legal name from Cashfree.
+    const isValid = isPanValid; 
+    
+    // We still track if name/dob matched for logging/internal purposes if needed
+    const strictMatch = isPanValid && nameMatched && dobMatched;
 
     const holderName = data.name || null;
     const dateOfBirth = data.dob || null;

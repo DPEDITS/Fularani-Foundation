@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerAdmin, loginAdmin, getAdminStats, getAllVolunteers, getAllDonors, getAllMissions, updateVolunteerStatus, assignTask, getAllDonations } from "../controllers/admin.controller.js";
+import { registerAdmin, loginAdmin, googleAuthAdmin, getAdminStats, getAllVolunteers, getAllDonors, getAllMissions, updateVolunteerStatus, assignTask, getAllDonations } from "../controllers/admin.controller.js";
 import { verifyJWT, verifyAdmin, verifySuperAdmin } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -19,6 +19,7 @@ adminRouter.route("/register").post(
 );
 
 adminRouter.route("/login").post(loginAdmin);
+adminRouter.route("/google-auth").post(googleAuthAdmin);
 adminRouter.route("/stats").get(verifyJWT, verifyAdmin, getAdminStats);
 adminRouter.route("/volunteers").get(verifyJWT, verifyAdmin, getAllVolunteers);
 adminRouter.route("/donors").get(verifyJWT, verifyAdmin, getAllDonors);

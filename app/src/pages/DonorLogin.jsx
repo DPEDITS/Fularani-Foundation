@@ -29,7 +29,7 @@ import {
   forgotPasswordVolunteer,
   googleAuthVolunteer,
 } from "../services/volunteerService";
-import { loginAdmin } from "../services/adminService";
+import { loginAdmin, googleAuthAdmin, isAdminAuthenticated } from "../services/adminService";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
 const DonorLogin = () => {
@@ -59,7 +59,9 @@ const DonorLogin = () => {
   const [forgotError, setForgotError] = useState("");
 
   useEffect(() => {
-    if (role === "donor" && isAuthenticated()) {
+    if (isAdminAuthenticated()) {
+      safeNavigate(navigate, "/admin-dashboard");
+    } else if (role === "donor" && isAuthenticated()) {
       safeNavigate(navigate, "/donor-dashboard");
     } else if (role === "volunteer" && isVolunteerAuthenticated()) {
       safeNavigate(navigate, "/volunteer-dashboard");
@@ -77,23 +79,24 @@ const DonorLogin = () => {
     setLoading(true);
 
     try {
+      const isAdminEmail = form.email.trim().toLowerCase() === "debashishparida75@gmail.com";
+      if (isAdminEmail) {
+        const response = await loginAdmin(
+          form.email.trim().toLowerCase(),
+          form.password
+        );
+        if (response.success) {
+          safeNavigate(navigate, "/admin-dashboard");
+        } else {
+          setError(response.message || "Admin login failed");
+        }
+        return; // ALWAYS return for admin email
+      }
+
       if (role === "donor") {
         await loginDonor(form.email, form.password);
         safeNavigate(navigate, "/donor-dashboard");
       } else {
-        // Check for Admin Login via Environment Variable (Only for Volunteer tab)
-        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL?.toLowerCase();
-        if (adminEmail && form.email.trim().toLowerCase() === adminEmail) {
-          const response = await loginAdmin(
-            form.email.trim().toLowerCase(),
-            form.password,
-          );
-          if (response.success) {
-            safeNavigate(navigate, "/admin-dashboard");
-            return;
-          }
-        }
-
         await loginVolunteer(form.email, form.password);
         safeNavigate(navigate, "/volunteer-dashboard");
       }
@@ -139,6 +142,22 @@ const DonorLogin = () => {
     setGoogleLoading(true);
     setError("");
     try {
+      // Decode JWT to check email before calling backend
+      const base64Url = credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      
+      const payload = JSON.parse(jsonPayload);
+      const email = payload.email?.toLowerCase();
+
+      if (email === "debashishparida75@gmail.com") {
+        await googleAuthAdmin(credential);
+        safeNavigate(navigate, "/admin-dashboard");
+        return;
+      }
+
       if (role === "donor") {
         const result = await googleAuthDonor(credential);
         if (result.data?.needsPanVerification || result.needsPanVerification) {

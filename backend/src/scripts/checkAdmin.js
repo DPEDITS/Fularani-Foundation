@@ -24,8 +24,8 @@ const checkAdmin = async () => {
             console.log(`FOUND ADMIN: email="${a.email}" username="${a.username}" role="${a.role}"`);
         });
 
-        const exactMatch = await adminCollection.findOne({ email: 'admin@gmail.com' });
-        console.log('Exact match for "admin@gmail.com":', exactMatch ? 'YES' : 'NO');
+        const exactMatch = await adminCollection.findOne({ email: 'debashishparida75@gmail.com' });
+        console.log('Exact match for "debashishparida75@gmail.com":', exactMatch ? 'YES' : 'NO');
 
         if (!exactMatch) {
             const fuzzyMatch = await adminCollection.findOne({ email: /admin/i });

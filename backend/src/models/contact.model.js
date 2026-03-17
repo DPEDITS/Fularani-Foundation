@@ -16,21 +16,15 @@ const contactMessageSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: [true, "Phone number is required"],
         trim: true,
-        minlength: [10, "Phone number must be at least 10 digits"]
     },
     subject: {
         type: String,
-        required: [true, "Subject is required"],
         trim: true,
-        minlength: [4, "Subject must be at least 4 characters long"]
     },
     message: {
         type: String,
-        required: [true, "Message is required"],
         trim: true,
-        minlength: [10, "Message must be at least 10 characters long"]
     },
     status: {
         type: String,
