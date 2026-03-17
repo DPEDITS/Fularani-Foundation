@@ -1,21 +1,11 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef } from "react";
 import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getAllContent } from "../services/contentService";
+import { storyData } from "../data/storyData";
 
 const Stories = () => {
   const scrollContainerRef = useRef(null);
-  const [stories, setStories] = useState([]);
-
-  useEffect(() => {
-    const fetchStories = async () => {
-      const response = await getAllContent();
-      if (response.success) {
-        setStories(response.data);
-      }
-    };
-    fetchStories();
-  }, []);
+  const stories = storyData;
 
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
@@ -76,8 +66,8 @@ const Stories = () => {
         >
           {stories.map((story, index) => (
             <Link
-              key={story._id}
-              to={`/stories/${story._id}`}
+              key={story.id}
+              to={`/stories/${story.id}`}
               className="min-w-[280px] md:min-w-[500px] snap-start bg-white shadow-2xl overflow-hidden group border border-secondary/5 cursor-pointer hover:shadow-3xl transition-shadow"
             >
               <div className="flex flex-col md:flex-row h-full">
@@ -102,7 +92,7 @@ const Stories = () => {
                       {story.title}
                     </h3>
                     <p className="text-muted-foreground font-bold text-base md:text-lg leading-tight mb-6 md:mb-8 line-clamp-3">
-                      "{story.shortDescription}"
+                      "{story.shortDescription || story.subtitle}"
                     </p>
                   </div>
 

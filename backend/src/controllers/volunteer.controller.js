@@ -90,11 +90,13 @@ const registerVolunteer = asyncHandler(async (req, res) => {
     availabilityHours,
     preferredAreas,
     motivation,
+    googleId,
+    ssoProvider,
   } = req.body;
 
   if (!username?.trim()) throw new ApiError(400, "Username is required");
   if (!email?.trim()) throw new ApiError(400, "Email is required");
-  if (!password?.trim()) throw new ApiError(400, "Password is required");
+  if (!googleId && !password?.trim()) throw new ApiError(400, "Password is required");
   if (!gender?.trim()) throw new ApiError(400, "Gender is required");
   if (!phone?.trim()) throw new ApiError(400, "Phone number is required");
   if (!address?.trim()) throw new ApiError(400, "Address is required");
@@ -139,16 +141,11 @@ const registerVolunteer = asyncHandler(async (req, res) => {
 
   if (existedUser) {
     if (existedUser.panNumber && existedUser.panNumber.toLowerCase() === panNumber.toLowerCase()) {
-      throw new ApiError(409, "PAN Number is already registered with another account");
+      throw new ApiError(409, "PAN Number is already registered with another volunteer account");
     }
     throw new ApiError(409, "User with email or username already exists");
   }
 
-  // Also prevent cross-role PAN sharing
-  const existedDonor = await Donor.findOne({ panNumber: new RegExp(`^${panNumber}$`, 'i') });
-  if (existedDonor) {
-    throw new ApiError(409, "PAN Number is already registered to a donor account");
-  }
 
   const avatarLocalPath = req.file?.path;
 
@@ -197,6 +194,8 @@ const registerVolunteer = asyncHandler(async (req, res) => {
     availabilityHours,
     preferredAreas: areasArray,
     motivation,
+    ssoId: googleId,
+    ssoProvider: ssoProvider || (googleId ? "google" : undefined),
   });
   const createdUser = await Volunteer.findById(user._id).select(
     "-password -refreshToken",
@@ -430,7 +429,8 @@ const googleAuthVolunteer = asyncHandler(async (req, res) => {
     });
     payload = ticket.getPayload();
   } catch (error) {
-    throw new ApiError(401, "Invalid Google credential");
+    console.error("Google verifyIdToken error:", error);
+    throw new ApiError(401, "Invalid Google credential: " + error.message);
   }
 
   const { sub: googleId, email, name, picture, email_verified } = payload;
@@ -439,7 +439,7 @@ const googleAuthVolunteer = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Google account does not have an email");
   }
 
-  // Check if user already exists with this SSO ID
+  // Check if user already exists with this Google ID
   let existingVolunteer = await Volunteer.findOne({ ssoId: googleId });
 
   if (existingVolunteer) {
@@ -460,14 +460,13 @@ const googleAuthVolunteer = asyncHandler(async (req, res) => {
       );
   }
 
-  // Check if a user exists with this email
+  // Check if a user exists with this email (regular signup)
   existingVolunteer = await Volunteer.findOne({ email: email.toLowerCase() });
 
   if (existingVolunteer) {
     // Link Google account to existing user
     existingVolunteer.ssoId = googleId;
     existingVolunteer.ssoProvider = "google";
-    existingVolunteer.emailVerified = email_verified || false;
     if (!existingVolunteer.avatar && picture) {
       existingVolunteer.avatar = picture;
     }
@@ -499,7 +498,7 @@ const googleAuthVolunteer = asyncHandler(async (req, res) => {
         googleProfile: {
           googleId,
           name,
-          email,
+          email: email.toLowerCase(),
           picture,
           emailVerified: email_verified,
         },

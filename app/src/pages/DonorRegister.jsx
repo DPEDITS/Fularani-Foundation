@@ -80,6 +80,7 @@ const DonorRegister = () => {
   const [panError, setPanError] = useState("");
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleCredential, setGoogleCredential] = useState(null);
+  const [googleId, setGoogleId] = useState(searchParams.get("googleId") || "");
 
   // Check for Google PAN completion mode
   const isGooglePanMode = searchParams.get("googlePan") === "true";
@@ -89,14 +90,19 @@ const DonorRegister = () => {
 
   // Pre-fill form with Google data if available
   useEffect(() => {
-    if (googleName || googleEmail) {
+    const gName = searchParams.get("googleName");
+    const gEmail = searchParams.get("googleEmail");
+    const gId = searchParams.get("googleId");
+
+    if (gName || gEmail || gId) {
       setForm((prev) => ({
         ...prev,
-        username: googleName || prev.username,
-        email: googleEmail || prev.email,
+        username: gName || prev.username,
+        email: gEmail || prev.email,
       }));
+      if (gId) setGoogleId(gId);
     }
-  }, [googleName, googleEmail]);
+  }, [searchParams]);
 
   // If in Google PAN mode (donor), skip to step 2
   // If in Google mode, skip to step 2
@@ -302,6 +308,10 @@ const DonorRegister = () => {
       // Include PAN verification status in form data
       formData.append("panVerified", panVerified);
       formData.append("panHolderName", panHolderName || "");
+      if (googleId) {
+        formData.append("googleId", googleId);
+        formData.append("ssoProvider", "google");
+      }
       if (avatar) formData.append("avatar", avatar);
 
       if (role === "donor") {
@@ -428,6 +438,9 @@ const DonorRegister = () => {
           if (profile.picture) {
             setAvatarPreview(profile.picture);
           }
+          if (profile.googleId) {
+            setGoogleId(profile.googleId);
+          }
           setCurrentStep(2);
           setError(""); // Clear any previous errors
         } else if (result.data?.needsPanVerification || result.needsPanVerification) {
@@ -464,6 +477,9 @@ const DonorRegister = () => {
           }));
           if (profile.picture) {
             setAvatarPreview(profile.picture);
+          }
+          if (profile.googleId) {
+            setGoogleId(profile.googleId);
           }
           setCurrentStep(2);
         } else {

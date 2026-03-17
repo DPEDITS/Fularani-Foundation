@@ -117,7 +117,7 @@ export const resetPasswordDonor = async (token, newPassword) => {
 // Supports optional name + dob matching
 export const verifyPAN = async (panNumber, name = "", dob = "") => {
     try {
-        const payload = { panNumber };
+        const payload = { panNumber, role: 'donor' };
         if (name?.trim()) payload.name = name.trim();
         if (dob?.trim()) payload.dob = dob.trim();
         const response = await api.post('/api/signzy/verify-pan', payload);
