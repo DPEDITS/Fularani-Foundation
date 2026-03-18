@@ -16,10 +16,12 @@ import VolunteerLogin from "./pages/VolunteerLogin";
 import VolunteerRegister from "./pages/VolunteerRegister";
 import VolunteerDashboard from "./pages/VolunteerDashboard";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 import CSRPartnership from "./pages/CSRPartnership";
 import AdminDashboard from "./pages/AdminDashboard";
 import AddContent from "./pages/AddContent";
 import ResetPassword from "./pages/ResetPassword";
+import LegalPolicy from "./pages/LegalPolicy";
 
 const App = () => {
   const location = useLocation();
@@ -36,6 +38,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <ScrollToTop />
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -55,6 +58,7 @@ const App = () => {
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/add-content" element={<AddContent />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/legal-policy" element={<LegalPolicy />} />
         </Routes>
       </main>
       {!shouldHideFooter && <Footer />}
