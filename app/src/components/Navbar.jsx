@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Heart, ChevronDown, Menu, X, LogOut, ArrowRight } from "lucide-react";
 import { safeLocationRedirect } from "../utils/safeNavigate";
 import {
@@ -23,6 +23,8 @@ import { useInterval } from "usehooks-ts";
 import logo from "../assets/image copy.png";
 
 const Navbar = () => {
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState(null);
@@ -111,7 +113,7 @@ const Navbar = () => {
             <img
               src={logo}
               alt="Fularani Foundation"
-              className="h-10 md:h-12 w-auto object-contain transition-transform"
+              className="h-12 md:h-12 w-auto object-contain transition-transform"
             />
           </Link>
 
@@ -167,7 +169,8 @@ const Navbar = () => {
                 )}
               </div>
             ))}
-            {currentUser?.email?.toLowerCase() === "debashishparida75@gmail.com" && (
+            {currentUser?.email?.toLowerCase() ===
+              "debashishparida75@gmail.com" && (
               <Link
                 to="/add-content"
                 className="text-[14px] font-bold text-secondary/70 hover:text-secondary hover:text-primary transition-colors uppercase tracking-tight"
@@ -222,8 +225,11 @@ const Navbar = () => {
                 >
                   Join Us
                 </Link>
-                <Link to="/donor-register" className="hidden lg:block">
-                  <button className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-tight shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:translate-y-0">
+                <Link
+                  to="/donor-register"
+                  className={isHomePage ? "hidden lg:block" : "block"}
+                >
+                  <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 lg:px-6 lg:py-2.5 rounded-lg text-[11px] lg:text-[13px] font-black uppercase tracking-tight shadow-md lg:shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap">
                     Donate Now
                   </button>
                 </Link>
@@ -291,13 +297,15 @@ const Navbar = () => {
                       >
                         Join Us
                       </Link>
-                      <Link
-                        to="/donor-register"
-                        className="block text-center py-3 bg-accent text-secondary rounded-xl font-black uppercase tracking-tight text-sm"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Donate Now
-                      </Link>
+                      {!isHomePage && (
+                        <Link
+                          to="/donor-register"
+                          className="block text-center py-3 bg-accent text-secondary rounded-xl font-black uppercase tracking-tight text-sm"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          Donate Now
+                        </Link>
+                      )}
                     </>
                   )}
                   {isLoggedIn && (

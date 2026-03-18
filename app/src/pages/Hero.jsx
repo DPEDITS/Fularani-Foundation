@@ -30,8 +30,6 @@ const Hero = () => {
     fetchDonors();
   }, []);
 
-
-
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentBadge((prev) => (prev + 1) % impactBadges.length);
@@ -47,7 +45,7 @@ const Hero = () => {
       {/* Main Content Area */}
       <div className="relative z-10 flex-grow flex flex-col-reverse lg:flex-row items-center pt-11">
         {/* Left Side: Impact Text */}
-        <div className="w-full lg:w-1/2 px-6 py-2 md:px-12 lg:px-20 lg:py-0 lg:pt-0">
+        <div className="w-full lg:w-1/2 px-6 py-10 md:px-12 lg:px-20 lg:py-0 lg:pt-0">
           <Motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -69,10 +67,10 @@ const Hero = () => {
               in India. Join the Fularani movement today.
             </p>
 
-            <div className="hidden sm:flex sm:flex-row gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <a
                 href="/donor-register"
-                className="bg-accent hover:bg-accent/80 text-secondary px-8 py-4 lg:px-10 lg:py-5 rounded-xl text-base lg:text-lg font-black uppercase tracking-tight transition-all shadow-2xl shadow-accent/30 hover:translate-y-[-4px] flex items-center justify-center gap-3 group"
+                className="bg-accent hover:bg-accent/80 text-secondary w-full sm:w-auto px-6 py-4 lg:px-10 lg:py-5 rounded-xl text-base lg:text-lg font-black uppercase tracking-tight transition-all shadow-2xl shadow-accent/30 hover:translate-y-[-4px] flex items-center justify-center gap-3 group"
               >
                 Donate Now
                 <Heart
@@ -82,7 +80,7 @@ const Hero = () => {
               </a>
               <a
                 href="/missions"
-                className="bg-secondary hover:bg-black text-white px-8 py-4 lg:px-10 lg:py-5 rounded-xl text-base lg:text-lg font-black uppercase tracking-tight transition-all flex items-center justify-center gap-3 group"
+                className="hidden sm:flex bg-secondary hover:bg-black text-white w-full sm:w-auto px-6 py-4 lg:px-10 lg:py-5 rounded-xl text-base lg:text-lg font-black uppercase tracking-tight transition-all items-center justify-center gap-3 group"
               >
                 Our Work
                 <ArrowRight
@@ -145,7 +143,14 @@ const Hero = () => {
             </div>
           </div>
 
-          <div className="w-full h-full relative" style={{ backgroundImage: `url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          <div
+            className="w-full h-full relative"
+            style={{
+              backgroundImage: `url(${heroBg})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
             <img
               src="/0214.gif"
               alt="Fularani Foundation Impact"
@@ -163,32 +168,36 @@ const Hero = () => {
               <div className="flex -space-x-2.5 md:-space-x-3 md:mb-1 shrink-0">
                 {recentDonors.length > 0
                   ? recentDonors.map((donor, i) => (
-                    <div
-                      key={donor._id || i}
-                      className="w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white overflow-hidden bg-primary"
-                    >
-                      <img
-                        src={donor.avatar}
-                        alt={donor.username}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ))
+                      <div
+                        key={donor._id || i}
+                        className="w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white overflow-hidden bg-primary"
+                      >
+                        <img
+                          src={donor.avatar}
+                          alt={donor.username}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))
                   : [1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className={`w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[7px] md:text-[8px] font-black text-white`}
-                    >
-                      FF
-                    </div>
-                  ))}
+                      <div
+                        key={i}
+                        className={`w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[7px] md:text-[8px] font-black text-white`}
+                      >
+                        FF
+                      </div>
+                    ))}
                 <div className="w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white bg-accent flex items-center justify-center text-[9px] md:text-[10px] font-black text-secondary">
                   +{totalDonorsCount > 5000 ? totalDonorsCount : "5k"}
                 </div>
               </div>
 
               <p className="text-[10px] md:text-sm font-black text-secondary/90 leading-tight md:mt-2 italic whitespace-nowrap tracking-tight">
-                Join {totalDonorsCount > 5000 ? totalDonorsCount.toLocaleString() : "5,000"}+ life-changers.
+                Join{" "}
+                {totalDonorsCount > 5000
+                  ? totalDonorsCount.toLocaleString()
+                  : "5,000"}
+                + life-changers.
               </p>
             </div>
           </div>
