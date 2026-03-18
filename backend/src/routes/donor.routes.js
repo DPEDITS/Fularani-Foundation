@@ -21,11 +21,11 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 // Rate limiter only for auth-sensitive endpoints
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10,                   // 10 attempts per 15 min per IP
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { success: false, message: "Too many attempts — please try again later" },
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,                   // 10 attempts per 15 min per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many attempts — please try again later" },
 });
 
 const forgotPasswordLimiter = rateLimit({

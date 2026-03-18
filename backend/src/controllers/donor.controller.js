@@ -49,7 +49,7 @@ const registerDonor = asyncHandler(async (req, res) => {
 
   const existedDonor = await Donor.findOne({
     $or: [
-      { username }, 
+      { username },
       { email },
       { panNumber: new RegExp(`^${panNumber}$`, 'i') }
     ],
@@ -127,7 +127,7 @@ const loginDonor = asyncHandler(async (req, res) => {
 
   const user = await Donor.findOne({
     $or: [
-      { username: queryIdentifier.toLowerCase() }, 
+      { username: queryIdentifier.toLowerCase() },
       { email: queryIdentifier.toLowerCase() }
     ]
   })
@@ -320,11 +320,11 @@ const updateDonorProfile = asyncHandler(async (req, res) => {
   if (phone) updateFields.phone = phone;
   if (address) updateFields.address = address;
   if (wants80GReceipt !== undefined) updateFields.wants80GReceipt = wants80GReceipt;
-  
+
   // Allow updating panNumber ONLY if it's currently PENDING or missing
   if (panNumber && (!req.user.panNumber || req.user.panNumber === "PENDING")) {
     const trimmedPan = panNumber.trim().toUpperCase();
-    
+
     // Basic PAN validation
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     if (!panRegex.test(trimmedPan)) {
@@ -332,7 +332,7 @@ const updateDonorProfile = asyncHandler(async (req, res) => {
     }
 
     // Uniqueness check
-    const existingPanDonor = await Donor.findOne({ 
+    const existingPanDonor = await Donor.findOne({
       panNumber: new RegExp(`^${trimmedPan}$`, 'i'),
       _id: { $ne: req.user._id }
     });
@@ -346,7 +346,7 @@ const updateDonorProfile = asyncHandler(async (req, res) => {
     }
 
     updateFields.panNumber = trimmedPan;
-    updateFields.panVerified = true; 
+    updateFields.panVerified = true;
   }
 
   const donor = await Donor.findByIdAndUpdate(
