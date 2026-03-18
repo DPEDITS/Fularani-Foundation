@@ -24,14 +24,14 @@ const Stories = () => {
   }
 
   return (
-    <section className="py-16 md:py-32 bg-muted/30 overflow-hidden">
+    <section className="md:py-10 bg-muted/30 overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-10 md:mb-16 gap-6 md:gap-8">
           <div className="max-w-xl">
             <div className="inline-block bg-accent px-4 py-1 rounded-sm text-[12px] md:text-[15px] font-black uppercase tracking-widest text-secondary mb-3 md:mb-4">
               Testimonials
             </div>
-            <h2 className="text-4xl md:text-7xl font-black text-secondary tracking-tighter leading-none lowercase">
+            <h2 className="text-6xl md:text-7xl font-black text-secondary tracking-tighter leading-none lowercase">
               voice of <br />
               <span className="text-white bg-primary px-2 md:px-4 py-1 inline-block rotate-1">
                 the field.

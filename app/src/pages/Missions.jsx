@@ -128,13 +128,13 @@ const Missions = () => {
       </section>
 
       {/* UPCOMING MISSIONS */}
-      <section className="py-32 px-6 bg-secondary text-white relative overflow-hidden">
+      <section className="py-15 px-6 bg-secondary text-white relative overflow-hidden">
         {/* Decorative pulse element */}
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
 
-        <div className="max-w-[1200px] mx-auto space-y-24 relative z-10">
-          <div className="flex flex-col md:flex-row items-end justify-between gap-8">
-            <div className="max-w-2xl">
+        <div className="max-w-[1200px] mx-auto space-y-10 relative z-10">
+          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 text-left">
+            <div className="max-w-2xl text-left">
               <span className="inline-block bg-primary px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-white mb-6">
                 Future Impact
               </span>
@@ -145,7 +145,7 @@ const Missions = () => {
                 </span>
               </h2>
             </div>
-            <p className="text-xl text-white/60 font-medium max-w-[400px] leading-tight pb-2">
+            <p className="text-xl text-white/60 font-medium max-w-[400px] leading-tight pb-2 text-left">
               Critical projects requiring immediate collective action and
               heartfelt support.
             </p>
