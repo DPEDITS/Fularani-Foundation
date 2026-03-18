@@ -68,30 +68,30 @@ const Stories = () => {
             <Link
               key={story.id}
               to={`/stories/${story.id}`}
-              className="min-w-[280px] md:min-w-[500px] snap-start bg-white shadow-2xl overflow-hidden group border border-secondary/5 cursor-pointer hover:shadow-3xl transition-shadow"
+              className="min-w-[260px] sm:min-w-[280px] md:min-w-[500px] snap-start bg-white shadow-2xl overflow-hidden group border border-secondary/5 cursor-pointer hover:shadow-3xl transition-shadow"
             >
               <div className="flex flex-col md:flex-row h-full">
-                <div className="w-full md:w-2/5 h-48 md:h-auto overflow-hidden relative">
+                <div className="w-full md:w-2/5 h-40 md:h-auto overflow-hidden relative">
                   <img
                     src={story.coverImage}
                     alt={story.title}
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-110"
+                    className="w-full h-full object-cover transition-all duration-700 hover:scale-110"
                   />
                   <div className="absolute top-4 left-4 bg-primary px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-wider text-white">
                     {story.category}
                   </div>
                 </div>
 
-                <div className="w-full md:w-3/5 p-6 md:p-10 flex flex-col justify-between">
+                <div className="w-full md:w-3/5 p-4 sm:p-6 md:p-10 flex flex-col justify-between">
                   <div>
                     <Quote
                       size={32}
                       className="text-primary mb-4 md:mb-6 opacity-40"
                     />
-                    <h3 className="text-2xl md:text-3xl font-black text-secondary mb-3 md:mb-4 tracking-tighter leading-none">
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-secondary mb-2 md:mb-4 tracking-tighter leading-none">
                       {story.title}
                     </h3>
-                    <p className="text-muted-foreground font-bold text-base md:text-lg leading-tight mb-6 md:mb-8 line-clamp-3">
+                    <p className="text-muted-foreground font-bold text-sm sm:text-base md:text-lg leading-tight mb-4 md:mb-8 line-clamp-3">
                       "{story.shortDescription || story.subtitle}"
                     </p>
                   </div>
