@@ -4,7 +4,7 @@ import missionGreenImg from "../assets/missionGreen.jpeg";
 
 const MissionGreen = () => (
   <section className="apple-card group overflow-hidden">
-    <div className="grid md:grid-cols-2 gap-12 p-8 md:p-12 items-center">
+    <div className="grid md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8 items-center">
       {/* TEXT */}
       <div>
         <div className="w-10 h-10 rounded-full bg-green-50 text-[#34c759] flex items-center justify-center mb-6">
@@ -37,14 +37,14 @@ const MissionGreen = () => (
       </div>
 
       {/* VISUAL */}
-            <div className="h-64 rounded-2xl bg-[#f5f5f7] overflow-hidden">
-              <img
-                src={missionGreenImg}
-                alt="Education For All"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
+      <div className="w-full rounded-2xl bg-[#f5f5f7] overflow-hidden">
+        <img
+          src={missionGreenImg}
+          alt="Mission Green"
+          className="w-full h-auto object-contain"
+        />
+      </div>
+    </div>
   </section>
 );
 
