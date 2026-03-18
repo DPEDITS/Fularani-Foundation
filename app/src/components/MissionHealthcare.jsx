@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 const MissionHealthcare = () => (
   <section className="apple-card group overflow-hidden">
-    <div className="grid md:grid-cols-2 gap-12 p-8 md:p-12 items-center">
+    <div className="grid md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8 items-center">
       {/* TEXT */}
       <div>
         <div className="w-10 h-10 rounded-full bg-red-50 text-[#ff3b30] flex items-center justify-center mb-6">
@@ -37,11 +37,11 @@ const MissionHealthcare = () => (
       </div>
 
       {/* VISUAL */}
-      <div className="h-64 rounded-2xl bg-[#f5f5f7] overflow-hidden">
+      <div className="w-full rounded-2xl bg-[#f5f5f7] overflow-hidden">
         <img
           src={missionHealthcareImg}
           alt="Mission Healthcare"
-          className="w-full h-full object-cover"
+          className="w-full h-auto object-contain"
         />
       </div>
     </div>
