@@ -45,7 +45,7 @@ const Hero = () => {
       <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/10 -skew-x-12 translate-x-1/2 z-0 hidden lg:block"></div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex-grow flex flex-col-reverse lg:flex-row items-center pt-9">
+      <div className="relative z-10 flex-grow flex flex-col-reverse lg:flex-row items-center pt-11">
         {/* Left Side: Impact Text */}
         <div className="w-full lg:w-1/2 px-6 py-2 md:px-12 lg:px-20 lg:py-0 lg:pt-0">
           <Motion.div
@@ -157,15 +157,15 @@ const Hero = () => {
             <div className="absolute inset-0 bg-secondary/20 z-0"></div>
           </div>
 
-          {/* Floating Impact Card */}
-          <div className="absolute bottom-2 right-2 md:bottom-10 md:right-10 z-30 block">
-            <div className="bg-white/90 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-white/20 max-w-[280px]">
-              <div className="flex -space-x-3 mb-1">
+          {/* Floating Impact Card - Pill on Mobile, Square on PC */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 md:bottom-10 md:right-10 md:left-auto md:translate-x-0 z-40 w-full flex justify-center md:block md:w-auto px-4">
+            <div className="bg-white/95 backdrop-blur-xl px-4 py-2 md:p-6 rounded-full md:rounded-3xl border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.1)] flex items-center md:block gap-3 md:gap-0 max-w-fit md:max-w-[280px]">
+              <div className="flex -space-x-2.5 md:-space-x-3 md:mb-1 shrink-0">
                 {recentDonors.length > 0
                   ? recentDonors.map((donor, i) => (
                     <div
                       key={donor._id || i}
-                      className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-primary"
+                      className="w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white overflow-hidden bg-primary"
                     >
                       <img
                         src={donor.avatar}
@@ -177,22 +177,18 @@ const Hero = () => {
                   : [1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
-                      className={`w-10 h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[8px] font-black text-white`}
+                      className={`w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[7px] md:text-[8px] font-black text-white`}
                     >
                       FF
                     </div>
                   ))}
-                <div className="w-10 h-10 rounded-full border-2 border-white bg-accent flex items-center justify-center text-[10px] font-black text-secondary">
+                <div className="w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white bg-accent flex items-center justify-center text-[9px] md:text-[10px] font-black text-secondary">
                   +{totalDonorsCount > 5000 ? totalDonorsCount : "5k"}
                 </div>
               </div>
 
-              <p className="text-sm font-black text-secondary leading-tight mt-2">
-                Join{" "}
-                {totalDonorsCount > 5000
-                  ? totalDonorsCount.toLocaleString()
-                  : "5,000"}
-                + donors making a real difference in India.
+              <p className="text-[10px] md:text-sm font-black text-secondary/90 leading-tight md:mt-2 italic whitespace-nowrap tracking-tight">
+                Join {totalDonorsCount > 5000 ? totalDonorsCount.toLocaleString() : "5,000"}+ life-changers.
               </p>
             </div>
           </div>
