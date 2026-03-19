@@ -90,8 +90,7 @@ const SubtopicSection = ({ subtopic, index, isSuperAdmin, onEdit, onDelete }) =>
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 bg-white/5 hover:bg-primary text-white text-[10px] md:text-sm font-semibold rounded-lg transition-all border border-white/10 hover:border-transparent"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <Eye size={14} className="md:w-[16px] md:h-[16px]" />
-                              <span className="hidden sm:inline">View</span>
+                              <span>View</span>
                             </a>
                             {isSuperAdmin && (
                               <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
