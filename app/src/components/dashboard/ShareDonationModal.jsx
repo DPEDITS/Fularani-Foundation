@@ -122,7 +122,8 @@ const ShareDonationModal = ({ show, onClose, amount, donorName, donationDate }) 
 
       ctx.fillStyle = "#1d1d1f";
       ctx.font = "bold 52px 'Segoe UI', Arial, sans-serif";
-      const nameText = displayName.length > 20 ? displayName.substring(0, 18) + "..." : displayName;
+      const upperName = displayName.toUpperCase();
+      const nameText = upperName.length > 20 ? upperName.substring(0, 18) + "..." : upperName;
       ctx.fillText(nameText, 540, 535);
 
       ctx.fillStyle = "#86868b";
