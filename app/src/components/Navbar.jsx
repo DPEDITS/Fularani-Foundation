@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Link, useLocation } from "react-router-dom";
 import { Heart, ChevronDown, Menu, X, LogOut, ArrowRight } from "lucide-react";
@@ -7,11 +7,13 @@ import { safeLocationRedirect } from "../utils/safeNavigate";
 import {
   isAuthenticated as isDonorAuthenticated,
   getDonorUser,
+  getDonorProfile,
   logoutDonor,
 } from "../services/donorService";
 import {
   isVolunteerAuthenticated,
   getVolunteerUser,
+  getVolunteerProfile,
   logoutVolunteer,
 } from "../services/volunteerService";
 import {
@@ -31,29 +33,61 @@ const Navbar = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const fetchingRef = useRef(false);
 
-  const checkAuth = () => {
+  // Fetch user profile from the backend API
+  const fetchUserFromBackend = useCallback(async (role) => {
+    if (fetchingRef.current) return;
+    fetchingRef.current = true;
+    try {
+      if (role === "donor") {
+        const res = await getDonorProfile();
+        setCurrentUser(res.data);
+      } else if (role === "volunteer") {
+        const res = await getVolunteerProfile();
+        setCurrentUser(res.data);
+      } else if (role === "admin") {
+        // Admin has no dedicated profile endpoint; use localStorage as fallback
+        setCurrentUser(getAdminUser());
+      }
+    } catch (err) {
+      // Fallback to localStorage if API call fails (e.g. network issues)
+      console.error("Navbar: failed to fetch profile from backend, using fallback", err);
+      if (role === "donor") setCurrentUser(getDonorUser());
+      else if (role === "volunteer") setCurrentUser(getVolunteerUser());
+      else if (role === "admin") setCurrentUser(getAdminUser());
+    } finally {
+      fetchingRef.current = false;
+    }
+  }, []);
+
+  // Check auth status (only token existence — fast, no API call)
+  const checkAuth = useCallback(() => {
     const isDonor = isDonorAuthenticated();
     const isVolunteer = isVolunteerAuthenticated();
     const isAdmin = isAdminAuthenticated();
 
-    setIsLoggedIn(isDonor || isVolunteer || isAdmin);
-    if (isAdmin) {
-      setUserRole("admin");
-      setCurrentUser(getAdminUser());
-    } else if (isVolunteer) {
-      setUserRole("volunteer");
-      setCurrentUser(getVolunteerUser());
-    } else if (isDonor) {
-      setUserRole("donor");
-      setCurrentUser(getDonorUser());
-    } else {
-      setUserRole(null);
+    const wasLoggedIn = isLoggedIn;
+    const prevRole = userRole;
+    const nowLoggedIn = isDonor || isVolunteer || isAdmin;
+
+    let newRole = null;
+    if (isAdmin) newRole = "admin";
+    else if (isVolunteer) newRole = "volunteer";
+    else if (isDonor) newRole = "donor";
+
+    setIsLoggedIn(nowLoggedIn);
+    setUserRole(newRole);
+
+    // Only fetch from backend when auth status actually changes (login/logout/role switch)
+    if (nowLoggedIn && (!wasLoggedIn || newRole !== prevRole)) {
+      fetchUserFromBackend(newRole);
+    } else if (!nowLoggedIn) {
       setCurrentUser(null);
     }
-  };
+  }, [isLoggedIn, userRole, fetchUserFromBackend]);
 
-  // Poll for changes every 2 seconds to handle login/logout without refresh
+  // Poll for auth status changes (login/logout detection only)
   useInterval(() => {
     checkAuth();
   }, 2000);
@@ -63,12 +97,37 @@ const Navbar = () => {
       setScrolled(window.scrollY > 10);
     };
 
-    checkAuth();
+    // Initial auth check + fetch
+    const isDonor = isDonorAuthenticated();
+    const isVolunteer = isVolunteerAuthenticated();
+    const isAdmin = isAdminAuthenticated();
+    const nowLoggedIn = isDonor || isVolunteer || isAdmin;
+
+    let role = null;
+    if (isAdmin) role = "admin";
+    else if (isVolunteer) role = "volunteer";
+    else if (isDonor) role = "donor";
+
+    setIsLoggedIn(nowLoggedIn);
+    setUserRole(role);
+    if (nowLoggedIn && role) {
+      fetchUserFromBackend(role);
+    }
+
+    // Listen for profile-updated event (dispatched from dashboards after profile save)
+    const handleProfileUpdated = () => {
+      if (userRole || role) {
+        fetchUserFromBackend(userRole || role);
+      }
+    };
+
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("storage", checkAuth);
+    window.addEventListener("profile-updated", handleProfileUpdated);
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("storage", checkAuth);
+      window.removeEventListener("profile-updated", handleProfileUpdated);
     };
   }, []);
 

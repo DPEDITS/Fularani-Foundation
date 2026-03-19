@@ -213,6 +213,8 @@ const DonorDashboard = () => {
       setIsUpdating(true);
       await updateDonorProfile(data);
       await fetchDashboardData();
+      // Notify Navbar to re-fetch user data from backend
+      window.dispatchEvent(new Event("profile-updated"));
     } catch (err) {
       console.error("Profile update failed:", err);
     } finally {
@@ -229,6 +231,8 @@ const DonorDashboard = () => {
       formData.append("avatar", file);
       await updateDonorAvatar(formData);
       await fetchDashboardData();
+      // Notify Navbar to re-fetch user data from backend
+      window.dispatchEvent(new Event("profile-updated"));
     } catch (err) {
       console.error("Avatar update failed:", err);
     } finally {
