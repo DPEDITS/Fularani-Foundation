@@ -49,7 +49,7 @@ const HomeAbout = () => {
                             </div>
                         </div>
                         <a
-                            href="/about"
+                            href="/missions"
                             className="inline-flex items-center gap-2 bg-[#1d1d1f] text-white px-8 py-3.5 rounded-full text-[17px] font-medium hover:bg-[#000000] transition-all shadow-lg hover:shadow-xl group"
                         >
                             Read full story <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />

@@ -9,7 +9,7 @@
 // Allowlist of all valid internal route prefixes from App.jsx
 const ALLOWED_ROUTES = [
   "/",
-  "/about",
+
   "/missions",
   "/csr-partnership",
   "/gallery",

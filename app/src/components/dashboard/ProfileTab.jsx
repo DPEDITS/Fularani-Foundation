@@ -296,7 +296,7 @@ const ProfileTab = ({ user, onUpdate, isUpdating }) => {
                             All your donations to Fularani Foundation are 50% tax-exempt under Section 80G of the Income Tax Act. Ensure your PAN is updated to receive accurate receipts.
                         </p>
                     </div>
-                    <a href="/about" className="px-6 py-3 bg-white text-primary rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/10 hover:-translate-y-1 transition-transform">
+                    <a href="/missions" className="px-6 py-3 bg-white text-primary rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/10 hover:-translate-y-1 transition-transform">
                         Learn More
                     </a>
                 </div>

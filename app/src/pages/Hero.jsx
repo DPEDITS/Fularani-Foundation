@@ -176,6 +176,10 @@ const Hero = () => {
                           src={donor.avatar}
                           alt={donor.username}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            e.target.parentElement.innerHTML = `<span class="w-full h-full flex items-center justify-center text-[8px] md:text-[10px] font-black text-white uppercase">${(donor.username || "FF").slice(0, 2)}</span>`;
+                          }}
                         />
                       </div>
                     ))
