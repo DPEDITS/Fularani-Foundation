@@ -2,8 +2,11 @@ import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-// Only this email is allowed to be SUPER_ADMIN
-const SUPER_ADMIN_EMAIL = "debashishparida75@gmail.com";
+// Only these emails are allowed to be SUPER_ADMIN
+const SUPER_ADMIN_EMAILS = [
+  "debashishparida75@gmail.com",
+  "abhijeetduttaam2222@gmail.com"
+];
 
 const adminSchema = new Schema(
   {
@@ -41,8 +44,8 @@ const adminSchema = new Schema(
 );
 
 adminSchema.pre("validate", function (next) {
-  if (this.role === "SUPER_ADMIN" && this.email !== SUPER_ADMIN_EMAIL) {
-    next(new Error(`Only ${SUPER_ADMIN_EMAIL} can be assigned the SUPER_ADMIN role`));
+  if (this.role === "SUPER_ADMIN" && !SUPER_ADMIN_EMAILS.includes(this.email)) {
+    next(new Error(`Only designated emails can be assigned the SUPER_ADMIN role`));
   } else {
     next();
   }

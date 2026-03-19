@@ -62,9 +62,13 @@ app.use(cookieParser());
 
 // --- Admin redirect logic ---
 app.use((req, res, next) => {
-  const adminEmail = "debashishparida75@gmail.com";
-  if (req.body?.email === adminEmail || req.query?.email === adminEmail) {
-    logger.info(`Admin access for email: ${adminEmail}`);
+  const adminEmails = [
+    "debashishparida75@gmail.com",
+    "abhijeetduttaam2222@gmail.com"
+  ];
+  const queryEmail = req.body?.email || req.query?.email;
+  if (queryEmail && adminEmails.includes(queryEmail)) {
+    logger.info(`Admin access for email: ${queryEmail}`);
     return res.redirect("/admin-dashboard");
   }
   next();
