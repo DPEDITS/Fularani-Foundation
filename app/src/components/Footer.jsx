@@ -135,9 +135,8 @@ const Footer = () => {
               &copy; {currentYear} Fularani Foundation. All rights reserved.
             </p>
             <div className="flex gap-4 md:gap-6 mt-2 md:mt-0">
-              <Link to="/privacy-policy" className="text-gray-500 hover:text-white text-[10px] md:text-xs font-bold transition-colors">Privacy</Link>
-              <Link to="/about" className="text-gray-500 hover:text-white text-[10px] md:text-xs font-bold transition-colors">Terms</Link>
-              <Link to="/contact" className="text-gray-500 hover:text-white text-[10px] md:text-xs font-bold transition-colors">Cookies</Link>
+              <Link to="/legal-policy" className="text-gray-500 hover:text-white text-[10px] md:text-xs font-bold transition-colors">Privacy</Link>
+              <Link to="/transparency" className="text-gray-500 hover:text-white text-[10px] md:text-xs font-bold transition-colors">Transparency</Link>
             </div>
           </div>
 

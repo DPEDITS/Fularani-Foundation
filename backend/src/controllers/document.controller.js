@@ -11,10 +11,16 @@ const createDocument = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Name, link, and category are required");
     }
 
+    // Case-insensitive category matching: reuse existing category casing if found
+    const existingDoc = await Document.findOne({
+        category: { $regex: new RegExp(`^${category.trim()}$`, "i") }
+    });
+    const normalizedCategory = existingDoc ? existingDoc.category : category.trim();
+
     const document = await Document.create({
         name,
         link,
-        category
+        category: normalizedCategory
     });
 
     if (!document) {
@@ -57,9 +63,19 @@ const updateDocument = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { name, link, category } = req.body;
 
+    // Case-insensitive category matching for updates too
+    let normalizedCategory = category;
+    if (category) {
+        const existingDoc = await Document.findOne({
+            category: { $regex: new RegExp(`^${category.trim()}$`, "i") },
+            _id: { $ne: id }
+        });
+        normalizedCategory = existingDoc ? existingDoc.category : category.trim();
+    }
+
     const document = await Document.findByIdAndUpdate(
         id,
-        { name, link, category },
+        { name, link, category: normalizedCategory },
         { new: true, runValidators: true }
     );
 
