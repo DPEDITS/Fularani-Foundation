@@ -16,7 +16,8 @@ const AddContent = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAdminAuthenticated() || getAdminUser()?.email !== "debashishparida75@gmail.com") {
+    const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com"];
+    if (!isAdminAuthenticated() || !adminEmails.includes(getAdminUser()?.email)) {
       navigate("/");
     }
   }, [navigate]);

@@ -11,7 +11,10 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { OAuth2Client } from "google-auth-library";
 
-const SUPER_ADMIN_EMAIL = "debashishparida75@gmail.com";
+const SUPER_ADMIN_EMAILS = [
+  "debashishparida75@gmail.com",
+  "abhijeetduttaam2222@gmail.com"
+];
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -241,7 +244,7 @@ const loginVolunteer = asyncHandler(async (req, res) => {
   const queryIdentifier = (email || username).trim();
 
   // Block super admin email from logging in as volunteer
-  if (queryIdentifier.toLowerCase() === SUPER_ADMIN_EMAIL) {
+  if (SUPER_ADMIN_EMAILS.includes(queryIdentifier.toLowerCase())) {
     throw new ApiError(403, "This email is registered as Super Admin. Please use the admin login.");
   }
 
@@ -447,7 +450,7 @@ const googleAuthVolunteer = asyncHandler(async (req, res) => {
   }
 
   // Block super admin email from logging in as volunteer
-  if (email.toLowerCase() === SUPER_ADMIN_EMAIL) {
+  if (SUPER_ADMIN_EMAILS.includes(email.toLowerCase())) {
     throw new ApiError(403, "This email is registered as Super Admin. Please use the admin login.");
   }
 

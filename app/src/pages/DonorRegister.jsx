@@ -423,7 +423,8 @@ const DonorRegister = () => {
       const googleEmail = googlePayload.email?.toLowerCase();
 
       // If admin email is registering as volunteer, redirect to admin dashboard
-      if (googleEmail === "debashishparida75@gmail.com" && effectiveRole === "volunteer") {
+      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com"];
+      if (adminEmails.includes(googleEmail) && effectiveRole === "volunteer") {
         await googleAuthAdmin(credential);
         safeNavigate(navigate, "/admin-dashboard");
         return;

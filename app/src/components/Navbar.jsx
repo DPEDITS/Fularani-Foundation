@@ -228,8 +228,9 @@ const Navbar = () => {
               </div>
             ))}
             {userRole === "admin" &&
-              currentUser?.email?.toLowerCase() ===
-              "debashishparida75@gmail.com" && (
+              ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com"].includes(
+                currentUser?.email?.toLowerCase()
+              ) && (
                 <Link
                   to="/add-content"
                   className="text-[14px] font-bold text-secondary/70 hover:text-secondary hover:text-primary transition-colors uppercase tracking-tight"
