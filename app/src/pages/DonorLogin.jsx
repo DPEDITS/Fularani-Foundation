@@ -80,7 +80,9 @@ const DonorLogin = () => {
 
     try {
       const isAdminEmail = form.email.trim().toLowerCase() === "debashishparida75@gmail.com";
-      if (isAdminEmail) {
+
+      // Only redirect to admin dashboard when logging in via volunteer role
+      if (isAdminEmail && role === "volunteer") {
         const response = await loginAdmin(
           form.email.trim().toLowerCase(),
           form.password
@@ -90,7 +92,7 @@ const DonorLogin = () => {
         } else {
           setError(response.message || "Admin login failed");
         }
-        return; // ALWAYS return for admin email
+        return;
       }
 
       if (role === "donor") {
@@ -152,7 +154,8 @@ const DonorLogin = () => {
       const payload = JSON.parse(jsonPayload);
       const email = payload.email?.toLowerCase();
 
-      if (email === "debashishparida75@gmail.com") {
+      // Only redirect to admin dashboard when using volunteer role
+      if (email === "debashishparida75@gmail.com" && role === "volunteer") {
         await googleAuthAdmin(credential);
         safeNavigate(navigate, "/admin-dashboard");
         return;
