@@ -313,7 +313,11 @@ const DonorRegister = () => {
         formData.append("googleId", googleId);
         formData.append("ssoProvider", "google");
       }
-      if (avatar) formData.append("avatar", avatar);
+      if (avatar) {
+        formData.append("avatar", avatar);
+      } else if (avatarPreview && typeof avatarPreview === 'string' && avatarPreview.startsWith("http")) {
+        formData.append("googleAvatarUrl", avatarPreview);
+      }
 
       if (role === "donor") {
         // Double check we are on the final step for donor
@@ -1225,7 +1229,7 @@ const DonorRegister = () => {
                             className="hidden"
                             onChange={handleAvatarChange}
                             accept="image/*"
-                            required
+                            required={!avatarPreview}
                           />
                         </label>
                         <p className="text-[9px] text-secondary/40 mt-2 uppercase tracking-wider">

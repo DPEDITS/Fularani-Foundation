@@ -153,18 +153,19 @@ const registerVolunteer = asyncHandler(async (req, res) => {
 
 
   const avatarLocalPath = req.file?.path;
+  let finalAvatarUrl = "";
 
-  if (!avatarLocalPath) {
+  if (avatarLocalPath) {
+    const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
+    if (!avatarUpload || !avatarUpload.url) {
+      throw new ApiError(400, "Error uploading avatar. Please try again.");
+    }
+    finalAvatarUrl = avatarUpload.url;
+  } else if (req.body.googleAvatarUrl && typeof req.body.googleAvatarUrl === "string" && req.body.googleAvatarUrl.startsWith("http")) {
+    finalAvatarUrl = req.body.googleAvatarUrl;
+  } else {
     throw new ApiError(400, "Avatar is required for volunteer registration");
   }
-
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
-
-  if (!avatar || !avatar.url) {
-    throw new ApiError(400, "Error uploading avatar. Please try again.");
-  }
-
-  const avatarUrl = avatar.url;
 
   let parsedDateOfBirth = dateOfBirth;
 
@@ -186,7 +187,7 @@ const registerVolunteer = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
     email,
     password: password, // Note: Schema handles hashing via pre-save hook
-    avatar: avatarUrl,
+    avatar: finalAvatarUrl,
     gender: normalizedGender,
     phone,
     dateOfBirth: parsedDateOfBirth,
