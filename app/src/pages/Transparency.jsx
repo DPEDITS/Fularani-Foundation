@@ -54,9 +54,10 @@ const SubtopicSection = ({ subtopic, index, isSuperAdmin, onEdit, onDelete }) =>
                     {subtopic.documents.map((doc, docIdx) => (
                       <tr 
                         key={doc.id} 
-                        className={`transition-colors group hover:bg-white/[0.03] ${
+                        className={`transition-colors group hover:bg-white/[0.03] cursor-pointer ${
                           docIdx !== subtopic.documents.length - 1 ? "border-b border-white/5" : ""
                         }`}
+                        onClick={() => window.open(doc.link, "_blank")}
                       >
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-3 text-gray-300 font-medium">
