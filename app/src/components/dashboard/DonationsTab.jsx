@@ -42,8 +42,8 @@ const DonationsTab = ({ donations, user, formatCurrency, formatDate, setShowDona
                         <section key={year} id={`year-${year}`} className="relative">
                             {/* Year Header */}
                             <div className="sticky top-28 z-30 mb-8">
-                                <div className="inline-flex items-center gap-4 bg-secondary text-white px-6 py-3 rounded-2xl shadow-2xl">
-                                    <span className="text-3xl font-black tracking-tighter">{year}</span>
+                                <div className="inline-flex items-center gap-4 bg-secondary text-white px-4 md:px-6 py-3 rounded-2xl shadow-2xl">
+                                    <span className="text-2xl md:text-3xl font-black tracking-tighter">{year}</span>
                                     <div className="w-px h-6 bg-white/20"></div>
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 leading-none">Yearly Total</span>
@@ -53,18 +53,18 @@ const DonationsTab = ({ donations, user, formatCurrency, formatDate, setShowDona
                             </div>
 
                             {/* Path Line */}
-                            <div className="absolute left-10 top-20 bottom-0 w-px bg-gradient-to-b from-secondary/20 via-secondary/10 to-transparent"></div>
+                            <div className="absolute left-4 md:left-10 top-20 bottom-0 w-px bg-gradient-to-b from-secondary/20 via-secondary/10 to-transparent"></div>
 
                             {/* Donation Nodes */}
-                            <div className="space-y-6 ml-10 pl-10 border-l-2 border-dashed border-secondary/5 py-4">
+                            <div className="space-y-6 ml-4 pl-6 md:ml-10 md:pl-10 border-l-2 border-dashed border-secondary/5 py-4">
                                 {yearDonations.map((donation, i) => (
                                     <div key={i} className="group relative">
                                         {/* The Dot */}
-                                        <div className="absolute -left-[51px] top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-4 border-secondary group-hover:bg-accent group-hover:border-accent group-hover:scale-125 transition-all z-10 shadow-lg"></div>
+                                        <div className="absolute -left-[33px] md:-left-[51px] top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-4 border-secondary group-hover:bg-accent group-hover:border-accent group-hover:scale-125 transition-all z-10 shadow-lg"></div>
 
                                         {/* The Card */}
-                                        <div className="bg-white p-6 rounded-[24px] border border-secondary/10 shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
-                                            <div className="flex items-center gap-6">
+                                        <div className="bg-white p-4 md:p-6 rounded-[24px] border border-secondary/10 shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+                                            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
                                                 <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center shrink-0 transition-colors">
                                                     <Heart size={24} className={i === 0 && year === years[0] ? "fill-primary text-primary" : ""} />
                                                 </div>
