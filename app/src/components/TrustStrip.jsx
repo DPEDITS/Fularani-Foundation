@@ -4,8 +4,8 @@ const TrustStrip = () => {
   const stats = [
     { label: "Trees Planted", value: "500+" },
     { label: "Child Outreach", value: "1,200+" },
-    { label: "Villages Served", value: "20+" },
-    { label: "Active Missions", value: "4" },
+    { label: "Villages Served", value: "10+" },
+    { label: "Active Missions", value: "3" },
   ];
 
   return (
