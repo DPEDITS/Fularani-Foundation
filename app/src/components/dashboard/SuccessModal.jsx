@@ -18,9 +18,9 @@ const SuccessModal = ({ show, onClose, amount, formatCurrency, donorName }) => {
   const displayName = donorName || "Generous Donor";
   const displayAmount = amount || 0;
 
-  const shareCaption = `Thank you ${displayName} for your generous donation of ₹${displayAmount.toLocaleString("en-IN")} to Fularani Foundation! 🙏 Your support helps empower dreams and inspire humanity. Donate and support the community at fularanifoundations.org 💝 #FularaniFoundation #Donate #EmpowerDreams`;
+  const shareCaption = `Thank you ${displayName} for your generous donation of ₹${displayAmount.toLocaleString("en-IN")} to Fularani Foundation! 🙏 Your support helps empower dreams and inspire humanity. Donate and support the community at kb.fularanifoundation.org 💝 #FularaniFoundation #Donate #EmpowerDreams`;
 
-  const websiteUrl = "https://fularanifoundations.org";
+  const websiteUrl = "https://kb.fularanifoundation.org";
 
   // Generate share image using Canvas
   const generateShareImage = useCallback(() => {
@@ -195,7 +195,7 @@ const SuccessModal = ({ show, onClose, amount, formatCurrency, donorName }) => {
       // Website in bottom bar
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 24px 'Segoe UI', Arial, sans-serif";
-      ctx.fillText("fularanifoundations.org", 540, 988);
+      ctx.fillText("kb.fularanifoundation.org", 540, 988);
 
       // Convert to image URL
       const url = canvas.toDataURL("image/png");
