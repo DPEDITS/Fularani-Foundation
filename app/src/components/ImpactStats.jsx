@@ -1,37 +1,37 @@
 import React from "react";
 import { motion as Motion } from "motion/react";
-import { Users, Heart, Globe, BriefcaseMedical } from "lucide-react";
+import { Leaf, Heart, Globe, ShieldCheck } from "lucide-react";
 
 const stats = [
   {
     id: 1,
-    label: "Lives Impacted",
-    value: "10,000+",
+    label: "Trees Planted",
+    value: "500+",
+    icon: Leaf,
+    color: "text-[#34c759]",
+    bgColor: "bg-green-50",
+  },
+  {
+    id: 2,
+    label: "Child Outreach",
+    value: "1,200+",
     icon: Heart,
     color: "text-[#ff3b30]",
     bgColor: "bg-red-50",
   },
   {
-    id: 2,
-    label: "Dedicated Volunteers",
-    value: "500+",
-    icon: Users,
+    id: 3,
+    label: "Villages Served",
+    value: "10+",
+    icon: Globe,
     color: "text-[#0071e3]",
     bgColor: "bg-blue-50",
   },
   {
-    id: 3,
-    label: "Missions Completed",
-    value: "50+",
-    icon: BriefcaseMedical,
-    color: "text-[#34c759]",
-    bgColor: "bg-green-50",
-  },
-  {
     id: 4,
-    label: "Communities Served",
-    value: "20+",
-    icon: Globe,
+    label: "Active Missions",
+    value: "3",
+    icon: ShieldCheck,
     color: "text-[#ff9500]",
     bgColor: "bg-orange-50",
   },

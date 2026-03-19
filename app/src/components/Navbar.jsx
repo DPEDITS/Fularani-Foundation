@@ -192,7 +192,7 @@ const Navbar = () => {
                         ? "/volunteer-dashboard"
                         : "/donor-dashboard"
                   }
-                  className="flex items-center gap-3 pl-2 pr-4 py-1.5 bg-muted rounded-full hover:bg-primary/10 transition-all border border-secondary/5"
+                  className="flex items-center gap-3 p-1 shrink-0 md:pl-2 md:pr-4 md:py-1.5 bg-muted/50 md:bg-muted rounded-full hover:bg-primary/10 transition-all border border-secondary/5"
                 >
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-black text-xs shadow-sm overflow-hidden">
                     {currentUser?.avatar ? (
@@ -211,7 +211,7 @@ const Navbar = () => {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-secondary/40 hover:text-accent transition-all"
+                  className="hidden md:block p-2 text-secondary/40 hover:text-accent transition-all"
                   title="Logout"
                 >
                   <LogOut size={18} />

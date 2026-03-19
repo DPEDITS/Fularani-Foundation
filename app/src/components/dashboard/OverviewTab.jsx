@@ -22,7 +22,7 @@ const OverviewTab = ({
                         <div className="flex justify-between items-end border-b border-muted pb-5">
                             <div>
                                 <p className="text-secondary/40 text-[10px] font-black uppercase tracking-widest mb-1">Average Donation</p>
-                                <p className="text-3xl font-black text-secondary tracking-tight">{formatCurrency(stats?.averageDonation || 0)}</p>
+                                <p className="text-2xl md:text-3xl font-black text-secondary tracking-tight">{formatCurrency(stats?.averageDonation || 0)}</p>
                             </div>
                             <div className="text-right">
                                 <span className={`text-[9px] font-black text-white px-2 py-1 rounded-sm uppercase tracking-widest ${engagementScore > 50 ? 'bg-green-600' : 'bg-orange-500'}`}>
@@ -34,7 +34,7 @@ const OverviewTab = ({
                         <div className="flex justify-between items-end border-b border-muted pb-5">
                             <div>
                                 <p className="text-secondary/40 text-[10px] font-black uppercase tracking-widest mb-1">Latest Contribution</p>
-                                <p className="text-3xl font-black text-secondary tracking-tight">
+                                <p className="text-2xl md:text-3xl font-black text-secondary tracking-tight">
                                     {donations?.[0] ? formatCurrency(donations[0].amount) : "—"}
                                 </p>
                             </div>

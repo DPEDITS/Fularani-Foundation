@@ -91,7 +91,7 @@ const Contact = () => {
 
             {/* Phone Card */}
             <a
-              href="tel:+911234567890"
+              href="tel:+919439665220"
               className="block bg-primary p-8 rounded-3xl shadow-xl shadow-primary/20 group hover:-translate-y-1 transition-all"
             >
               <div className="flex items-start justify-between">
@@ -122,7 +122,7 @@ const Contact = () => {
               <div className="rounded-2xl overflow-hidden border border-secondary/10">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3740.863132844295!2d85.80803257523817!3d20.347272081136882!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a190916b5b20b17%3A0x45d8edf0190bee95!2sFularani%20Foundation!5e0!3m2!1sen!2sin!4v1769515569356!5m2!1sen!2sin"
-                  className="w-full h-40 border-0 grayscale hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-40 border-0 transition-all duration-700"
                   allowFullScreen=""
                   loading="lazy"
                 ></iframe>
