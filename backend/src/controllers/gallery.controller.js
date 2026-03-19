@@ -23,7 +23,7 @@ const createGalleryItem = asyncHandler(async (req, res) => {
   const galleryItem = await GalleryItem.create({
     title,
     category,
-    imageUrl: imageUrl?.url || "",
+    imageUrl: imageUrl?.secure_url || "",
     uploadedBy: uploadedBy || "",
     description,
   });
@@ -117,7 +117,7 @@ const updateGalleryItem = asyncHandler(async (req, res) => {
   if (imageUrlLocalPath) {
     const uploadedImage = await uploadOnCloudinary(imageUrlLocalPath);
     if (uploadedImage) {
-      imageUrl = uploadedImage.url;
+      imageUrl = uploadedImage.secure_url;
     }
   }
 

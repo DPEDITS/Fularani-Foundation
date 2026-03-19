@@ -75,7 +75,7 @@ const registerDonor = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
     email,
     password,
-    avatar: avatar?.url || "",
+    avatar: avatar?.secure_url || "",
     phone,
     address,
     panNumber,
@@ -373,7 +373,7 @@ const updateDonorAvatar = asyncHandler(async (req, res) => {
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
 
-  if (!avatar.url) {
+  if (!avatar.secure_url) {
     throw new ApiError(400, "Error while uploading avatar");
   }
 
@@ -381,7 +381,7 @@ const updateDonorAvatar = asyncHandler(async (req, res) => {
     req.user._id,
     {
       $set: {
-        avatar: avatar.url,
+        avatar: avatar.secure_url,
       },
     },
     { new: true }

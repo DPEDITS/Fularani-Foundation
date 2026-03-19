@@ -43,8 +43,8 @@ const createContent = asyncHandler(async (req, res) => {
   if (images && images.length > 0) {
     for (const image of images) {
       const uploaded = await uploadOnCloudinary(image.path);
-      if (uploaded?.url) {
-        imageUrls.push(uploaded.url);
+      if (uploaded?.secure_url) {
+        imageUrls.push(uploaded.secure_url);
       }
     }
   }
@@ -56,8 +56,8 @@ const createContent = asyncHandler(async (req, res) => {
     eventDate,
     status,
     isPublished,
-    markdownFile: markdownUpload.url,
-    coverImage: coverImageUpload?.url || "",
+    markdownFile: markdownUpload.secure_url,
+    coverImage: coverImageUpload?.secure_url || "",
     images: imageUrls,
     createdBy: req.user?._id,
     author,
@@ -126,20 +126,20 @@ const updateContent = asyncHandler(async (req, res) => {
 
   if (markdown) {
     const markdownUpload = await uploadOnCloudinary(markdown);
-    updateData.markdownFile = markdownUpload.url;
+    updateData.markdownFile = markdownUpload.secure_url;
   }
 
   if (coverImage) {
     const uploaded = await uploadOnCloudinary(coverImage);
-    updateData.coverImage = uploaded.url;
+    updateData.coverImage = uploaded.secure_url;
   }
 
   if (images && images.length > 0) {
     let imageUrls = [];
     for (const image of images) {
       const uploaded = await uploadOnCloudinary(image.path);
-      if (uploaded?.url) {
-        imageUrls.push(uploaded.url);
+      if (uploaded?.secure_url) {
+        imageUrls.push(uploaded.secure_url);
       }
     }
     updateData.images = imageUrls;

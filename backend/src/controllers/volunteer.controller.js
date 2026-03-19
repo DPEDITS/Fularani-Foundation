@@ -157,10 +157,10 @@ const registerVolunteer = asyncHandler(async (req, res) => {
 
   if (avatarLocalPath) {
     const avatarUpload = await uploadOnCloudinary(avatarLocalPath);
-    if (!avatarUpload || !avatarUpload.url) {
+    if (!avatarUpload || !avatarUpload.secure_url) {
       throw new ApiError(400, "Error uploading avatar. Please try again.");
     }
-    finalAvatarUrl = avatarUpload.url;
+    finalAvatarUrl = avatarUpload.secure_url;
   } else if (req.body.googleAvatarUrl && typeof req.body.googleAvatarUrl === "string" && req.body.googleAvatarUrl.startsWith("http")) {
     finalAvatarUrl = req.body.googleAvatarUrl;
   } else {
@@ -539,7 +539,7 @@ const updateVolunteerAvatar = asyncHandler(async (req, res) => {
     req.user._id,
     {
       $set: {
-        avatar: avatar.url,
+        avatar: avatar.secure_url,
       },
     },
     { new: true }
