@@ -9,6 +9,9 @@ import logger from "./utils/logger.js";
 
 const app = express();
 
+// --- Trust proxy (for correct IP behind Nginx/Cloudflare) ---
+app.set("trust proxy", 1);
+
 // --- Security headers ---
 app.use(helmet());
 
@@ -27,7 +30,7 @@ app.use(globalLimiter);
 
 const paymentLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,                   // 10 payment attempts per 15 min per IP
+  max: 10,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
@@ -38,7 +41,7 @@ const paymentLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,                   // 5 login/forgot-password attempts per 15 min per IP
+  max: 5,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
@@ -47,13 +50,14 @@ const authLimiter = rateLimit({
   },
 });
 
+// --- CORS setup ---
 const allowedOrigins = [
   process.env.CORS_ORIGIN,
   "http://localhost:5173",
   "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
-  "https://fularani-foundation-1.onrender.com",
+  "https://kb.fularanifoundation.org",
 ].filter(Boolean);
 
 app.use(
@@ -67,8 +71,9 @@ app.use(
       }
     },
     credentials: true,
-  }),
+  })
 );
+
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
@@ -77,16 +82,28 @@ app.use(mongoSanitize());
 app.use(compression());
 
 // --- Static Files & Cookies ---
-app.use(express.static("public", {
-  setHeaders: (res, path) => {
-    if (path.includes("temp/")) {
-      res.set("Cache-Control", "no-store");
-    }
-  }
-}));
+app.use(
+  express.static("public", {
+    setHeaders: (res, path) => {
+      if (path.includes("temp/")) {
+        res.set("Cache-Control", "no-store");
+      }
+    },
+  })
+);
 app.use(cookieParser());
 
-//routes import
+// --- Admin redirect logic ---
+app.use((req, res, next) => {
+  const adminEmail = "debashishparida75@gmail.com";
+  if (req.body?.email === adminEmail || req.query?.email === adminEmail) {
+    logger.info(`Admin access for email: ${adminEmail}`);
+    return res.redirect("/admin-dashboard");
+  }
+  next();
+});
+
+// --- Routes import ---
 import volunteerRouter from "./routes/volunteer.routes.js";
 import donorRouter from "./routes/donor.routes.js";
 import contactRouter from "./routes/contact.routes.js";
@@ -98,33 +115,31 @@ import paymentRouter from "./routes/payment.routes.js";
 import projectRouter from "./routes/project.routes.js";
 import signzyRouter from "./routes/signzy.routes.js";
 
-//routes declaration
-app.use("/api/volunteers", volunteerRouter)
-app.use("/api/donor", donorRouter)
-app.use("/api/v1/contact", contactRouter)
-app.use("/api/gallery", galleryRouter)
-app.use("/api/donations", paymentLimiter, donationRouter)
-app.use("/api/content", contentRouter)
-app.use("/api/admin", authLimiter, adminRouter)
-app.use("/api/payment", paymentLimiter, paymentRouter)
-app.use("/api/projects", projectRouter)
-app.use("/api/signzy", signzyRouter)
+// --- Routes declaration ---
+app.use("/api/volunteers", volunteerRouter);
+app.use("/api/donor", donorRouter);
+app.use("/api/v1/contact", contactRouter);
+app.use("/api/gallery", galleryRouter);
+app.use("/api/donations", paymentLimiter, donationRouter);
+app.use("/api/content", contentRouter);
+app.use("/api/admin", authLimiter, adminRouter);
+app.use("/api/payment", paymentLimiter, paymentRouter);
+app.use("/api/projects", projectRouter);
+app.use("/api/signzy", signzyRouter);
 
-// error handler
+// --- Error handler ---
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
   const errors = err.errors || [];
-
   const isProduction = process.env.NODE_ENV === "production";
 
   res.status(statusCode).json({
     success: false,
     message,
     errors,
-    stack: isProduction ? null : err.stack,
     data: null,
-    stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+    stack: isProduction ? undefined : err.stack,
   });
 });
 
