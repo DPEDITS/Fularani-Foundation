@@ -22,6 +22,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AddContent from "./pages/AddContent";
 import ResetPassword from "./pages/ResetPassword";
 import LegalPolicy from "./pages/LegalPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
 
 const App = () => {
   const location = useLocation();
@@ -59,6 +60,7 @@ const App = () => {
           <Route path="/add-content" element={<AddContent />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/legal-policy" element={<LegalPolicy />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
         </Routes>
       </main>
       {!shouldHideFooter && <Footer />}
