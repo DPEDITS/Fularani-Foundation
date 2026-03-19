@@ -3,14 +3,15 @@ import path from "path";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "./public/temp"); // Organize temp files
+    const uploadPath = path.resolve(process.cwd(), "public", "temp");
+    console.log(`[Multer] Uploading file to: ${uploadPath}`);
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname),
-    );
+    const fname = file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname);
+    console.log(`[Multer] Generated filename: ${fname}`);
+    cb(null, fname);
   },
 });
 

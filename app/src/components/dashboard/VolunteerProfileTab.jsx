@@ -1,7 +1,7 @@
 import React from "react";
 import { User, Mail, Phone, MapPin, FileText, Wrench, Target, Sparkles, Camera } from "lucide-react";
 
-const VolunteerProfileTab = ({ profile, user, handleLogout }) => {
+const VolunteerProfileTab = ({ profile, user, handleLogout, onUpdateAvatar, isUpdatingAvatar }) => {
     const data = profile || user;
     const skillsList = typeof data?.skills === 'string' ? data.skills.split(',') : (Array.isArray(data?.skills) ? data.skills : []);
     const areasList = typeof data?.preferredAreas === 'string' ? data.preferredAreas.split(',') : (Array.isArray(data?.preferredAreas) ? data.preferredAreas : []);
@@ -79,8 +79,12 @@ const VolunteerProfileTab = ({ profile, user, handleLogout }) => {
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
-                    <button className="px-6 py-3 bg-white border border-secondary/10 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm hover:bg-muted transition-all flex items-center gap-2">
-                        <Camera size={14} /> Update Avatar
+                    <button 
+                        onClick={onUpdateAvatar}
+                        disabled={isUpdatingAvatar}
+                        className="px-6 py-3 bg-white border border-secondary/10 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm hover:bg-muted transition-all flex items-center gap-2 disabled:opacity-50"
+                    >
+                        {isUpdatingAvatar ? "Updating..." : <><Camera size={14} /> Update Avatar</>}
                     </button>
                     <button
                         onClick={handleLogout}

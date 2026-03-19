@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerAdmin, loginAdmin, googleAuthAdmin, getAdminStats, getAllVolunteers, getAllDonors, getAllMissions, updateVolunteerStatus, assignTask, getAllDonations } from "../controllers/admin.controller.js";
+import { registerAdmin, loginAdmin, googleAuthAdmin, getAdminStats, getAllVolunteers, getAllDonors, getAllMissions, updateVolunteerStatus, assignTask, getAllDonations, updateAdminAvatar } from "../controllers/admin.controller.js";
 import { verifyJWT, verifyAdmin, verifySuperAdmin } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -14,7 +14,6 @@ adminRouter.route("/register").post(
       maxCount: 1,
     },
   ]),
-  verifyJWT,
   registerAdmin,
 );
 
@@ -27,5 +26,6 @@ adminRouter.route("/donations").get(verifyJWT, verifyAdmin, getAllDonations);
 adminRouter.route("/missions").get(verifyJWT, verifyAdmin, getAllMissions);
 adminRouter.route("/update-volunteer-status").post(verifyJWT, verifyAdmin, updateVolunteerStatus);
 adminRouter.route("/assign-task").post(verifyJWT, verifyAdmin, assignTask);
+adminRouter.route("/update-avatar").patch(verifyJWT, verifyAdmin, upload.single("avatar"), updateAdminAvatar);
 
 export default adminRouter;

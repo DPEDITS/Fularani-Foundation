@@ -9,6 +9,7 @@ import { Donation } from "../models/donation.model.js";
 import { Content } from "../models/content.model.js";
 import { Assignment } from "../models/assignment.model.js";
 import { Project } from "../models/project.model.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const registerAdmin = asyncHandler(async (req, res) => {
   const { username, password, email, role, phone } = req.body;
@@ -31,14 +32,19 @@ const registerAdmin = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Admin already exists");
   }
 
-    const admin = await Admin.create({
-        username,
-        password,
-        email,
-        role,
-        phone,
-        avatar: avatar
-    });
+  const result = await uploadOnCloudinary(avatar);
+  if (!result?.url) {
+    throw new ApiError(400, "Error while uploading avatar");
+  }
+
+  const admin = await Admin.create({
+    username,
+    password,
+    email,
+    role,
+    phone,
+    avatar: result.url
+  });
 
     const createdAdmin = await Admin.findById(admin._id).select("-password -refreshToken");
 
@@ -257,6 +263,34 @@ const googleAuthAdmin = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, { admin: loggedInAdmin, accessToken, refreshToken }, "Admin logged in with Google successfully"));
 });
 
+const updateAdminAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar file is missing");
+  }
+
+  const result = await uploadOnCloudinary(avatarLocalPath);
+
+  if (!result?.url) {
+    throw new ApiError(400, "Error while uploading avatar");
+  }
+
+  const admin = await Admin.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        avatar: result.url,
+      },
+    },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, admin, "Avatar image updated successfully"));
+});
+
 export { 
     registerAdmin, 
     loginAdmin, 
@@ -267,5 +301,6 @@ export {
     getAllMissions, 
     updateVolunteerStatus, 
     assignTask, 
-    getAllDonations 
+    getAllDonations,
+    updateAdminAvatar
 };

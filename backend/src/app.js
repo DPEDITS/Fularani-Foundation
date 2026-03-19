@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
-import rateLimit from "express-rate-limit";
 import mongoSanitize from "express-mongo-sanitize";
 import compression from "compression";
 import logger from "./utils/logger.js";
@@ -16,29 +15,6 @@ app.set("trust proxy", 1);
 app.use(helmet());
 
 // --- Specific route limiters only ---
-// Auth limiter (for login/signup)
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    logger.warn(`Auth rate limit exceeded for IP: ${req.ip}`);
-    res.status(429).json({ success: false, message: "Too many attempts — please try again later" });
-  },
-});
-
-// Payment limiter (for sensitive payment routes)
-const paymentLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    logger.warn(`Payment rate limit exceeded for IP: ${req.ip}`);
-    res.status(429).json({ success: false, message: "Too many payment attempts — please try again later" });
-  },
-});
 
 // --- CORS setup ---
 const allowedOrigins = [
@@ -110,10 +86,10 @@ app.use("/api/volunteers", volunteerRouter);
 app.use("/api/donor", donorRouter);
 app.use("/api/v1/contact", contactRouter);
 app.use("/api/gallery", galleryRouter);
-app.use("/api/donations", paymentLimiter, donationRouter);
+app.use("/api/donations", donationRouter);
 app.use("/api/content", contentRouter);
-app.use("/api/admin", authLimiter, adminRouter);
-app.use("/api/payment", paymentLimiter, paymentRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/payment", paymentRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/signzy", signzyRouter);
 
