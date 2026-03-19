@@ -134,10 +134,11 @@ const SuccessModal = ({ show, onClose, amount, formatCurrency, donorName }) => {
       // Donor Name
       ctx.fillStyle = "#1d1d1f";
       ctx.font = "bold 52px 'Segoe UI', Arial, sans-serif";
+      const upperName = displayName.toUpperCase();
       const nameText =
-        displayName.length > 20
-          ? displayName.substring(0, 18) + "..."
-          : displayName;
+        upperName.length > 20
+          ? upperName.substring(0, 18) + "..."
+          : upperName;
       ctx.fillText(nameText, 540, 535);
 
       // "for your generous donation of"
