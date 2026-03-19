@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { motion as Motion, AnimatePresence } from "motion/react";
 import { galleryItems } from "../data/galleryData";
 
@@ -29,7 +30,7 @@ const GalleryCarousel = () => {
           className="absolute inset-0 w-full h-full"
         >
           <img
-            src={currentItem.src}
+            src={getSecureCloudinaryUrl(currentItem.src)}
             alt={currentItem.title}
             className="w-full h-full object-cover"
           />

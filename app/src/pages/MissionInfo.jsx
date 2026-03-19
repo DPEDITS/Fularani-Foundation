@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { safeNavigate } from "../utils/safeNavigate";
 import { missions } from "../data/missions";
@@ -200,7 +201,7 @@ const MissionInfo = () => {
                           className={`relative rounded-2xl overflow-hidden group ${idx === 0 || idx === 3 ? "col-span-2 aspect-[2/1]" : "aspect-square"}`}
                         >
                           <img
-                            src={img}
+                            src={getSecureCloudinaryUrl(img)}
                             alt={`${title} highlight ${idx + 1}`}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           />
