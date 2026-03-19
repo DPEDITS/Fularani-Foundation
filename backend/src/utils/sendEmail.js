@@ -9,7 +9,7 @@ const sendEmail = async (options) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Fularani Foundation <onboarding@resend.dev>", // Must use onboarding domain on free tier
+      from: process.env.RESEND_FROM_EMAIL || "Fularani Foundation <noreply@kb.fularanifoundation.org>", // Must be a verified domain on Resend
       to: options.email,
       subject: options.subject,
       html: options.html,
