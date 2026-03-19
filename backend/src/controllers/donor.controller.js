@@ -441,7 +441,7 @@ const forgotPasswordDonor = asyncHandler(async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     console.error("Email send error:", error);
-    throw new ApiError(500, "There was an error sending the reset email. Please try again later.");
+    throw new ApiError(500, `Email send error: ${error.message}`);
   }
 });
 
