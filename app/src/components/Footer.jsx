@@ -39,6 +39,7 @@ const Footer = () => {
     legal: [
       { label: "Privacy Policy", to: "/legal-policy" },
       { label: "Terms and Conditions", to: "/terms" },
+      { label: "Financial Transparency", to: "/transparency" },
     ],
   };
 
