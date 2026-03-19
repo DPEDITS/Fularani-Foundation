@@ -53,6 +53,7 @@ const AdminDashboard = () => {
     totalVolunteers: 0,
     totalFunds: 0,
     activeMissions: 0,
+    totalProjects: 0,
   });
   const [loadingStats, setLoadingStats] = useState(true);
   const [listData, setListData] = useState([]);
@@ -163,16 +164,19 @@ const AdminDashboard = () => {
 
   const handleProjectCreated = () => {
     fetchListData(); // Refresh list
+    fetchStats();    // Refresh dashboard counters
     setIsCreateProjectModalOpen(false);
   };
 
   const handleProjectAssigned = () => {
     fetchListData(); // Refresh list
+    fetchStats();
     setIsAssignModalOpen(false);
   };
 
   const handleProjectUpdated = () => {
     fetchListData();
+    fetchStats();
     setIsLinkDonationModalOpen(false);
   };
 
@@ -191,7 +195,7 @@ const AdminDashboard = () => {
     { label: "Total Donors", value: stats.totalDonors, icon: Users, color: "text-blue-500", bg: "bg-blue-50" },
     { label: "Total Volunteers", value: stats.totalVolunteers, icon: Briefcase, color: "text-emerald-500", bg: "bg-emerald-50" },
     { label: "Total Funds", value: formatCurrency(stats.totalFunds), icon: DollarSign, color: "text-amber-500", bg: "bg-amber-50" },
-    { label: "Active Project", value: (listData && activeTab === 'projects' ? listData.length : 0), icon: Database, color: "text-rose-500", bg: "bg-rose-50" },
+    { label: "Active Project", value: stats.totalProjects, icon: Database, color: "text-rose-500", bg: "bg-rose-50" },
   ];
 
   return (

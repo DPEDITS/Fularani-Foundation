@@ -8,6 +8,7 @@ import { Volunteer } from "../models/volunteer.model.js";
 import { Donation } from "../models/donation.model.js";
 import { Content } from "../models/content.model.js";
 import { Assignment } from "../models/assignment.model.js";
+import { Project } from "../models/project.model.js";
 
 const registerAdmin = asyncHandler(async (req, res) => {
   const { username, password, email, role, phone } = req.body;
@@ -92,6 +93,8 @@ const getAdminStats = asyncHandler(async (req, res) => {
     status: "active",
   });
 
+  const totalProjects = await Project.countDocuments();
+
   return res.status(200).json(
     new ApiResponse(
       200,
@@ -100,6 +103,7 @@ const getAdminStats = asyncHandler(async (req, res) => {
         totalVolunteers,
         totalFunds,
         activeMissions,
+        totalProjects,
       },
       "Admin stats fetched successfully",
     ),
