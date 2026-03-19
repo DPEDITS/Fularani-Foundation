@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
 import { Link } from "react-router-dom";
 import { storyData } from "../data/storyData";
+import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 
 const Stories = () => {
   const scrollContainerRef = useRef(null);
@@ -73,7 +74,7 @@ const Stories = () => {
               <div className="flex flex-col md:flex-row h-full">
                 <div className="w-full md:w-2/5 h-40 md:h-auto overflow-hidden relative">
                   <img
-                    src={story.coverImage}
+                    src={getSecureCloudinaryUrl(story.coverImage)}
                     alt={story.title}
                     className="w-full h-full object-cover transition-all duration-700 hover:scale-110"
                   />

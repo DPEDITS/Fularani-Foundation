@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { useNavigate } from "react-router-dom";
 import { safeNavigate } from "../utils/safeNavigate";
 import {
@@ -305,7 +306,7 @@ const DonorDashboard = () => {
               <div className="w-24 h-24 md:w-48 md:h-48 rounded-[2.5rem] overflow-hidden border-4 border-white shadow-2xl transition-transform group-hover:scale-105 bg-accent">
                 {user?.avatar ? (
                   <img
-                    src={user.avatar}
+                    src={getSecureCloudinaryUrl(user.avatar)}
                     alt={user.username}
                     className="w-full h-full object-cover"
                   />

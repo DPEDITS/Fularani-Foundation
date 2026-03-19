@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { useNavigate } from "react-router-dom";
 import { safeNavigate } from "../utils/safeNavigate";
 import {
@@ -235,7 +236,7 @@ const AdminDashboard = () => {
               onClick={() => fileInputRef.current.click()}
             >
               {admin?.avatar ? (
-                <img src={admin.avatar} alt={admin.username} className="w-full h-full object-cover" />
+                <img src={getSecureCloudinaryUrl(admin.avatar)} alt={admin.username} className="w-full h-full object-cover" />
               ) : (
                 <ShieldCheck size={48} className="text-accent animate-pulse" />
               )}
@@ -386,7 +387,7 @@ const AdminDashboard = () => {
                           <div className="flex items-center gap-4">
                             <div className="w-10 h-10 rounded-lg overflow-hidden border border-secondary/5 shadow-sm">
                               {item.avatar || item.coverImage ? (
-                                <img src={item.avatar || item.coverImage} className="w-full h-full object-cover" alt="" />
+                                <img src={getSecureCloudinaryUrl(item.avatar || item.coverImage)} className="w-full h-full object-cover" alt="" />
                               ) : (
                                 <div className="w-full h-full bg-muted flex items-center justify-center font-black text-secondary/20">
                                   {(item.username || item.title).charAt(0).toUpperCase()}
