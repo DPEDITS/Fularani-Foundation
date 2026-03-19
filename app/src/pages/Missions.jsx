@@ -49,27 +49,27 @@ const Missions = () => {
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <StatCard
-              end={1200}
-              suffix="+"
-              label="Meals Served"
-              icon={<Heart size={24} />}
-            />
-            <StatCard
               end={500}
               suffix="+"
               label="Trees Planted"
               icon={<Leaf size={24} />}
             />
             <StatCard
-              end={100}
+              end={1200}
               suffix="+"
-              label="Volunteers"
+              label="Child Outreach"
+              icon={<Heart size={24} />}
+            />
+            <StatCard
+              end={10}
+              suffix="+"
+              label="Villages Served"
               icon={<Globe size={24} />}
             />
             <StatCard
-              end={50}
-              suffix="+"
-              label="Campaigns"
+              end={3}
+              suffix=""
+              label="Active Missions"
               icon={<ShieldCheck size={24} />}
             />
           </div>
