@@ -138,7 +138,12 @@ export const generateDonationReceipt = async (donation, user) => {
         doc.setFont("helvetica", "normal");
         doc.text("Dated :", 130, receiptInfoY);
         doc.setFont("helvetica", "bold");
-        const donationDate = donation.donatedAt ? new Date(donation.donatedAt).toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' }) : "N/A";
+        const rawDate = donation.donatedAt || donation.createdAt || new Date();
+        const donationDate = new Date(rawDate).toLocaleDateString("en-GB", { 
+            day: 'numeric', 
+            month: 'short', 
+            year: 'numeric' 
+        });
         doc.text(donationDate, 150, receiptInfoY);
         doc.line(150, receiptInfoY + 2, pageWidth - leftMargin, receiptInfoY + 2);
 
@@ -293,7 +298,7 @@ export const generateDonationsReport = (donations, user) => {
 
         const tableColumn = ["Date", "Amount", "Method", "Type", "Status"];
         const tableRows = donations.map((d) => [
-            d.donatedAt ? new Date(d.donatedAt).toLocaleDateString("en-IN") : "N/A",
+            new Date(d.donatedAt || d.createdAt || new Date()).toLocaleDateString("en-IN"),
             `INR ${typeof d.amount === 'number' ? d.amount.toLocaleString("en-IN") : d.amount}`,
             d.paymentGateway || "Razorpay",
             d.isRecurring ? "Recurring" : "One-time",

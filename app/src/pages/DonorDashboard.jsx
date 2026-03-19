@@ -148,6 +148,7 @@ const DonorDashboard = () => {
               razorpay_signature: response.razorpay_signature,
               isRecurring,
               recurringInterval: isRecurring ? "monthly" : "once",
+              donatedAt: new Date().toISOString(),
             };
 
             await createDonation(donationData);
