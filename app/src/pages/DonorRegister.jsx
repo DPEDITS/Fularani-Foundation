@@ -32,6 +32,7 @@ import {
   verifyPAN as verifyPANVolunteer,
   googleAuthVolunteer,
 } from "../services/volunteerService";
+import { googleAuthAdmin } from "../services/adminService";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
 const DonorRegister = () => {
@@ -412,6 +413,22 @@ const DonorRegister = () => {
     console.log("Google Sign-In executing for role:", effectiveRole);
 
     try {
+      // Decode JWT to check email
+      const base64Url = credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      const googlePayload = JSON.parse(jsonPayload);
+      const googleEmail = googlePayload.email?.toLowerCase();
+
+      // If admin email is registering as volunteer, redirect to admin dashboard
+      if (googleEmail === "debashishparida75@gmail.com" && effectiveRole === "volunteer") {
+        await googleAuthAdmin(credential);
+        safeNavigate(navigate, "/admin-dashboard");
+        return;
+      }
+
       if (effectiveRole === "donor") {
         const result = await googleAuthDonor(credential);
         console.log("Donor Google Auth Result:", result);
