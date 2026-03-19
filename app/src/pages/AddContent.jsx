@@ -9,9 +9,17 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { isAdminAuthenticated, getAdminUser } from "../services/adminService";
+import { useEffect } from "react";
 
 const AddContent = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAdminAuthenticated() || getAdminUser()?.email !== "debashishparida75@gmail.com") {
+      navigate("/");
+    }
+  }, [navigate]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -98,11 +106,13 @@ const AddContent = () => {
     <div className="min-h-screen bg-gray-50 pt-24 pb-12 px-6">
       <div className="max-w-3xl mx-auto">
         <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-black transition-colors font-medium mb-8"
+          to="/admin-dashboard"
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-black transition-all font-bold mb-8 group"
         >
-          <ArrowLeft size={18} />
-          Back to Dashboard
+          <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+            <ArrowLeft size={16} />
+          </div>
+          <span className="text-xs uppercase tracking-widest font-black">Back to Control Center</span>
         </Link>
 
         <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">

@@ -168,7 +168,8 @@ const Navbar = () => {
                 )}
               </div>
             ))}
-            {currentUser?.email?.toLowerCase() ===
+            {userRole === "admin" &&
+              currentUser?.email?.toLowerCase() ===
               "debashishparida75@gmail.com" && (
                 <Link
                   to="/add-content"
