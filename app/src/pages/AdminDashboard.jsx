@@ -445,8 +445,8 @@ const AdminDashboard = () => {
                               {item.proofOfWork && item.proofOfWork.images && item.proofOfWork.images.length > 0 && (
                                 <div className="flex -space-x-2 mt-1">
                                   {item.proofOfWork.images.map((img, idx) => (
-                                    <a key={idx} href={img.url} target="_blank" rel="noopener noreferrer" className="w-6 h-6 rounded-full border border-white overflow-hidden hover:scale-150 transition-transform z-10 hover:z-20">
-                                      <img src={img.url} className="w-full h-full object-cover" />
+                                    <a key={idx} href={getSecureCloudinaryUrl(img.url)} target="_blank" rel="noopener noreferrer" className="w-6 h-6 rounded-full border border-white overflow-hidden hover:scale-150 transition-transform z-10 hover:z-20">
+                                      <img src={getSecureCloudinaryUrl(img.url)} className="w-full h-full object-cover" />
                                     </a>
                                   ))}
                                 </div>
@@ -1168,7 +1168,7 @@ const ViewProofModal = ({ project, onClose }) => {
                 className="group relative aspect-square rounded-[24px] overflow-hidden border-2 border-transparent hover:border-secondary/10 transition-all cursor-pointer shadow-sm hover:shadow-xl"
                 onClick={() => setSelectedImage(img.url)}
               >
-                <img src={img.url} alt={`Proof ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <img src={getSecureCloudinaryUrl(img.url)} alt={`Proof ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <span className="text-white text-xs font-black uppercase tracking-widest px-3 py-1 border border-white/30 rounded-full backdrop-blur-sm">View</span>
                 </div>
@@ -1189,7 +1189,7 @@ const ViewProofModal = ({ project, onClose }) => {
             >
               <CloseIcon size={24} />
             </button>
-            <img src={selectedImage} alt="Proof Fullscreen" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
+            <img src={getSecureCloudinaryUrl(selectedImage)} alt="Proof Fullscreen" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { getSecureCloudinaryUrl } from "../../utils/imageUtils";
 import {
     Heart,
     Eye,
@@ -191,7 +192,7 @@ const ImpactTab = ({ formatCurrency, formatDate }) => {
                                                                 onClick={() => setSelectedImage(img.url)}
                                                                 className="aspect-square rounded-2xl overflow-hidden border-2 border-white shadow-sm hover:scale-105 transition-all group/img relative cursor-zoom-in"
                                                             >
-                                                                <img src={img.url} className="w-full h-full object-cover" alt="Proof" />
+                                                                <img src={getSecureCloudinaryUrl(img.url)} className="w-full h-full object-cover" alt="Proof" />
                                                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
                                                                     <Eye className="text-white" size={20} />
                                                                 </div>
@@ -328,7 +329,7 @@ const ImpactTab = ({ formatCurrency, formatDate }) => {
                         >
                             <CloseIcon size={24} />
                         </button>
-                        <img src={selectedImage} alt="Proof of work" className="w-full h-full object-contain bg-black" />
+                        <img src={getSecureCloudinaryUrl(selectedImage)} alt="Proof of work" className="w-full h-full object-contain bg-black" />
                     </div>
                 </div>
             )}

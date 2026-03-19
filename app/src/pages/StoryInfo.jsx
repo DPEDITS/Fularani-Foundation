@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { storyData } from "../data/storyData";
 import { safeNavigate } from "../utils/safeNavigate";
@@ -139,7 +140,7 @@ const StoryInfo = () => {
         {coverImage && (
           <div className="relative aspect-video rounded-3xl overflow-hidden mb-16 shadow-2xl">
             <img
-              src={coverImage}
+              src={getSecureCloudinaryUrl(coverImage)}
               alt={title}
               className="w-full h-full object-cover"
             />
@@ -197,7 +198,7 @@ const StoryInfo = () => {
                     className="my-10 rounded-2xl overflow-hidden shadow-lg not-prose"
                   >
                     <img
-                      src={block.src}
+                      src={getSecureCloudinaryUrl(block.src)}
                       alt={block.caption || ""}
                       className="w-full h-auto object-cover"
                     />
@@ -226,7 +227,7 @@ const StoryInfo = () => {
                   className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
                 >
                   <img
-                    src={img}
+                    src={getSecureCloudinaryUrl(img)}
                     alt={`Gallery image ${index + 1}`}
                     className="w-full h-64 object-cover hover:scale-105 transition-transform duration-500"
                   />

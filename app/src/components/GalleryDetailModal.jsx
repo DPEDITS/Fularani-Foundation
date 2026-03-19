@@ -1,4 +1,5 @@
 import React from "react";
+import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { motion as Motion } from "motion/react";
 import { X, ArrowRight } from "lucide-react";
 import { safeLocationRedirect } from "../utils/safeNavigate";
@@ -23,7 +24,7 @@ const GalleryDetailModal = ({ item, onClose }) => {
       >
         <div className="flex-1 bg-black relative flex items-center justify-center overflow-hidden">
           <img
-            src={item.src}
+            src={getSecureCloudinaryUrl(item.src)}
             alt={item.title}
             className="max-h-[80vh] w-full object-contain"
           />

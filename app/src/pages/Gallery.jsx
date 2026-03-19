@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { motion as Motion, AnimatePresence } from "motion/react";
 import {
   Plus,
@@ -239,7 +240,7 @@ const Gallery = () => {
                   className="group relative bg-muted/20 rounded-[40px] overflow-hidden aspect-[4/5] cursor-pointer"
                   onClick={() => setSelectedImage(item)}
                 >
-                  <img src={item.src} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                  <img src={getSecureCloudinaryUrl(item.src)} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/10 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
                   <div className="absolute inset-0 p-10 flex flex-col justify-end text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                     <span className="inline-block px-3 py-1 bg-primary text-white rounded-lg text-[10px] font-black uppercase tracking-widest mb-4 w-fit">{item.category}</span>
