@@ -21,8 +21,8 @@ const registerAdmin = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Avatar is required");
   }
 
-  if (role !== "SUPER_ADMIN" && role !== "ADMIN") {
-    throw new ApiError(400, "Invalid role");
+  if (role !== "ADMIN") {
+    throw new ApiError(400, "Only ADMIN role can be registered. SUPER_ADMIN is reserved.");
   }
 
   const existingAdmin = await Admin.findOne({ email });
