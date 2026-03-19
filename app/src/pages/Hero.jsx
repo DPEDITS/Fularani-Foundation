@@ -3,6 +3,7 @@ import { motion as Motion, AnimatePresence } from "motion/react";
 import { ArrowRight, Heart, ShieldCheck } from "lucide-react";
 import heroBg from "../assets/missions1.jpeg";
 import { getRecentDonors } from "../services/donorService";
+import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 
 const Hero = () => {
   const impactBadges = [
@@ -173,7 +174,7 @@ const Hero = () => {
                         className="w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white overflow-hidden bg-primary"
                       >
                         <img
-                          src={donor.avatar}
+                          src={getSecureCloudinaryUrl(donor.avatar)}
                           alt={donor.username}
                           className="w-full h-full object-cover"
                           onError={(e) => {

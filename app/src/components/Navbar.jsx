@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { motion, AnimatePresence } from "motion/react";
 import { Link, useLocation } from "react-router-dom";
 import { Heart, ChevronDown, Menu, X, LogOut, ArrowRight } from "lucide-react";
@@ -257,7 +258,7 @@ const Navbar = () => {
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-black text-xs shadow-sm overflow-hidden">
                     {currentUser?.avatar ? (
                       <img
-                        src={currentUser.avatar}
+                        src={getSecureCloudinaryUrl(currentUser.avatar)}
                         alt={currentUser.username}
                         className="w-full h-full object-cover"
                       />
