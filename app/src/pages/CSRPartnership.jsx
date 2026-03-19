@@ -140,7 +140,7 @@ const CSRPartnership = () => {
       <div className="absolute top-1/2 left-0 w-64 h-64 bg-accent/5 rounded-full blur-[120px] -translate-x-1/2"></div>
 
       {/* Hero Section */}
-      <div className="relative pt-25 pb-20 px-6 z-10">
+      <div className="relative pt-20 md:pt-25 pb-12 md:pb-20 px-4 md:px-6 z-10">
         <div className="max-w-[1200px] mx-auto">
           <Motion.div
             initial="hidden"
@@ -148,23 +148,23 @@ const CSRPartnership = () => {
             variants={fadeIn}
             className="text-center md:text-left"
           >
-            <div className="inline-block bg-accent px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-6">
+            <div className="inline-block bg-accent px-3 md:px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-4 md:mb-6">
               Partnership for Growth
             </div>
-            <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-10 lowercase">
+            <h1 className="text-5xl md:text-8xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-6 md:mb-10 lowercase">
               Partner for <br />
-              <span className="text-white bg-primary px-6 py-2 inline-block -rotate-1 mt-2">
+              <span className="text-white bg-primary px-4 md:px-6 py-1 md:py-2 inline-block -rotate-1 mt-2">
                 impactful change.
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground leading-tight max-w-[800px] font-bold mb-12">
+            <p className="text-lg md:text-2xl text-muted-foreground leading-tight max-w-[800px] font-bold mb-8 md:mb-12">
               Align your brand with our missions to create sustainable
               developments and transform lives across the nation.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <a
                 href="#contact"
-                className="bg-accent hover:bg-accent/80 text-secondary px-12 py-6 rounded-2xl text-lg font-black uppercase tracking-tight transition-all shadow-2xl shadow-accent/30 hover:translate-y-[-4px] flex items-center justify-center gap-3 group"
+                className="bg-accent hover:bg-accent/80 text-secondary px-8 md:px-12 py-4 md:py-6 rounded-2xl text-base md:text-lg font-black uppercase tracking-tight transition-all shadow-2xl shadow-accent/30 hover:translate-y-[-4px] flex items-center justify-center gap-3 group"
               >
                 Collaborate Now
                 <ArrowRight
@@ -178,25 +178,25 @@ const CSRPartnership = () => {
       </div>
 
       {/* Trust & Stats Section */}
-      <section className="py-24 px-6 bg-secondary text-white relative overflow-hidden">
+      <section className="py-12 md:py-24 px-4 md:px-6 bg-secondary text-white relative overflow-hidden">
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
 
         <div className="max-w-[1200px] mx-auto relative z-10">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-16">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-16">
             <div className="max-w-xl text-center lg:text-left">
-              <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none mb-8 lowercase">
+              <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter leading-none mb-4 md:mb-8 lowercase">
                 Our track <br />
-                <span className="text-secondary bg-accent px-4 py-1 inline-block rotate-1 mt-2">
+                <span className="text-secondary bg-accent px-3 md:px-4 py-1 inline-block rotate-1 mt-2">
                   record.
                 </span>
               </h2>
-              <p className="text-xl text-white/60 font-medium leading-tight">
+              <p className="text-lg md:text-xl text-white/60 font-medium leading-tight">
                 We work with leading corporates to fulfill their ESG and SDG
                 goals through transparent and impactful initiatives.
               </p>
             </div>
 
-            <div className="flex-grow grid grid-cols-2 gap-8">
+            <div className="flex-grow grid grid-cols-2 gap-6 md:gap-8">
               {[
                 {
                   label: "Lives Impacted",
@@ -223,7 +223,7 @@ const CSRPartnership = () => {
                   key={idx}
                   className="flex flex-col items-center lg:items-start group"
                 >
-                  <div className="text-4xl md:text-6xl font-black text-primary tracking-tighter transition-transform group-hover:scale-110">
+                  <div className="text-3xl md:text-6xl font-black text-primary tracking-tighter transition-transform group-hover:scale-110">
                     {stat.value}
                   </div>
                   <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mt-2">
@@ -237,24 +237,24 @@ const CSRPartnership = () => {
       </section>
 
       {/* Ways to Collaborate */}
-      <section className="py-32 bg-white px-6 relative z-10">
+      <section className="py-12 md:py-32 bg-white px-4 md:px-6 relative z-10">
         <div className="max-w-[1200px] mx-auto">
-          <div className="text-center md:text-left mb-24">
-            <h2 className="text-4xl md:text-6xl font-black text-secondary tracking-tighter leading-none mb-6 lowercase">
+          <div className="text-center md:text-left mb-12 md:mb-24">
+            <h2 className="text-3xl md:text-6xl font-black text-secondary tracking-tighter leading-none mb-4 md:mb-6 lowercase">
               ways to{" "}
-              <span className="text-primary italic underline decoration-accent decoration-8 underline-offset-8">
+              <span className="text-primary italic underline decoration-accent decoration-4 md:decoration-8 underline-offset-4 md:underline-offset-8">
                 collaborate
               </span>
               .
             </h2>
-            <p className="text-xl text-muted-foreground font-bold max-w-2xl leading-tight">
+            <p className="text-lg md:text-xl text-muted-foreground font-bold max-w-2xl leading-tight">
               Every partnership is unique. We offer diverse engagement models to
               suit your brand's CSR objectives.
             </p>
           </div>
 
           <Motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
@@ -264,18 +264,18 @@ const CSRPartnership = () => {
               <Motion.div
                 key={idx}
                 variants={fadeIn}
-                className="group p-10 bg-muted/20 rounded-[40px] border-2 border-transparent hover:border-primary/10 hover:bg-white hover:shadow-2xl transition-all duration-500"
+                className="group p-6 md:p-10 bg-muted/20 rounded-[30px] md:rounded-[40px] border-2 border-transparent hover:border-primary/10 hover:bg-white hover:shadow-2xl transition-all duration-500"
               >
                 <div
                   style={{
                     backgroundColor: `${way.color}15`,
                     color: way.color,
                   }}
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10 transition-all duration-500 group-hover:scale-110"
+                  className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center mb-6 md:mb-10 transition-all duration-500 group-hover:scale-110"
                 >
-                  <way.icon size={32} />
+                  <way.icon size={24} className="md:w-8 md:h-8" />
                 </div>
-                <h3 className="text-2xl font-black text-secondary mb-4 lowercase tracking-tight group-hover:text-primary transition-colors">
+                <h3 className="text-xl md:text-2xl font-black text-secondary mb-2 md:mb-4 lowercase tracking-tight group-hover:text-primary transition-colors">
                   {way.title}
                 </h3>
                 <p className="text-muted-foreground font-bold leading-tight uppercase text-xs tracking-wider opacity-60">
@@ -288,19 +288,19 @@ const CSRPartnership = () => {
       </section>
 
       {/* Brand Development / Direct Impact */}
-      <section className="py-24 px-6 relative z-10">
-        <div className="max-w-[1200px] mx-auto bg-primary text-white p-12 md:p-24 rounded-[40px] relative overflow-hidden shadow-2xl shadow-primary/30">
+      <section className="py-12 md:py-24 px-4 md:px-6 relative z-10">
+        <div className="max-w-[1200px] mx-auto bg-primary text-white p-6 md:p-12 lg:p-24 rounded-[30px] md:rounded-[40px] relative overflow-hidden shadow-2xl shadow-primary/30">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/3" />
 
-          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-16">
-            <div className="flex-1">
-              <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.8] mb-12 lowercase">
+          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
+            <div className="flex-1 text-center md:text-left">
+              <h2 className="text-4xl md:text-7xl font-black tracking-tighter leading-[0.8] mb-8 md:mb-12 lowercase">
                 Brand development through <br />
-                <span className="text-secondary bg-accent px-6 py-2 inline-block -rotate-1 mt-4">
+                <span className="text-secondary bg-accent px-4 md:px-6 py-1 md:py-2 inline-block -rotate-1 mt-2 md:mt-4">
                   compassion.
                 </span>
               </h2>
-              <p className="text-xl md:text-2xl text-white/80 font-bold leading-tight mb-12">
+              <p className="text-lg md:text-2xl text-white/80 font-bold leading-tight mb-8 md:mb-12">
                 Connect your business objectives with social good. Our team
                 ensures that your corporate contributions translate into
                 tangible, documented impact.
@@ -337,7 +337,7 @@ const CSRPartnership = () => {
             </div>
 
             <div className="w-full lg:w-[440px]">
-              <div className="bg-white dark:bg-[#1d1d1f] p-10 rounded-[40px] shadow-[0_32px_64px_rgba(0,0,0,0.1)] border border-black/5 dark:border-white/5 relative overflow-hidden">
+              <div className="bg-white dark:bg-[#1d1d1f] p-6 text-left md:p-10 rounded-[30px] md:rounded-[40px] shadow-[0_32px_64px_rgba(0,0,0,0.1)] border border-black/5 dark:border-white/5 relative overflow-hidden">
                 {/* Accent line */}
                 <div className="absolute top-0 left-0 w-full h-2 bg-accent"></div>
                 
@@ -392,8 +392,8 @@ const CSRPartnership = () => {
                         </Motion.div>
                       )}
 
-                      <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-2">
+                      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                        <div className="space-y-1 md:space-y-2">
                           <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">Company Name</label>
                           <input
                             type="text"
@@ -401,11 +401,11 @@ const CSRPartnership = () => {
                             value={form.companyName}
                             onChange={handleChange}
                             placeholder="Your Company Inc."
-                            className="w-full h-16 px-6 bg-muted/30 dark:bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold placeholder:text-gray-400 dark:placeholder:text-gray-600 text-secondary dark:text-white"
+                            className="w-full h-14 md:h-16 px-4 md:px-6 bg-muted/30 dark:bg-white/5 border-none rounded-xl md:rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold placeholder:text-gray-400 dark:placeholder:text-gray-600 text-secondary dark:text-white text-sm md:text-base"
                           />
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-1 md:space-y-2">
                           <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">Work Email</label>
                           <input
                             type="email"
@@ -413,11 +413,11 @@ const CSRPartnership = () => {
                             value={form.email}
                             onChange={handleChange}
                             placeholder="name@company.com"
-                            className="w-full h-16 px-6 bg-muted/30 dark:bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold placeholder:text-gray-400 dark:placeholder:text-gray-600 text-secondary dark:text-white"
+                            className="w-full h-14 md:h-16 px-4 md:px-6 bg-muted/30 dark:bg-white/5 border-none rounded-xl md:rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold placeholder:text-gray-400 dark:placeholder:text-gray-600 text-secondary dark:text-white text-sm md:text-base"
                           />
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-1 md:space-y-2">
                           <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">Phone Number</label>
                           <input
                             type="tel"
@@ -425,14 +425,14 @@ const CSRPartnership = () => {
                             value={form.phone}
                             onChange={handleChange}
                             placeholder="+91 00000 00000"
-                            className="w-full h-16 px-6 bg-muted/30 dark:bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold placeholder:text-gray-400 dark:placeholder:text-gray-600 text-secondary dark:text-white"
+                            className="w-full h-14 md:h-16 px-4 md:px-6 bg-muted/30 dark:bg-white/5 border-none rounded-xl md:rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold placeholder:text-gray-400 dark:placeholder:text-gray-600 text-secondary dark:text-white text-sm md:text-base"
                           />
                         </div>
 
                         <button 
                           type="submit"
                           disabled={loading}
-                          className="w-full h-18 bg-secondary dark:bg-accent dark:text-secondary text-white rounded-2xl font-black uppercase tracking-[0.1em] text-sm shadow-2xl shadow-secondary/20 dark:shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-3 disabled:opacity-50"
+                          className="w-full h-14 md:h-18 bg-secondary dark:bg-accent dark:text-secondary text-white rounded-xl md:rounded-2xl font-black uppercase tracking-[0.1em] text-xs md:text-sm shadow-2xl shadow-secondary/20 dark:shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all mt-6 flex items-center justify-center gap-3 disabled:opacity-50"
                         >
                           {loading ? (
                             <>
@@ -463,45 +463,45 @@ const CSRPartnership = () => {
       {/* Contact Section */}
       <section
         id="contact"
-        className="py-32 bg-white px-6 relative z-10 text-center"
+        className="py-16 md:py-32 bg-white px-4 md:px-6 relative z-10 text-center"
       >
         <div className="max-w-[800px] mx-auto">
-          <div className="inline-block bg-accent px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-8">
+          <div className="inline-block bg-accent px-3 md:px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-6 md:mb-8">
             Ready to start?
           </div>
-          <h2 className="text-5xl md:text-8xl font-black text-secondary tracking-tighter leading-[0.8] mb-20 lowercase">
+          <h2 className="text-4xl md:text-8xl font-black text-secondary tracking-tighter leading-[0.8] mb-12 md:mb-20 lowercase">
             Let's Build a <br />
-            <span className="text-white bg-primary px-6 py-2 inline-block -rotate-1 mt-4">
+            <span className="text-white bg-primary px-4 md:px-6 py-1 md:py-2 inline-block -rotate-1 mt-2 md:mt-4">
               luminous future.
             </span>
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-8 mb-12 md:mb-16">
             <a
               href="mailto:info@fularanifoundation.org"
-              className="flex flex-col items-center p-12 bg-muted/20 rounded-[40px] border-2 border-transparent hover:border-primary/10 hover:bg-white hover:shadow-2xl transition-all group"
+              className="flex flex-col items-center p-4 sm:p-8 md:p-12 bg-muted/20 rounded-[20px] sm:rounded-[30px] md:rounded-[40px] border-2 border-transparent hover:border-primary/10 hover:bg-white hover:shadow-2xl transition-all group"
             >
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 transition-all group-hover:bg-primary group-hover:text-white">
-                <Mail size={28} />
+              <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-primary/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-primary mb-3 sm:mb-4 md:mb-6 transition-all group-hover:bg-primary group-hover:text-white">
+                <Mail size={20} className="sm:w-6 sm:h-6 md:w-7 md:h-7" />
               </div>
-              <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">
-                Email Us
+              <div className="text-[9px] sm:text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 md:mb-2">
+                Email
               </div>
-              <div className="text-xl font-black text-secondary">
+              <div className="text-[13px] sm:text-sm md:text-xl font-black text-secondary break-all sm:break-normal text-center w-full">
                 info@fularani.org
               </div>
             </a>
             <a
               href="tel:+917997801001"
-              className="flex flex-col items-center p-12 bg-muted/20 rounded-[40px] border-2 border-transparent hover:border-primary/10 hover:bg-white hover:shadow-2xl transition-all group"
+              className="flex flex-col items-center p-4 sm:p-8 md:p-12 bg-muted/20 rounded-[20px] sm:rounded-[30px] md:rounded-[40px] border-2 border-transparent hover:border-primary/10 hover:bg-white hover:shadow-2xl transition-all group"
             >
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 transition-all group-hover:bg-primary group-hover:text-white">
-                <Phone size={28} />
+              <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-primary/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-primary mb-3 sm:mb-4 md:mb-6 transition-all group-hover:bg-primary group-hover:text-white">
+                <Phone size={20} className="sm:w-6 sm:h-6 md:w-7 md:h-7" />
               </div>
-              <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">
-                Call Us
+              <div className="text-[9px] sm:text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 md:mb-2">
+                Call
               </div>
-              <div className="text-xl font-black text-secondary">
+              <div className="text-[13px] sm:text-sm md:text-xl font-black text-secondary text-center w-full">
                 +91 79978 01001
               </div>
             </a>
