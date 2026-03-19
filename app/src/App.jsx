@@ -23,6 +23,7 @@ import AddContent from "./pages/AddContent";
 import ResetPassword from "./pages/ResetPassword";
 import LegalPolicy from "./pages/LegalPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import Transparency from "./pages/Transparency";
 
 const App = () => {
   const location = useLocation();
@@ -61,6 +62,7 @@ const App = () => {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/legal-policy" element={<LegalPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
+          <Route path="/transparency" element={<Transparency />} />
         </Routes>
       </main>
       {!shouldHideFooter && <Footer />}
