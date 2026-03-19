@@ -3,6 +3,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Download, ShieldCheck, ChevronDown, Plus, X, Loader2, Pencil, Trash2, PlusCircle, MinusCircle } from "lucide-react";
 import api from "../services/api";
 import { isAdminAuthenticated, getAdminUser } from "../services/adminService";
+const getDownloadLink = (url) => {
+  if (!url) return "#";
+  try {
+    const driveMatch = url.match(/\/file\/d\/(.+?)\/(?:view|edit)/) || url.match(/id=(.+?)(?:&|$)/);
+    if (driveMatch && driveMatch[1]) {
+      return `https://docs.google.com/uc?export=download&id=${driveMatch[1]}`;
+    }
+    return url;
+  } catch (err) {
+    return url;
+  }
+};
 
 const SubtopicSection = ({ subtopic, index, isSuperAdmin, onEdit, onDelete }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -71,7 +83,7 @@ const SubtopicSection = ({ subtopic, index, isSuperAdmin, onEdit, onDelete }) =>
                         <td className="py-4 px-2 md:px-4 text-right">
                           <div className="inline-flex items-center gap-1.5 md:gap-2">
                             <a
-                              href={doc.link}
+                              href={getDownloadLink(doc.link)}
                               target="_blank"
                               rel="noopener noreferrer"
                               download
