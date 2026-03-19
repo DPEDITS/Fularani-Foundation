@@ -1,0 +1,41 @@
+{
+  "acquirer_data": {
+    "rrn": "644480457787"
+  },
+  "amount": 100000,
+  "amount_captured": null,
+  "amount_refunded": 0,
+  "bank": null,
+  "captured": true,
+  "card_id": null,
+  "contact": "+917978920623",
+  "created_at": 1773941646,
+  "currency": "INR",
+  "description": "Donation Transaction",
+  "email": "abhijeetdashx@gmail.com",
+  "entity": "payment",
+  "error_code": null,
+  "error_description": null,
+  "error_reason": null,
+  "error_source": null,
+  "error_step": null,
+  "fee": 2360,
+  "id": "pay_STAUhvN7R0KjOG",
+  "international": false,
+  "invoice_id": null,
+  "method": "upi",
+  "notes": [],
+  "order_id": "order_STATZprymlB0iz",
+  "provider": null,
+  "refund_status": null,
+  "reward": null,
+  "status": "captured",
+  "tax": 360,
+  "upi": {
+    "flow": "intent",
+    "payer_account_type": "bank_account",
+    "vpa": "7978920623@superyes"
+  },
+  "vpa": "7978920623@superyes",
+  "wallet": null
+}
