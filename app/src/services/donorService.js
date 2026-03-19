@@ -6,6 +6,14 @@ const REFRESH_TOKEN_KEY = 'donor_refresh_token';
 const USER_KEY = 'donor_user';
 
 export const setAuthTokens = (accessToken, refreshToken) => {
+    // Clear other roles to avoid dashboard confusion
+    localStorage.removeItem('admin_access_token');
+    localStorage.removeItem('admin_refresh_token');
+    localStorage.removeItem('admin_user');
+    localStorage.removeItem('volunteer_access_token');
+    localStorage.removeItem('volunteer_refresh_token');
+    localStorage.removeItem('volunteer_user');
+    
     localStorage.setItem(TOKEN_KEY, accessToken);
     localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 };
