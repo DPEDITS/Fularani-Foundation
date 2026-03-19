@@ -8,6 +8,7 @@ import {
   forgotPasswordVolunteer,
   resetPasswordVolunteer,
   googleAuthVolunteer,
+  updateVolunteerAvatar,
 } from "../controllers/volunteer.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -42,6 +43,7 @@ router
 router.route("/profile").get(verifyJWT, getVolunteerProfile);
 router.route("/stats").get(verifyJWT, getVolunteerStats);
 router.route("/refresh-token").post(refreshAccessToken);
+router.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateVolunteerAvatar);
 
 export default router;
 

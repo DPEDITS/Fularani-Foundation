@@ -172,3 +172,22 @@ export const linkDonationToProject = async (data) => {
         throw error;
     }
 };
+
+export const updateAdminAvatar = async (formData) => {
+    try {
+        const response = await api.patch('/api/admin/update-avatar', formData, {
+            headers: {
+                ...authHeader(),
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        const { admin } = response.data.data;
+        if (admin) {
+            setAdminUser(admin);
+            window.dispatchEvent(new Event("storage"));
+        }
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

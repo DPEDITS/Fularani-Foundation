@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { safeNavigate } from "../utils/safeNavigate";
 import {
@@ -28,6 +28,7 @@ import {
   getVolunteerUser,
   getMyProjects,
   submitProofOfWork,
+  updateVolunteerAvatar,
   clearAuthData,
 } from "../services/volunteerService";
 import { isAdminAuthenticated } from "../services/adminService";
@@ -47,6 +48,8 @@ const VolunteerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [error, setError] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+  const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Task State
   const [myTasks, setMyTasks] = useState([]);
@@ -107,6 +110,27 @@ const VolunteerDashboard = () => {
     setIsProofModalOpen(false);
     fetchTasks();
     setToastMessage({ type: 'success', text: 'Proof submitted successfully!' });
+  };
+
+  const handleAvatarUpdate = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsUpdatingAvatar(true);
+      const formData = new FormData();
+      formData.append("avatar", file);
+      const response = await updateVolunteerAvatar(formData);
+      if (response.success) {
+        setProfile(response.data);
+        setToastMessage({ type: 'success', text: 'Avatar updated successfully!' });
+      }
+    } catch (error) {
+      console.error("Avatar update failed:", error);
+      setToastMessage({ type: 'error', text: 'Failed to update avatar.' });
+    } finally {
+      setIsUpdatingAvatar(false);
+    }
   };
 
   const handleLogout = async () => {
@@ -314,12 +338,23 @@ const VolunteerDashboard = () => {
               profile={profile}
               user={user}
               handleLogout={handleLogout}
+              onUpdateAvatar={() => fileInputRef.current.click()}
+              isUpdatingAvatar={isUpdatingAvatar}
             />
           )}
         </div>
       </div>
 
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={handleAvatarUpdate}
+        disabled={isUpdatingAvatar}
+      />
 
       {isProofModalOpen && selectedTask && (
         <SubmitProofModal

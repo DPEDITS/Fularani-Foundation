@@ -81,7 +81,7 @@ const registerDonor = asyncHandler(async (req, res) => {
     panNumber,
     panVerified: panVerified === true || panVerified === "true",
     panHolderName: panHolderName || "",
-    wants80GReceipt: wants80GReceipt || false,
+    wants80GReceipt: wants80GReceipt !== undefined ? wants80GReceipt === true || wants80GReceipt === "true" : true,
   });
 
   const createdDonor = await Donor.findById(donor._id).select(

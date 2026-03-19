@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { safeNavigate } from "../utils/safeNavigate";
 import {
@@ -40,9 +40,11 @@ import {
   assignTask,
   getAllProjects,
   createProject,
-  linkDonationToProject
+  linkDonationToProject,
+  updateAdminAvatar
 } from "../services/adminService";
 import { format } from "date-fns";
+import Toast from "../components/dashboard/Toast";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -68,6 +70,9 @@ const AdminDashboard = () => {
   const [isViewProofModalOpen, setIsViewProofModalOpen] = useState(false);
   const [missions, setMissions] = useState([]);
   const [allVolunteers, setAllVolunteers] = useState([]);
+  const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
+  const fileInputRef = useRef(null);
+  const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
     if (!isAdminAuthenticated()) {
@@ -180,6 +185,27 @@ const AdminDashboard = () => {
     setIsLinkDonationModalOpen(false);
   };
 
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsUpdatingAvatar(true);
+      const formData = new FormData();
+      formData.append("avatar", file);
+      const response = await updateAdminAvatar(formData);
+      if (response.success) {
+        setAdmin(response.data);
+        setToastMessage({ type: 'success', text: 'Avatar updated successfully!' });
+      }
+    } catch (error) {
+      console.error("Avatar update failed:", error);
+      setToastMessage({ type: 'error', text: 'Failed to update avatar.' });
+    } finally {
+      setIsUpdatingAvatar(false);
+    }
+  };
+
   const handleLogout = () => {
     logoutAdmin();
     safeNavigate(navigate, "/volunteer-login");
@@ -204,16 +230,31 @@ const AdminDashboard = () => {
         {/* Admin Hero Header */}
         <div className="flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8 mb-16 text-center lg:text-left">
           <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-secondary flex items-center justify-center relative group">
+            <div 
+              className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-secondary flex items-center justify-center relative group cursor-pointer"
+              onClick={() => fileInputRef.current.click()}
+            >
               {admin?.avatar ? (
                 <img src={admin.avatar} alt={admin.username} className="w-full h-full object-cover" />
               ) : (
                 <ShieldCheck size={48} className="text-accent animate-pulse" />
               )}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Camera className="text-white" size={24} />
+                {isUpdatingAvatar ? (
+                  <Activity size={24} className="text-white animate-spin" />
+                ) : (
+                  <Camera className="text-white" size={24} />
+                )}
               </div>
             </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              disabled={isUpdatingAvatar}
+            />
 
             <div className="flex flex-col items-center md:items-start text-center md:text-left">
               <div className="inline-flex items-center gap-2 bg-secondary text-accent px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-[0.2em] mb-4 shadow-xl">
@@ -559,6 +600,8 @@ const AdminDashboard = () => {
           onClose={() => setIsViewProofModalOpen(false)}
         />
       )}
+
+      <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
     </main>
   );
 };

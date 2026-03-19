@@ -112,8 +112,8 @@ const updateContent = asyncHandler(async (req, res) => {
 
   const markdown = req.files?.markdownFile?.[0]?.path;
   const coverImage = req.files?.coverImage?.[0]?.path;
-  const images = req.files?.images?.[0]?.path;
-
+  const images = req.files?.images; // Array of files
+  
   const updateData = {
     title,
     shortDescription,
@@ -134,9 +134,15 @@ const updateContent = asyncHandler(async (req, res) => {
     updateData.coverImage = uploaded.url;
   }
 
-  if (images) {
-    const uploaded = await uploadOnCloudinary(images);
-    updateData.images = [uploaded.url];
+  if (images && images.length > 0) {
+    let imageUrls = [];
+    for (const image of images) {
+      const uploaded = await uploadOnCloudinary(image.path);
+      if (uploaded?.url) {
+        imageUrls.push(uploaded.url);
+      }
+    }
+    updateData.images = imageUrls;
   }
 
   const content = await Content.findByIdAndUpdate(req.params.id, updateData, {

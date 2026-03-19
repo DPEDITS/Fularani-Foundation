@@ -208,3 +208,22 @@ export const submitProofOfWork = async (formData) => {
         throw error;
     }
 };
+
+export const updateVolunteerAvatar = async (formData) => {
+    try {
+        const response = await api.patch('/api/volunteers/update-avatar', formData, {
+            headers: {
+                ...authHeader(),
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        const { user } = response.data.data;
+        if (user) {
+            setVolunteerUser(user);
+            window.dispatchEvent(new Event("storage"));
+        }
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

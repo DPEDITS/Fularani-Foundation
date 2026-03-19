@@ -518,6 +518,34 @@ const googleAuthVolunteer = asyncHandler(async (req, res) => {
     );
 });
 
+const updateVolunteerAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar file is missing");
+  }
+
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  if (!avatar.url) {
+    throw new ApiError(400, "Error while uploading avatar");
+  }
+
+  const volunteer = await Volunteer.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, volunteer, "Avatar image updated successfully"));
+});
+
 export {
   registerVolunteer,
   loginVolunteer,
@@ -526,5 +554,6 @@ export {
   refreshAccessToken,
   forgotPasswordVolunteer,
   resetPasswordVolunteer,
-  googleAuthVolunteer
+  googleAuthVolunteer,
+  updateVolunteerAvatar
 };

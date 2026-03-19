@@ -71,7 +71,7 @@ const donorSchema = new Schema(
     },
     wants80GReceipt: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     hasActiveRecurringDonation: {
       type: Boolean,
