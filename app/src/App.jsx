@@ -11,7 +11,7 @@ import DonorLogin from "./pages/DonorLogin";
 import DonorRegister from "./pages/DonorRegister";
 import DonorDashboard from "./pages/DonorDashboard";
 import Contact from "./pages/Contact";
-import AboutPage from "./pages/About";
+
 import VolunteerLogin from "./pages/VolunteerLogin";
 import VolunteerRegister from "./pages/VolunteerRegister";
 import VolunteerDashboard from "./pages/VolunteerDashboard";
@@ -44,7 +44,7 @@ const App = () => {
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
+
           <Route path="/missions" element={<Missions />} />
           <Route path="/missions/:id" element={<MissionInfo />} />
           <Route path="/stories/:id" element={<StoryInfo />} />
