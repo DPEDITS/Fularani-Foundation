@@ -91,7 +91,7 @@ const Hero = () => {
             </div>
 
             {/* Trust Badges */}
-            <div className="mt-6 lg:mt-8 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-muted pt-4 lg:pt-8">
+            <div className="mt-6 lg:mt-8 flex flex-wrap justify-center sm:justify-start items-center gap-x-8 gap-y-4 border-t border-muted pt-4 lg:pt-8">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={24} className="text-primary" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-secondary/60">
@@ -104,7 +104,7 @@ const Hero = () => {
                   100% Transparency
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2">
                 <div className="w-6 h-6 rounded-md bg-green-500/10 flex items-center justify-center">
                   <span className="text-[10px] font-black text-green-600">
                     %
