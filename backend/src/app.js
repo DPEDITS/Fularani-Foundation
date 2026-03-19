@@ -24,6 +24,7 @@ const allowedOrigins = [
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
   "https://kb.fularanifoundation.org",
+  "https://fularanikb-c7hhn0k6i-fularanifoundation-7390s-projects.vercel.app",
 ].filter(Boolean);
 
 app.use(
