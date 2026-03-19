@@ -263,7 +263,7 @@ const ImpactTab = ({ formatCurrency, formatDate }) => {
                             </p>
                         </div>
 
-                        <div className="divide-y divide-muted/50 max-h-[600px] overflow-y-auto custom-scrollbar">
+                        <div className="divide-y divide-muted/50 max-h-[412px] overflow-y-auto custom-scrollbar">
                             {unlinkedDonations.length > 0 ? unlinkedDonations.map((donation) => (
                                 <div key={donation._id} className="p-6 hover:bg-muted/10 transition-colors group">
                                     <div className="flex items-center justify-between mb-2">
