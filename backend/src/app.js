@@ -85,6 +85,7 @@ import adminRouter from "./routes/admin.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
 import projectRouter from "./routes/project.routes.js";
 import signzyRouter from "./routes/signzy.routes.js";
+import documentRouter from "./routes/document.routes.js";
 
 // --- Routes declaration ---
 app.use("/api/volunteers", volunteerRouter);
@@ -97,6 +98,8 @@ app.use("/api/admin", adminRouter);
 app.use("/api/payment", paymentRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/signzy", signzyRouter);
+app.use("/api/documents", documentRouter);
+
 
 // --- Error handler ---
 app.use((err, req, res, next) => {
