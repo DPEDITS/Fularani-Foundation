@@ -15,30 +15,8 @@ app.set("trust proxy", 1);
 // --- Security headers ---
 app.use(helmet());
 
-// --- Rate limiting ---
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,                  // 100 requests per window per IP
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    logger.warn(`Rate limit exceeded for IP: ${req.ip}`);
-    res.status(429).json({ success: false, message: "Too many requests — please try again later" });
-  },
-});
-app.use(globalLimiter);
-
-const paymentLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    logger.warn(`Payment rate limit exceeded for IP: ${req.ip}`);
-    res.status(429).json({ success: false, message: "Too many payment attempts — please try again later" });
-  },
-});
-
+// --- Specific route limiters only ---
+// Auth limiter (for login/signup)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -47,6 +25,18 @@ const authLimiter = rateLimit({
   handler: (req, res) => {
     logger.warn(`Auth rate limit exceeded for IP: ${req.ip}`);
     res.status(429).json({ success: false, message: "Too many attempts — please try again later" });
+  },
+});
+
+// Payment limiter (for sensitive payment routes)
+const paymentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Payment rate limit exceeded for IP: ${req.ip}`);
+    res.status(429).json({ success: false, message: "Too many payment attempts — please try again later" });
   },
 });
 
