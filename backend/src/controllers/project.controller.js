@@ -77,8 +77,8 @@ const submitProofOfWork = asyncHandler(async (req, res) => {
     const uploadedImages = [];
     for (const file of files) {
         const result = await uploadOnCloudinary(file.path);
-        if (result?.url) {
-            uploadedImages.push({ url: result.url });
+        if (result?.secure_url) {
+            uploadedImages.push({ url: result.secure_url });
         }
     }
 

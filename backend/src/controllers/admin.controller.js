@@ -33,7 +33,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
   }
 
   const result = await uploadOnCloudinary(avatar);
-  if (!result?.url) {
+  if (!result?.secure_url) {
     throw new ApiError(400, "Error while uploading avatar");
   }
 
@@ -43,7 +43,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
     email,
     role,
     phone,
-    avatar: result.url
+    avatar: result.secure_url
   });
 
     const createdAdmin = await Admin.findById(admin._id).select("-password -refreshToken");
@@ -272,7 +272,7 @@ const updateAdminAvatar = asyncHandler(async (req, res) => {
 
   const result = await uploadOnCloudinary(avatarLocalPath);
 
-  if (!result?.url) {
+  if (!result?.secure_url) {
     throw new ApiError(400, "Error while uploading avatar");
   }
 
@@ -280,7 +280,7 @@ const updateAdminAvatar = asyncHandler(async (req, res) => {
     req.user._id,
     {
       $set: {
-        avatar: result.url,
+        avatar: result.secure_url,
       },
     },
     { new: true }
