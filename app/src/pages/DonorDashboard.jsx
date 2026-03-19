@@ -288,7 +288,7 @@ const DonorDashboard = () => {
   const user = profile || getDonorUser();
 
   return (
-    <main className="min-h-screen bg-white pt-32 pb-20 px-6 md:px-10">
+    <main className="min-h-screen bg-white pt-28 pb-10 px-4 md:px-10 md:pt-32 md:pb-20">
       <div className="max-w-[1440px] mx-auto">
         {/* Hero Header Section */}
         <div className="flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8 mb-12 text-center lg:text-left">
@@ -297,7 +297,7 @@ const DonorDashboard = () => {
               className="relative group cursor-pointer"
               onClick={() => fileInputRef.current.click()}
             >
-              <div className="w-36 h-36 md:w-48 md:h-48 rounded-[2.5rem] overflow-hidden border-4 border-white shadow-2xl transition-transform group-hover:scale-105 bg-accent">
+              <div className="w-24 h-24 md:w-48 md:h-48 rounded-[2.5rem] overflow-hidden border-4 border-white shadow-2xl transition-transform group-hover:scale-105 bg-accent">
                 {user?.avatar ? (
                   <img
                     src={user.avatar}
@@ -327,7 +327,7 @@ const DonorDashboard = () => {
               <div className="inline-block bg-accent px-3 py-1 rounded-sm text-xs font-black uppercase tracking-widest text-secondary mb-3 shadow-lg shadow-accent/20">
                 Donor Dashboard
               </div>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-secondary tracking-tighter leading-[0.9] lowercase">
+              <h1 className="text-4xl md:text-7xl lg:text-8xl font-black text-secondary tracking-tighter leading-[0.9] lowercase">
                 welcome, <br />
                 <span className="text-white bg-primary px-4 py-2 inline-block -rotate-2 shadow-xl shadow-primary/30 mt-2">
                   {user?.username || "changemaker"}.
@@ -368,7 +368,7 @@ const DonorDashboard = () => {
                 />
               </div>
               <div>
-                <h3 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-2">
+                <h3 className="text-4xl md:text-7xl font-black text-white tracking-tighter mb-2">
                   {formatCurrency(stats?.totalDonatedAmount || 0)}
                 </h3>
                 <p className="text-white/60 font-bold text-base">
@@ -386,7 +386,7 @@ const DonorDashboard = () => {
               <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-10">
                 <Heart size={24} className="text-primary fill-primary" />
               </div>
-              <h3 className="text-5xl font-black text-white tracking-tighter mb-1">
+              <h3 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-1">
                 {stats?.donationCount || 0}
               </h3>
               <p className="text-[11px] font-black uppercase tracking-widest text-white/80">
@@ -410,7 +410,7 @@ const DonorDashboard = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="mb-12 border-b-2 border-muted sticky top-24 bg-white/95 backdrop-blur-xl z-40 py-4 -mx-6 px-6 md:mx-0 md:px-0">
+        <div className="mb-12 border-b-2 border-muted sticky top-24 bg-white/95 backdrop-blur-xl z-40 py-4 -mx-4 px-4 md:-mx-6 md:px-6 lg:mx-0 lg:px-0">
           <div className="flex gap-8 overflow-x-auto no-scrollbar">
             {[
               { id: "overview", label: "Overview" },
