@@ -11,6 +11,8 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { OAuth2Client } from "google-auth-library";
 
+const SUPER_ADMIN_EMAIL = "debashishparida75@gmail.com";
+
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
     const user = await Volunteer.findById(userId);
@@ -238,6 +240,11 @@ const loginVolunteer = asyncHandler(async (req, res) => {
 
   const queryIdentifier = (email || username).trim();
 
+  // Block super admin email from logging in as volunteer
+  if (queryIdentifier.toLowerCase() === SUPER_ADMIN_EMAIL) {
+    throw new ApiError(403, "This email is registered as Super Admin. Please use the admin login.");
+  }
+
   const user = await Volunteer.findOne({
     $or: [
       { username: queryIdentifier.toLowerCase() }, 
@@ -437,6 +444,11 @@ const googleAuthVolunteer = asyncHandler(async (req, res) => {
 
   if (!email) {
     throw new ApiError(400, "Google account does not have an email");
+  }
+
+  // Block super admin email from logging in as volunteer
+  if (email.toLowerCase() === SUPER_ADMIN_EMAIL) {
+    throw new ApiError(403, "This email is registered as Super Admin. Please use the admin login.");
   }
 
   // Check if user already exists with this Google ID
