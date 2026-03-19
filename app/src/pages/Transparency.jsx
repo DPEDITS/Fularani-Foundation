@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Download, ShieldCheck, ChevronDown, Plus, X, Loader2, Pencil, Trash2, PlusCircle, MinusCircle } from "lucide-react";
+import { FileText, Download, Eye, ShieldCheck, ChevronDown, Plus, X, Loader2, Pencil, Trash2, PlusCircle, MinusCircle } from "lucide-react";
 import api from "../services/api";
 import { isAdminAuthenticated, getAdminUser } from "../services/adminService";
 const getDownloadLink = (url) => {
@@ -84,15 +84,14 @@ const SubtopicSection = ({ subtopic, index, isSuperAdmin, onEdit, onDelete }) =>
                         <td className="py-4 px-2 md:px-4 text-right">
                           <div className="inline-flex items-center gap-1.5 md:gap-2">
                             <a
-                              href={getDownloadLink(doc.link)}
+                              href={doc.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              download
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 bg-white/5 hover:bg-emerald-500 text-white text-[10px] md:text-sm font-semibold rounded-lg transition-all border border-white/10 hover:border-transparent"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 bg-white/5 hover:bg-primary text-white text-[10px] md:text-sm font-semibold rounded-lg transition-all border border-white/10 hover:border-transparent"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <Download size={14} className="md:w-[16px] md:h-[16px]" />
-                              <span className="hidden sm:inline">Download</span>
+                              <Eye size={14} className="md:w-[16px] md:h-[16px]" />
+                              <span className="hidden sm:inline">View</span>
                             </a>
                             {isSuperAdmin && (
                               <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
