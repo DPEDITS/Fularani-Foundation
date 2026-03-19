@@ -79,7 +79,7 @@ export const Banner = () => {
               />
             </button>
             <a
-              href="/about"
+              href="/missions"
               className="text-[#0066cc] text-[17px] hover:underline flex items-center gap-1 group"
             >
               Learn more{" "}
