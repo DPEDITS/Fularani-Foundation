@@ -6,9 +6,10 @@ import { isAdminAuthenticated, getAdminUser } from "../services/adminService";
 const getDownloadLink = (url) => {
   if (!url) return "#";
   try {
-    const driveMatch = url.match(/\/file\/d\/(.+?)\/(?:view|edit)/) || url.match(/id=(.+?)(?:&|$)/);
+    // Robust regex to extract ID from various Drive URL formats
+    const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]{25,})\b/) || url.match(/id=([a-zA-Z0-9_-]{25,})\b/);
     if (driveMatch && driveMatch[1]) {
-      return `https://docs.google.com/uc?export=download&id=${driveMatch[1]}`;
+      return `https://drive.google.com/uc?export=download&id=${driveMatch[1]}`;
     }
     return url;
   } catch (err) {
