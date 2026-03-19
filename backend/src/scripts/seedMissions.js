@@ -1,84 +1,70 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const MONGODB_URI = 'mongodb+srv://fularanifoundation_db_user:Kiq5hRME0kGPaOzV@fularani-cluster.hr0oztg.mongodb.net/fularani-cluster';
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-
-const DB_NAME = "fularani-cluster";
+const missions = [
+    {
+        title: "Mission Green",
+        type: "MISSION",
+        status: "active",
+        description: "Promoting environmental sustainability and community cleaning drives.",
+        category: "Environment"
+    },
+    {
+        title: "Mission Education",
+        type: "MISSION",
+        status: "active",
+        description: "Empowering underprivileged children through quality education and resources.",
+        category: "Education"
+    },
+    {
+        title: "Mission Period Pride",
+        type: "MISSION",
+        status: "active",
+        description: "Promoting menstrual hygiene and breaking taboos through awareness programs.",
+        category: "Health & Hygiene"
+    },
+    {
+        title: "Mission Thalassemia",
+        type: "MISSION",
+        status: "active",
+        description: "Raising awareness and supporting screening for Thalassemia.",
+        category: "Healthcare"
+    }
+];
 
 const seedMissions = async () => {
     try {
-        const fullUri = `${process.env.MONGODB_URI}/${DB_NAME}`;
-        await mongoose.connect(fullUri);
+        console.log('Connecting to database...');
+        await mongoose.connect(MONGODB_URI);
         const db = mongoose.connection.db;
-        const coll = db.collection('contents');
+        const collection = db.collection('contents');
 
-        const missions = [
-            {
-                type: 'MISSION',
-                title: 'Mission Education',
-                shortDescription: 'Providing quality education and resources to underprivileged children.',
-                status: 'active',
-                category: 'Education',
-                isPublished: true,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            },
-            {
-                type: 'MISSION',
-                title: 'Mission Period',
-                shortDescription: 'Promoting menstrual hygiene and health awareness among women.',
-                status: 'active',
-                category: 'Healthcare',
-                isPublished: true,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            },
-            {
-                type: 'MISSION',
-                title: 'Mission Green',
-                shortDescription: 'Environmental conservation and tree plantation initiatives.',
-                status: 'active',
-                category: 'Environment',
-                isPublished: true,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            },
-            {
-                type: 'MISSION',
-                title: 'Mission Mobility',
-                shortDescription: 'Assisting people with disabilities through mobility aids and support.',
-                status: 'active',
-                category: 'Social Support',
-                isPublished: true,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            },
-            {
-                type: 'MISSION',
-                title: 'Mission Thalassemia',
-                shortDescription: 'Supporting patients and awareness for Thalassemia.',
-                status: 'active',
-                category: 'Healthcare',
-                isPublished: true,
-                createdAt: new Date(),
-                updatedAt: new Date()
+        for (const mission of missions) {
+            const exists = await collection.findOne({ title: mission.title, type: "MISSION" });
+            if (!exists) {
+                await collection.insertOne({
+                    ...mission,
+                    coverImage: "",
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                });
+                console.log(`- Created mission: ${mission.title}`);
+            } else {
+                console.log(`- Mission already exists: ${mission.title}`);
+                // Optional: Force active status if it's inactive
+                if (exists.status !== 'active') {
+                    await collection.updateOne({ _id: exists._id }, { $set: { status: 'active' } });
+                    console.log(`  (updated to active status)`);
+                }
             }
-        ];
+        }
 
-        // Clear existing missions if any to avoid duplicates pendant development
-        await coll.deleteMany({ type: 'MISSION' });
-
-        await coll.insertMany(missions);
-        console.log('Successfully seeded 5 core missions.');
-
+        console.log('\nMissions seeded successfully.');
         await mongoose.disconnect();
     } catch (err) {
-        console.error('Error:', err);
+        console.error('Error seeding missions:', err);
+        process.exit(1);
     }
 };
 
