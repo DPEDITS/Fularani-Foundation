@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fularani-offline-v2';
+const CACHE_NAME = 'fularani-offline-v3';
 const OFFLINE_URL = '/offline.html';
 const ASSETS_TO_CACHE = [
   OFFLINE_URL,
