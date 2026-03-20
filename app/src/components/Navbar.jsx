@@ -229,7 +229,7 @@ const Navbar = () => {
               </div>
             ))}
             {userRole === "admin" &&
-              ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com"].includes(
+              ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"].includes(
                 currentUser?.email?.toLowerCase()
               ) && (
                 <Link

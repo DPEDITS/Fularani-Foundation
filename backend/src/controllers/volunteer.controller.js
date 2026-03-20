@@ -13,7 +13,8 @@ import { OAuth2Client } from "google-auth-library";
 
 const SUPER_ADMIN_EMAILS = [
   "debashishparida75@gmail.com",
-  "abhijeetduttaam2222@gmail.com"
+  "abhijeetduttaam2222@gmail.com",
+  "abhijeetdashx@gmail.com"
 ];
 
 const generateAccessAndRefereshTokens = async (userId) => {

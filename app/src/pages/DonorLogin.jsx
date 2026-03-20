@@ -79,7 +79,7 @@ const DonorLogin = () => {
     setLoading(true);
 
     try {
-      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com"];
+      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"];
       const isAdminEmail = adminEmails.includes(form.email.trim().toLowerCase());
 
       // Only redirect to admin dashboard when logging in via volunteer role
@@ -156,7 +156,7 @@ const DonorLogin = () => {
       const email = payload.email?.toLowerCase();
 
       // Only redirect to admin dashboard when using volunteer role
-      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com"];
+      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"];
       if (adminEmails.includes(email) && role === "volunteer") {
         await googleAuthAdmin(credential);
         safeNavigate(navigate, "/admin-dashboard");

@@ -44,7 +44,7 @@ const Gallery = () => {
   const volunteer = getVolunteerUser();
   const admin = getAdminUser();
   const currentUser = donor || volunteer || admin;
-  const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com"];
+  const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"];
   const isAuthorizedUser = admin && adminEmails.includes(currentUser?.email);
 
   const [selectedImage, setSelectedImage] = useState(null);
