@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Allow: /dist/
+
+Sitemap: https://fularanifoundation.org/sitemap.xml
