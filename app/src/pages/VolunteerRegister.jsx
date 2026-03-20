@@ -79,6 +79,13 @@ const VolunteerRegister = () => {
     setError("");
 
     try {
+      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"];
+      if (adminEmails.includes(form.email?.trim().toLowerCase())) {
+        setError("This email is registered as an Admin. Redirecting to admin login...");
+        setTimeout(() => safeNavigate(navigate, "/volunteer-login"), 1500);
+        return;
+      }
+
       const formData = new FormData();
       Object.keys(form).forEach((key) => formData.append(key, form[key]));
       if (avatar) formData.append("avatar", avatar);
@@ -121,9 +128,16 @@ const VolunteerRegister = () => {
       }
     } catch (err) {
       console.error("Google auth error:", err);
-      setError(
-        err.response?.data?.message || "Google sign-up failed. Please try again."
-      );
+      const errorMsg = err.response?.data?.message || err.message || "Registration failed";
+      
+      if (errorMsg.includes("Super Admin") || errorMsg.includes("admin login")) {
+        setError("Super Admin identified. Redirecting to admin authentication...");
+        setTimeout(() => {
+          safeNavigate(navigate, "/volunteer-login");
+        }, 1500);
+      } else {
+        setError(errorMsg);
+      }
     } finally {
       setGoogleLoading(false);
     }
