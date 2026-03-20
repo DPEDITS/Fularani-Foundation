@@ -150,7 +150,7 @@ const Transparency = () => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const adminEmail = getAdminUser()?.email?.toLowerCase();
-  const superAdminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com"];
+  const superAdminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"];
   const isSuperAdmin = isAdminAuthenticated() && superAdminEmails.includes(adminEmail);
 
   const fetchDocuments = async () => {

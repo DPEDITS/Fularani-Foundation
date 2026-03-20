@@ -40,7 +40,7 @@ const VolunteerLogin = () => {
     setError("");
 
     try {
-      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com"];
+      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"];
       const isAdminEmail = adminEmails.includes(form.email.trim().toLowerCase());
 
       if (isAdminEmail) {
@@ -89,7 +89,7 @@ const VolunteerLogin = () => {
       const payload = JSON.parse(jsonPayload);
       const email = payload.email?.toLowerCase();
 
-      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com"];
+      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"];
       if (adminEmails.includes(email)) {
         await googleAuthAdmin(credential);
         safeNavigate(navigate, "/admin-dashboard");
