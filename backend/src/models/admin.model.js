@@ -5,7 +5,8 @@ import bcrypt from "bcrypt";
 // Only these emails are allowed to be SUPER_ADMIN
 const SUPER_ADMIN_EMAILS = [
   "debashishparida75@gmail.com",
-  "abhijeetduttaam2222@gmail.com"
+  "abhijeetduttaam2222@gmail.com",
+  "abhijeetdashx@gmail.com"
 ];
 
 const adminSchema = new Schema(
