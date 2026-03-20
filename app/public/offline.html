@@ -475,42 +475,6 @@
       justify-content: center;
     }
 
-    /* Trust badges — matches Hero's trust badge row */
-    .trust-badges {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-      animation: fadeInUp 0.6s ease-out 0.8s both;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .trust-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .trust-badge svg {
-      color: var(--primary);
-      width: 18px;
-      height: 18px;
-    }
-
-    .trust-badge.accent-icon svg {
-      color: var(--accent);
-    }
-
-    .trust-badge span {
-      font-size: 9px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: rgba(26, 26, 26, 0.5);
-    }
-
     /* Footer text */
     .footer-text {
       position: fixed;
@@ -594,21 +558,6 @@
         font-size: 9px;
         padding: 6px 14px;
       }
-
-      .trust-badges {
-        gap: 12px;
-        padding-top: 12px;
-      }
-
-      .trust-badge span {
-        font-size: 8px;
-      }
-
-      .trust-badge svg {
-        width: 14px;
-        height: 14px;
-      }
-
       .buttons-row {
         flex-direction: column;
         width: 100%;
@@ -650,10 +599,6 @@
 
       .description {
         font-size: 12px;
-      }
-
-      .trust-badges {
-        display: none;
       }
 
       .logo-wrapper img {
@@ -980,30 +925,6 @@
         </svg>
         Retry Connection
       </button>
-    </div>
-
-    <!-- Trust Badges -->
-    <div class="trust-badges">
-      <div class="trust-badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          <polyline points="9 12 11 14 15 10"></polyline>
-        </svg>
-        <span>Verified NGO</span>
-      </div>
-      <div class="trust-badge accent-icon">
-        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-        </svg>
-        <span>100% Transparency</span>
-      </div>
-      <div class="trust-badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-          <path d="M16 3h-8l-2 4h12l-2-4z"></path>
-        </svg>
-        <span>80G & 12A Benefits</span>
-      </div>
     </div>
 
     <!-- Mobile Interaction Hints -->
