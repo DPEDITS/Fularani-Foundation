@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { motion as Motion, AnimatePresence } from "motion/react";
-import {
-  Plus,
-  Edit2,
-  Trash2,
-  Filter,
-} from "lucide-react";
+import { Plus, Edit2, Trash2, Filter } from "lucide-react";
 import {
   getAllGalleryItems,
   createGalleryItem,
@@ -44,7 +39,11 @@ const Gallery = () => {
   const volunteer = getVolunteerUser();
   const admin = getAdminUser();
   const currentUser = donor || volunteer || admin;
-  const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"];
+  const adminEmails = [
+    "debashishparida75@gmail.com",
+    "abhijeetduttaam2222@gmail.com",
+    "abhijeetdashx@gmail.com",
+  ];
   const isAuthorizedUser = admin && adminEmails.includes(currentUser?.email);
 
   const [selectedImage, setSelectedImage] = useState(null);
@@ -61,6 +60,7 @@ const Gallery = () => {
     description: "",
     uploadedBy: "",
     imageUrl: null,
+    imageLink: "",
   });
 
   const categories = [
@@ -110,10 +110,9 @@ const Gallery = () => {
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
     if (
-      (!uploadFormData.imageUrl && !editingItem) ||
+      (!uploadFormData.imageUrl && !uploadFormData.imageLink && !editingItem) ||
       !uploadFormData.title ||
-      !uploadFormData.category ||
-      !uploadFormData.description
+      !uploadFormData.category
     )
       return;
 
@@ -125,10 +124,13 @@ const Gallery = () => {
       formData.append("description", uploadFormData.description);
       formData.append(
         "uploadedBy",
-        uploadFormData.uploadedBy || currentUser?.username || "Anonymous"
+        uploadFormData.uploadedBy || currentUser?.username || "Anonymous",
       );
-      if (uploadFormData.imageUrl)
+      if (uploadFormData.imageUrl) {
         formData.append("imageUrl", uploadFormData.imageUrl);
+      } else if (uploadFormData.imageLink) {
+        formData.append("imageLink", uploadFormData.imageLink);
+      }
 
       if (editingItem) {
         await updateGalleryItem(editingItem._id || editingItem.id, formData);
@@ -144,6 +146,7 @@ const Gallery = () => {
         description: "",
         uploadedBy: "",
         imageUrl: null,
+        imageLink: "",
       });
       await fetchGalleryItems();
     } catch (error) {
@@ -161,6 +164,7 @@ const Gallery = () => {
       description: item.description,
       uploadedBy: item.uploadedBy,
       imageUrl: null,
+      imageLink: item.src || "",
     });
     setIsUploadModalOpen(true);
   };
@@ -178,7 +182,10 @@ const Gallery = () => {
     }
   };
 
-  const filteredItems = activeCategory === "All" ? items : items.filter((item) => item.category === activeCategory);
+  const filteredItems =
+    activeCategory === "All"
+      ? items
+      : items.filter((item) => item.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-white text-secondary overflow-x-hidden">
@@ -186,13 +193,36 @@ const Gallery = () => {
 
       <section className="relative pt-30 pb-20 px-6 z-10">
         <div className="max-w-[1200px] mx-auto">
-          <Motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center md:text-left">
-            <div className="inline-block bg-accent px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-6">Visual Chronicles</div>
-            <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-10 lowercase">Moments of <br /><span className="text-white bg-primary px-6 py-2 inline-block -rotate-1 mt-2">hope & impact.</span></h1>
-            <p className="text-xl md:text-2xl text-muted-foreground leading-tight max-w-[800px] font-bold mb-12">Every image tells a story of transformation. Witness the real-world impact of our missions through the lenses of our ground volunteers.</p>
+          <Motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center md:text-left"
+          >
+            <div className="inline-block bg-accent px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-6">
+              Visual Chronicles
+            </div>
+            <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-10 lowercase">
+              Moments of <br />
+              <span className="text-white bg-primary px-6 py-2 inline-block -rotate-1 mt-2">
+                hope & impact.
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-muted-foreground leading-tight max-w-[800px] font-bold mb-12">
+              Every image tells a story of transformation. Witness the
+              real-world impact of our missions through the lenses of our ground
+              volunteers.
+            </p>
             {isAuthorizedUser && (
-              <button onClick={() => setIsUploadModalOpen(true)} className="bg-secondary hover:bg-black text-white px-12 py-6 rounded-2xl text-lg font-black uppercase tracking-tight transition-all flex items-center justify-center gap-3 group w-full sm:w-auto">
-                <Plus size={24} className="group-active:rotate-90 transition-transform" /> Contribute Moment
+              <button
+                onClick={() => setIsUploadModalOpen(true)}
+                className="bg-secondary hover:bg-black text-white px-12 py-6 rounded-2xl text-lg font-black uppercase tracking-tight transition-all flex items-center justify-center gap-3 group w-full sm:w-auto"
+              >
+                <Plus
+                  size={24}
+                  className="group-active:rotate-90 transition-transform"
+                />{" "}
+                Contribute Moment
               </button>
             )}
           </Motion.div>
@@ -201,10 +231,21 @@ const Gallery = () => {
 
       <div className="sticky top-[72px] z-40 bg-white/90 backdrop-blur-xl border-y border-secondary/5 py-6 px-6">
         <div className="max-w-[1200px] mx-auto flex items-center gap-8 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-3 shrink-0"><Filter size={18} className="text-primary" /><span className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">Filter</span></div>
+          <div className="flex items-center gap-3 shrink-0">
+            <Filter size={18} className="text-primary" />
+            <span className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">
+              Filter
+            </span>
+          </div>
           <div className="flex gap-3">
             {categories.map((category) => (
-              <button key={category} onClick={() => setActiveCategory(category)} className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-tight transition-all whitespace-nowrap ${activeCategory === category ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-muted/30 text-secondary/60 hover:bg-muted/50"}`}>{category}</button>
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-tight transition-all whitespace-nowrap ${activeCategory === category ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-muted/30 text-secondary/60 hover:bg-muted/50"}`}
+              >
+                {category}
+              </button>
             ))}
           </div>
         </div>
@@ -221,7 +262,9 @@ const Gallery = () => {
               className="flex flex-col items-center justify-center py-40 gap-6"
             >
               <div className="w-16 h-16 border-[6px] border-primary/10 border-t-primary rounded-full animate-spin" />
-              <p className="text-secondary/40 font-black uppercase text-xs tracking-[0.3em] animate-pulse">Curating Chronicles...</p>
+              <p className="text-secondary/40 font-black uppercase text-xs tracking-[0.3em] animate-pulse">
+                Curating Chronicles...
+              </p>
             </Motion.div>
           ) : (
             <Motion.div
@@ -240,17 +283,45 @@ const Gallery = () => {
                   className="group relative bg-muted/20 rounded-[40px] overflow-hidden aspect-[4/5] cursor-pointer"
                   onClick={() => setSelectedImage(item)}
                 >
-                  <img src={getSecureCloudinaryUrl(item.src)} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                  <img
+                    src={getSecureCloudinaryUrl(item.src)}
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/10 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
                   <div className="absolute inset-0 p-10 flex flex-col justify-end text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                    <span className="inline-block px-3 py-1 bg-primary text-white rounded-lg text-[10px] font-black uppercase tracking-widest mb-4 w-fit">{item.category}</span>
-                    <h3 className="text-3xl font-black leading-[0.9] tracking-tighter mb-6 lowercase">{item.title}</h3>
+                    <span className="inline-block px-3 py-1 bg-primary text-white rounded-lg text-[10px] font-black uppercase tracking-widest mb-4 w-fit">
+                      {item.category}
+                    </span>
+                    <h3 className="text-3xl font-black leading-[0.9] tracking-tighter mb-6 lowercase">
+                      {item.title}
+                    </h3>
                     <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
-                      <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-xs font-black border border-white/20">{item.uploadedBy.charAt(0).toUpperCase()}</div><span className="text-[10px] font-black uppercase tracking-widest text-white/60">{item.uploadedBy}</span></div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-xs font-black border border-white/20">
+                          {item.uploadedBy.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white/60">
+                          {item.uploadedBy}
+                        </span>
+                      </div>
                       {isAuthorizedUser && (
                         <div className="flex gap-2">
-                          <button onClick={(e) => { e.stopPropagation(); handleEdit(item); }} className="p-3 rounded-xl bg-white/10 hover:bg-accent hover:text-secondary transition-all"><Edit2 size={16} /></button>
-                          <button onClick={(e) => handleDelete(e, item.id)} className="p-3 rounded-xl bg-white/10 hover:bg-red-500 transition-all"><Trash2 size={16} /></button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(item);
+                            }}
+                            className="p-3 rounded-xl bg-white/10 hover:bg-accent hover:text-secondary transition-all"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button
+                            onClick={(e) => handleDelete(e, item.id)}
+                            className="p-3 rounded-xl bg-white/10 hover:bg-red-500 transition-all"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       )}
                     </div>
@@ -263,7 +334,12 @@ const Gallery = () => {
       </main>
 
       <AnimatePresence>
-        {selectedImage && <GalleryDetailModal item={selectedImage} onClose={() => setSelectedImage(null)} />}
+        {selectedImage && (
+          <GalleryDetailModal
+            item={selectedImage}
+            onClose={() => setSelectedImage(null)}
+          />
+        )}
       </AnimatePresence>
 
       <AnimatePresence>

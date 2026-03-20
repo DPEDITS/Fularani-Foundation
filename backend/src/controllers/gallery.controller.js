@@ -8,24 +8,28 @@ import {
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const createGalleryItem = asyncHandler(async (req, res) => {
-  const { title, category, uploadedBy, description } = req.body;
-  if (!title || !category || !description) {
-    throw new ApiError(400, "All fields are required");
+  const { title, category, uploadedBy, description, imageLink } = req.body;
+  if (!title || !category) {
+    throw new ApiError(400, "Title and category are required");
   }
   const imageUrlLocalPath = req.files?.imageUrl?.[0]?.path;
   let imageUrl;
   if (imageUrlLocalPath) {
-    imageUrl = await uploadOnCloudinary(imageUrlLocalPath);
+    const uploadResult = await uploadOnCloudinary(imageUrlLocalPath);
+    if (uploadResult) imageUrl = uploadResult.secure_url;
+  } else if (imageLink) {
+    imageUrl = imageLink;
   }
+
   if (!imageUrl) {
-    throw new ApiError(400, "Image is required");
+    throw new ApiError(400, "Image or image link is required");
   }
   const galleryItem = await GalleryItem.create({
     title,
     category,
-    imageUrl: imageUrl?.secure_url || "",
+    imageUrl,
     uploadedBy: uploadedBy || "",
-    description,
+    description: description || "",
   });
   const createdGalleryItem = await GalleryItem.findById(galleryItem._id).select(
     "-password -refreshToken",
@@ -101,9 +105,9 @@ const getAllGalleryItems = asyncHandler(async (req, res) => {
 });
 
 const updateGalleryItem = asyncHandler(async (req, res) => {
-  const { title, category, uploadedBy, description } = req.body;
-  if (!title || !category || !description) {
-    throw new ApiError(400, "All fields are required");
+  const { title, category, uploadedBy, description, imageLink } = req.body;
+  if (!title || !category) {
+    throw new ApiError(400, "Title and category are required");
   }
 
   const galleryItem = await GalleryItem.findById(req.params.id);
@@ -119,6 +123,8 @@ const updateGalleryItem = asyncHandler(async (req, res) => {
     if (uploadedImage) {
       imageUrl = uploadedImage.secure_url;
     }
+  } else if (imageLink) {
+    imageUrl = imageLink;
   }
 
   const updatedGalleryItem = await GalleryItem.findByIdAndUpdate(
@@ -129,7 +135,7 @@ const updateGalleryItem = asyncHandler(async (req, res) => {
         category,
         imageUrl,
         uploadedBy: uploadedBy || galleryItem.uploadedBy,
-        description,
+        description: description || "",
       },
     },
     { new: true },
