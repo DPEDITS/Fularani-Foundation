@@ -22,7 +22,7 @@ jobs:
 
       - name: Login to ECR
         run: |
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }}  | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
 
       - name: Build Docker image
         run: docker build -t ngo-backend ./backend
@@ -39,9 +39,18 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: PORT,MONGO_URI,RAZORPAY_KEY,RAZORPAY_SECRET
           script: |
             docker stop $(docker ps -q) || true
             docker rm $(docker ps -aq) || true
-            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
+      
+            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 657566734867.dkr.ecr.ap-south-1.amazonaws.com
+      
             docker pull ${{ secrets.ECR_REPOSITORY }}:latest
-            docker run -d -p 3000:3000 --env-file .env ${{ secrets.ECR_REPOSITORY }}:latest
+      
+            docker run -d -p 3000:3000 \
+            -e PORT=$PORT \
+            -e MONGO_URI=$MONGO_URI \
+            -e RAZORPAY_KEY=$RAZORPAY_KEY \
+            -e RAZORPAY_SECRET=$RAZORPAY_SECRET \
+            ${{ secrets.ECR_REPOSITORY }}:latest
