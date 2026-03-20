@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>No Internet | Fularani Foundation</title>
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <style>
+    /* System fonts only — Google Fonts can't load when offline */
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #0066cc;
+      --primary-light: rgba(0, 102, 204, 0.1);
+      --primary-glow: rgba(0, 102, 204, 0.15);
+      --secondary: #1a1a1a;
+      --accent: #ffc20e;
+      --accent-glow: rgba(255, 194, 14, 0.15);
+      --bg: #ffffff;
+      --muted: #f4f4f4;
+      --muted-fg: #666666;
+      --border: #e2e2e2;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--secondary);
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtle background pattern */
+    .bg-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 1px 1px, rgba(0, 102, 204, 0.03) 1px, transparent 0);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* Soft glow accents (matching the hero's primary/10 skew) */
+    .bg-glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+    }
+
+    .bg-glow-primary {
+      top: -150px;
+      right: -100px;
+      width: 500px;
+      height: 500px;
+      background: var(--primary);
+      opacity: 0.06;
+    }
+
+    .bg-glow-accent {
+      bottom: -150px;
+      left: -100px;
+      width: 400px;
+      height: 400px;
+      background: var(--accent);
+      opacity: 0.06;
+    }
+
+    /* Floating particles in brand colors */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      animation: particleFloat linear infinite;
+    }
+
+    .particle.blue {
+      background: rgba(0, 102, 204, 0.25);
+    }
+
+    .particle.yellow {
+      background: rgba(255, 194, 14, 0.3);
+    }
+
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* Main container */
+    .container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 24px;
+      padding: 20px;
+    }
+
+    /* Logo */
+    .logo-wrapper {
+      animation: fadeInDown 0.6s ease-out;
+    }
+
+    .logo-wrapper img {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* Buddy Character */
+    .buddy-wrapper {
+      position: relative;
+      width: 200px;
+      height: 240px;
+      animation: buddyFloat 3s ease-in-out infinite;
+      margin-top: 8px;
+    }
+
+    @keyframes buddyFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .buddy-shadow {
+      position: absolute;
+      bottom: 0px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 16px;
+      background: radial-gradient(ellipse, rgba(0, 102, 204, 0.15), transparent);
+      border-radius: 50%;
+      animation: shadowPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes shadowPulse {
+      0%, 100% { width: 100px; opacity: 0.6; }
+      50% { width: 70px; opacity: 0.3; }
+    }
+
+    .buddy-body {
+      position: relative;
+      width: 160px;
+      height: 200px;
+      margin: 0 auto;
+    }
+
+    .buddy-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Eyes */
+    .eyes-container {
+      position: absolute;
+      top: 58px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 24px;
+    }
+
+    .eye {
+      width: 34px;
+      height: 40px;
+      background: #ffffff;
+      border-radius: 50% 50% 50% 50% / 55% 55% 45% 45%;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 
+        inset 0 2px 8px rgba(0,0,0,0.08),
+        0 0 15px rgba(0, 102, 204, 0.2);
+      border: 1.5px solid rgba(0, 102, 204, 0.1);
+    }
+
+    .pupil {
+      width: 15px;
+      height: 17px;
+      background: radial-gradient(circle at 40% 40%, #1a1a1a, #0a0a1a);
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s ease-out;
+    }
+
+    .pupil::after {
+      content: '';
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+    }
+
+    .pupil::before {
+      content: '';
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      bottom: 3px;
+      right: 3px;
+    }
+
+    /* Blink */
+    .blink-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,1) 40%,
+        rgba(255,255,255,1) 60%,
+        rgba(255,255,255,0) 100%
+      );
+      border-radius: 50%;
+      transform: scaleY(0);
+      animation: blink 4s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 94%, 100% { transform: scaleY(0); }
+      96% { transform: scaleY(1); }
+      98% { transform: scaleY(0); }
+    }
+
+    /* Mouth */
+    .mouth {
+      position: absolute;
+      top: 110px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 6px;
+      border-bottom: 2.5px solid var(--primary);
+      border-radius: 0 0 50% 50%;
+      opacity: 0.5;
+    }
+
+    /* Cheeks */
+    .cheek {
+      position: absolute;
+      top: 102px;
+      width: 16px;
+      height: 9px;
+      background: rgba(255, 194, 14, 0.2);
+      border-radius: 50%;
+    }
+
+    .cheek.left { left: 24px; }
+    .cheek.right { right: 24px; }
+
+    /* Antenna */
+    .antenna {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 3px;
+      height: 24px;
+      background: linear-gradient(to top, var(--primary), var(--accent));
+      border-radius: 2px;
+    }
+
+    .antenna::after {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 16px var(--accent), 0 0 32px rgba(255, 194, 14, 0.4);
+      animation: antennaBlink 2s ease-in-out infinite;
+    }
+
+    @keyframes antennaBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Status Badge — matches Fularani's pill badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      background: var(--primary-light);
+      border: 1px solid rgba(0, 102, 204, 0.15);
+      border-radius: 980px;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--primary);
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: statusBlink 1.5s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(255, 194, 14, 0.5);
+    }
+
+    @keyframes statusBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Title — matches Hero's font-black tracking-tighter style */
+    .title {
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .title-top {
+      display: block;
+      color: var(--secondary);
+    }
+
+    .title-bottom {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      padding: 4px 16px;
+      transform: rotate(-1deg);
+      margin-top: 6px;
+    }
+
+    /* Description — matches Hero's muted text style */
+    .description {
+      font-size: 15px;
+      color: var(--muted-fg);
+      max-width: 380px;
+      line-height: 1.5;
+      font-weight: 700;
+      leading-trim: both;
+      animation: fadeInUp 0.6s ease-out 0.4s both;
+    }
+
+    /* Retry Button — matches the Donate Now / Our Work button styles */
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 36px;
+      background: var(--accent);
+      color: var(--secondary);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 12px 30px rgba(255, 194, 14, 0.3);
+      animation: fadeInUp 0.6s ease-out 0.6s both;
+    }
+
+    .retry-btn:hover {
+      background: #e6af00;
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(255, 194, 14, 0.4);
+    }
+
+    .retry-btn:active {
+      transform: translateY(0);
+    }
+
+    .retry-btn svg {
+      width: 18px;
+      height: 18px;
+      animation: spin 2s linear infinite paused;
+    }
+
+    .retry-btn:hover svg {
+      animation-play-state: running;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Secondary link button */
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      background: var(--secondary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      animation: fadeInUp 0.6s ease-out 0.7s both;
+    }
+
+    .home-link:hover {
+      background: #000;
+      transform: translateY(-2px);
+    }
+
+    .buttons-row {
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* Trust badges — matches Hero's trust badge row */
+    .trust-badges {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      animation: fadeInUp 0.6s ease-out 0.8s both;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .trust-badge svg {
+      color: var(--primary);
+      width: 18px;
+      height: 18px;
+    }
+
+    .trust-badge.accent-icon svg {
+      color: var(--accent);
+    }
+
+    .trust-badge span {
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(26, 26, 26, 0.5);
+    }
+
+    /* Footer text */
+    .footer-text {
+      position: fixed;
+      bottom: 24px;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      color: rgba(26, 26, 26, 0.15);
+      text-transform: uppercase;
+      z-index: 5;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Wifi-off icon (SVG inline in status badge) */
+    .wifi-off-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .title {
+        font-size: 38px;
+      }
+
+      .buddy-wrapper {
+        width: 160px;
+        height: 200px;
+      }
+
+      .description {
+        font-size: 13px;
+        padding: 0 12px;
+      }
+
+      .trust-badges {
+        gap: 16px;
+      }
+
+      .buttons-row {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .retry-btn, .home-link {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .logo-wrapper img {
+        height: 36px;
+      }
+    }
+
+    /* ===== MOBILE INTERACTIONS ===== */
+
+    /* Touch Ripple Effect */
+    .touch-ripple {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 999;
+      animation: rippleExpand 0.7s ease-out forwards;
+    }
+
+    @keyframes rippleExpand {
+      0% {
+        width: 0;
+        height: 0;
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(0);
+      }
+      100% {
+        width: 120px;
+        height: 120px;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    /* Buddy Tap Reactions */
+    .buddy-wrapper.tapped {
+      animation: buddyBounce 0.5s ease-out;
+    }
+
+    @keyframes buddyBounce {
+      0% { transform: scale(1) translateY(0); }
+      20% { transform: scale(0.9) translateY(5px); }
+      50% { transform: scale(1.15) translateY(-20px); }
+      70% { transform: scale(0.95) translateY(-5px); }
+      100% { transform: scale(1) translateY(0); }
+    }
+
+    /* Surprised expression */
+    .buddy-wrapper.surprised .mouth {
+      width: 12px;
+      height: 12px;
+      border: 2.5px solid var(--primary);
+      border-radius: 50%;
+      opacity: 0.6;
+    }
+
+    /* Happy expression — wide smile */
+    .buddy-wrapper.happy .mouth {
+      width: 24px;
+      height: 10px;
+      border-bottom: 3px solid var(--accent);
+      border-radius: 0 0 50% 50%;
+      opacity: 0.7;
+    }
+
+    /* Dizzy expression — swirl eyes */
+    .buddy-wrapper.dizzy .pupil {
+      animation: dizzyEyes 0.6s ease-in-out;
+    }
+
+    @keyframes dizzyEyes {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      25% { transform: translate(calc(-50% + 5px), calc(-50% - 3px)) rotate(90deg); }
+      50% { transform: translate(calc(-50% - 5px), calc(-50% + 3px)) rotate(180deg); }
+      75% { transform: translate(calc(-50% + 3px), calc(-50% + 5px)) rotate(270deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* Floating hearts on tap */
+    .floating-heart {
+      position: absolute;
+      pointer-events: none;
+      z-index: 50;
+      animation: heartFloat 1s ease-out forwards;
+      font-size: 20px;
+    }
+
+    @keyframes heartFloat {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(0.5) rotate(0deg);
+      }
+      50% {
+        opacity: 1;
+        transform: translateY(-40px) scale(1.2) rotate(15deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-80px) scale(0.8) rotate(-10deg);
+      }
+    }
+
+    /* Floating emoji burst */
+    .floating-emoji {
+      position: absolute;
+      pointer-events: none;
+      z-index: 50;
+      font-size: 18px;
+      animation: emojiBurst 0.8s ease-out forwards;
+    }
+
+    @keyframes emojiBurst {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(0.3);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(1);
+      }
+    }
+
+    /* Shake indicator */
+    .shake-hint {
+      position: fixed;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--secondary);
+      color: #fff;
+      border-radius: 980px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 100;
+      opacity: 0;
+      animation: shakeHintIn 0.4s ease-out forwards;
+      white-space: nowrap;
+    }
+
+    .shake-hint.visible {
+      display: flex;
+    }
+
+    @keyframes shakeHintIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .shake-hint svg {
+      width: 16px;
+      height: 16px;
+      animation: shakeIcon 0.5s ease-in-out infinite;
+    }
+
+    @keyframes shakeIcon {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(15deg); }
+      75% { transform: rotate(-15deg); }
+    }
+
+    /* Mobile interaction hints */
+    .mobile-hints {
+      display: none;
+      gap: 20px;
+      animation: fadeInUp 0.6s ease-out 1s both;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    @media (max-width: 600px), (hover: none) and (pointer: coarse) {
+      .mobile-hints {
+        display: flex;
+      }
+    }
+
+    .hint-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      background: var(--muted);
+      border-radius: 980px;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted-fg);
+      border: 1px solid var(--border);
+    }
+
+    .hint-chip svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0.6;
+    }
+
+    /* Buddy tilt visual (CSS for gyro tilt) */
+    .buddy-wrapper.gyro-active {
+      transition: transform 0.15s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background effects -->
+  <div class="bg-pattern"></div>
+  <div class="bg-glow bg-glow-primary"></div>
+  <div class="bg-glow bg-glow-accent"></div>
+
+  <!-- Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Logo -->
+    <div class="logo-wrapper">
+      <img src="/logo.png" alt="Fularani Foundation" />
+    </div>
+
+    <!-- Buddy Character -->
+    <div class="buddy-wrapper" id="buddy">
+      <div class="antenna"></div>
+      <div class="buddy-body">
+        <svg class="buddy-svg" viewBox="0 0 160 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Body -->
+          <ellipse cx="80" cy="100" rx="65" ry="75" fill="url(#bodyGrad)" stroke="url(#bodyStroke)" stroke-width="1.5"/>
+          <!-- Inner shading -->
+          <ellipse cx="80" cy="90" rx="50" ry="55" fill="url(#innerGrad)" opacity="0.4"/>
+          <!-- Feet -->
+          <ellipse cx="50" cy="172" rx="18" ry="10" fill="url(#feetGrad)" stroke="rgba(0,102,204,0.1)" stroke-width="1"/>
+          <ellipse cx="110" cy="172" rx="18" ry="10" fill="url(#feetGrad)" stroke="rgba(0,102,204,0.1)" stroke-width="1"/>
+          <!-- Arms -->
+          <ellipse cx="12" cy="105" rx="12" ry="18" fill="url(#armGrad)" stroke="rgba(0,102,204,0.08)" stroke-width="1" transform="rotate(-12 12 105)"/>
+          <ellipse cx="148" cy="105" rx="12" ry="18" fill="url(#armGrad)" stroke="rgba(0,102,204,0.08)" stroke-width="1" transform="rotate(12 148 105)"/>
+          <!-- Belly circle — brand accent -->
+          <circle cx="80" cy="125" r="13" fill="none" stroke="rgba(0,102,204,0.08)" stroke-width="1"/>
+          <circle cx="80" cy="125" r="6" fill="rgba(255,194,14,0.12)"/>
+          <!-- Top highlight -->
+          <ellipse cx="68" cy="48" rx="26" ry="10" fill="rgba(0,102,204,0.04)" transform="rotate(-10 68 48)"/>
+
+          <defs>
+            <radialGradient id="bodyGrad" cx="0.5" cy="0.35" r="0.65">
+              <stop offset="0%" stop-color="#e8f0fe"/>
+              <stop offset="100%" stop-color="#d4e4f7"/>
+            </radialGradient>
+            <linearGradient id="bodyStroke" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(0,102,204,0.2)"/>
+              <stop offset="100%" stop-color="rgba(0,102,204,0.05)"/>
+            </linearGradient>
+            <radialGradient id="innerGrad" cx="0.5" cy="0.3" r="0.7">
+              <stop offset="0%" stop-color="rgba(0,102,204,0.06)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+            <radialGradient id="feetGrad" cx="0.5" cy="0.4" r="0.6">
+              <stop offset="0%" stop-color="#dce8f5"/>
+              <stop offset="100%" stop-color="#c8d9ed"/>
+            </radialGradient>
+            <radialGradient id="armGrad" cx="0.5" cy="0.4" r="0.6">
+              <stop offset="0%" stop-color="#dce8f5"/>
+              <stop offset="100%" stop-color="#c8d9ed"/>
+            </radialGradient>
+          </defs>
+        </svg>
+
+        <!-- Eyes -->
+        <div class="eyes-container">
+          <div class="eye" id="leftEye">
+            <div class="pupil" id="leftPupil"></div>
+            <div class="blink-overlay"></div>
+          </div>
+          <div class="eye" id="rightEye">
+            <div class="pupil" id="rightPupil"></div>
+            <div class="blink-overlay"></div>
+          </div>
+        </div>
+
+        <!-- Cheeks -->
+        <div class="cheek left"></div>
+        <div class="cheek right"></div>
+
+        <!-- Mouth -->
+        <div class="mouth"></div>
+      </div>
+      <div class="buddy-shadow"></div>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      <svg class="wifi-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+        <path d="M10.71 5.05A16 16 0 0 1 22.56 9"></path>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+        <line x1="12" y1="20" x2="12.01" y2="20"></line>
+      </svg>
+      Connection Lost
+    </div>
+
+    <!-- Title -->
+    <h1 class="title">
+      <span class="title-top">No Internet</span>
+      <span class="title-bottom">Connection</span>
+    </h1>
+
+    <!-- Description -->
+    <p class="description">
+      Looks like you've gone offline. Check your internet connection and try again to continue your journey with Fularani Foundation.
+    </p>
+
+    <!-- Buttons -->
+    <div class="buttons-row">
+      <button class="retry-btn" id="retryBtn" onclick="location.reload()">
+        <!-- Refresh icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        Retry Connection
+      </button>
+    </div>
+
+    <!-- Trust Badges -->
+    <div class="trust-badges">
+      <div class="trust-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <polyline points="9 12 11 14 15 10"></polyline>
+        </svg>
+        <span>Verified NGO</span>
+      </div>
+      <div class="trust-badge accent-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+        <span>100% Transparency</span>
+      </div>
+      <div class="trust-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 3h-8l-2 4h12l-2-4z"></path>
+        </svg>
+        <span>80G & 12A Benefits</span>
+      </div>
+    </div>
+
+    <!-- Mobile Interaction Hints -->
+    <div class="mobile-hints" id="mobileHints">
+      <div class="hint-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L12 6"></path><path d="M12 18L12 22"></path>
+          <path d="M2 12L6 12"></path><path d="M18 12L22 12"></path>
+        </svg>
+        Tilt to look
+      </div>
+      <div class="hint-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        Tap buddy
+      </div>
+      <div class="hint-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 4 23 10 17 10"></path>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        Shake to retry
+      </div>
+    </div>
+  </div>
+
+  <!-- Shake Hint Toast -->
+  <div class="shake-hint" id="shakeHint">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 4 23 10 17 10"></path>
+      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+    </svg>
+    Retrying connection...
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-text">Fularani Foundation &bull; Empowering Communities</div>
+
+  <script>
+    // ===== CORE ELEMENTS =====
+    const leftPupil = document.getElementById('leftPupil');
+    const rightPupil = document.getElementById('rightPupil');
+    const leftEye = document.getElementById('leftEye');
+    const rightEye = document.getElementById('rightEye');
+    const buddyWrapper = document.getElementById('buddy');
+    const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+    // ===== EYE TRACKING (Mouse + Touch + Gyroscope) =====
+    function updateEyes(clientX, clientY) {
+      const eyes = [
+        { eye: leftEye, pupil: leftPupil },
+        { eye: rightEye, pupil: rightPupil }
+      ];
+
+      eyes.forEach(({ eye, pupil }) => {
+        const rect = eye.getBoundingClientRect();
+        const eyeCenterX = rect.left + rect.width / 2;
+        const eyeCenterY = rect.top + rect.height / 2;
+
+        const angle = Math.atan2(clientY - eyeCenterY, clientX - eyeCenterX);
+        const distance = Math.min(
+          Math.hypot(clientX - eyeCenterX, clientY - eyeCenterY) / 15,
+          7
+        );
+
+        const pupilX = Math.cos(angle) * distance;
+        const pupilY = Math.sin(angle) * distance;
+
+        pupil.style.transform = `translate(calc(-50% + ${pupilX}px), calc(-50% + ${pupilY}px))`;
+      });
+    }
+
+    // Move eyes based on raw offset (-1 to 1 range)
+    function updateEyesDirect(offsetX, offsetY) {
+      const maxMove = 7;
+      const px = offsetX * maxMove;
+      const py = offsetY * maxMove;
+
+      leftPupil.style.transform = `translate(calc(-50% + ${px}px), calc(-50% + ${py}px))`;
+      rightPupil.style.transform = `translate(calc(-50% + ${px}px), calc(-50% + ${py}px))`;
+    }
+
+    // Mouse (desktop)
+    document.addEventListener('mousemove', (e) => {
+      updateEyes(e.clientX, e.clientY);
+    });
+
+    // Touch drag — eyes follow finger (mobile)
+    document.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      updateEyes(touch.clientX, touch.clientY);
+    }, { passive: true });
+
+    // Touch tap — eyes look at tap position
+    document.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      updateEyes(touch.clientX, touch.clientY);
+    }, { passive: true });
+
+    // ===== GYROSCOPE EYE TRACKING (Mobile) =====
+    let gyroPermissionGranted = false;
+
+    function initGyroscope() {
+      if (window.DeviceOrientationEvent) {
+        // iOS 13+ requires permission
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+          DeviceOrientationEvent.requestPermission()
+            .then(state => {
+              if (state === 'granted') {
+                gyroPermissionGranted = true;
+                window.addEventListener('deviceorientation', handleGyro);
+                buddyWrapper.classList.add('gyro-active');
+              }
+            })
+            .catch(console.error);
+        } else {
+          // Android and other devices
+          window.addEventListener('deviceorientation', handleGyro);
+          buddyWrapper.classList.add('gyro-active');
+          gyroPermissionGranted = true;
+        }
+      }
+    }
+
+    function handleGyro(event) {
+      // gamma: left-right tilt (-90 to 90)
+      // beta: front-back tilt (-180 to 180)
+      const gamma = event.gamma || 0; // left/right
+      const beta = event.beta || 0;   // front/back
+
+      // Normalize to -1...1 range (clamp at ±30 degrees for sensitivity)
+      const x = Math.max(-1, Math.min(1, gamma / 30));
+      const y = Math.max(-1, Math.min(1, (beta - 40) / 30)); // 40° is roughly holding the phone upright
+
+      updateEyesDirect(x, y);
+
+      // Slight buddy body tilt for extra life
+      if (buddyWrapper.classList.contains('gyro-active')) {
+        buddyWrapper.style.transform = `translateY(${Math.sin(Date.now() / 500) * 12}px) rotateZ(${x * 3}deg) rotateX(${y * -2}deg)`;
+      }
+    }
+
+    // Auto-init gyroscope on mobile
+    if (isMobile) {
+      // Try auto-init (works on Android)
+      initGyroscope();
+      // Also init on first touch (needed for iOS permission)
+      document.addEventListener('touchstart', function iosGyroInit() {
+        if (!gyroPermissionGranted) {
+          initGyroscope();
+        }
+        document.removeEventListener('touchstart', iosGyroInit);
+      }, { once: true });
+    }
+
+    // ===== BUDDY TAP REACTIONS (Mobile) =====
+    let tapCount = 0;
+    const expressions = ['happy', 'surprised', 'dizzy', 'happy'];
+    const emojis = ['💛', '😲', '😵‍💫', '💙'];
+
+    buddyWrapper.addEventListener('click', handleBuddyTap);
+    buddyWrapper.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      handleBuddyTap(e);
+    });
+
+    function handleBuddyTap(e) {
+      // Haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate(30);
+      }
+
+      const expressionIndex = tapCount % expressions.length;
+      const expression = expressions[expressionIndex];
+      const emoji = emojis[expressionIndex];
+      tapCount++;
+
+      // Remove previous expression classes
+      buddyWrapper.classList.remove('happy', 'surprised', 'dizzy', 'tapped');
+
+      // Force reflow to restart animation
+      void buddyWrapper.offsetWidth;
+
+      // Add bounce + expression
+      buddyWrapper.classList.add('tapped', expression);
+
+      // Spawn floating emojis around buddy
+      spawnEmojis(emoji, 5);
+
+      // Spawn hearts
+      if (expression === 'happy') {
+        spawnHearts(3);
+      }
+
+      // Remove after animation
+      setTimeout(() => {
+        buddyWrapper.classList.remove('tapped', expression);
+      }, 800);
+    }
+
+    function spawnHearts(count) {
+      for (let i = 0; i < count; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'floating-heart';
+        heart.textContent = '💛';
+        heart.style.left = (40 + Math.random() * 80) + 'px';
+        heart.style.top = (30 + Math.random() * 60) + 'px';
+        heart.style.animationDelay = (i * 0.15) + 's';
+        buddyWrapper.querySelector('.buddy-body').appendChild(heart);
+        setTimeout(() => heart.remove(), 1200);
+      }
+    }
+
+    function spawnEmojis(emoji, count) {
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'floating-emoji';
+        el.textContent = emoji;
+        const angle = (Math.PI * 2 / count) * i + (Math.random() * 0.5);
+        const dist = 50 + Math.random() * 40;
+        el.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
+        el.style.setProperty('--ty', `${Math.sin(angle) * dist - 30}px`);
+        el.style.left = '70px';
+        el.style.top = '80px';
+        el.style.animationDelay = (i * 0.08) + 's';
+        buddyWrapper.querySelector('.buddy-body').appendChild(el);
+        setTimeout(() => el.remove(), 1000);
+      }
+    }
+
+    // ===== TOUCH RIPPLE EFFECT =====
+    if (isMobile) {
+      document.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        createRipple(touch.clientX, touch.clientY);
+      }, { passive: true });
+    }
+
+    function createRipple(x, y) {
+      const ripple = document.createElement('div');
+      ripple.className = 'touch-ripple';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      // Alternate brand colors
+      const colors = ['rgba(0, 102, 204, 0.15)', 'rgba(255, 194, 14, 0.2)'];
+      ripple.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random() * 2)]}, transparent)`;
+      document.body.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 700);
+    }
+
+    // ===== SHAKE TO RETRY (Mobile) =====
+    let lastShakeTime = 0;
+    let shakeThreshold = 25;
+    let lastX = null, lastY = null, lastZ = null;
+
+    if (window.DeviceMotionEvent) {
+      window.addEventListener('devicemotion', (event) => {
+        const acc = event.accelerationIncludingGravity;
+        if (!acc) return;
+
+        const { x, y, z } = acc;
+        if (lastX !== null) {
+          const deltaX = Math.abs(x - lastX);
+          const deltaY = Math.abs(y - lastY);
+          const deltaZ = Math.abs(z - lastZ);
+          const totalDelta = deltaX + deltaY + deltaZ;
+
+          if (totalDelta > shakeThreshold) {
+            const now = Date.now();
+            if (now - lastShakeTime > 2000) { // 2s cooldown
+              lastShakeTime = now;
+              handleShake();
+            }
+          }
+        }
+        lastX = x;
+        lastY = y;
+        lastZ = z;
+      });
+    }
+
+    function handleShake() {
+      // Haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 30, 50]);
+      }
+
+      // Show shake hint toast
+      const shakeHint = document.getElementById('shakeHint');
+      shakeHint.classList.add('visible');
+
+      // Make buddy react
+      buddyWrapper.classList.remove('tapped', 'dizzy');
+      void buddyWrapper.offsetWidth;
+      buddyWrapper.classList.add('tapped', 'dizzy');
+      spawnEmojis('🔄', 4);
+
+      setTimeout(() => {
+        buddyWrapper.classList.remove('tapped', 'dizzy');
+        shakeHint.classList.remove('visible');
+        location.reload();
+      }, 1500);
+    }
+
+    // ===== PARTICLES =====
+    const particlesContainer = document.getElementById('particles');
+
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      particle.classList.add(Math.random() > 0.6 ? 'yellow' : 'blue');
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDuration = (Math.random() * 8 + 8) + 's';
+      particle.style.animationDelay = (Math.random() * 5) + 's';
+      const size = (Math.random() * 4 + 2) + 'px';
+      particle.style.width = size;
+      particle.style.height = size;
+      particlesContainer.appendChild(particle);
+
+      setTimeout(() => {
+        particle.remove();
+        createParticle();
+      }, (parseFloat(particle.style.animationDuration) + parseFloat(particle.style.animationDelay)) * 1000);
+    }
+
+    for (let i = 0; i < 18; i++) {
+      setTimeout(createParticle, i * 300);
+    }
+
+    // ===== AUTO-RELOAD WHEN BACK ONLINE =====
+    window.addEventListener('online', () => {
+      location.reload();
+    });
+  </script>
+</body>
+</html>
