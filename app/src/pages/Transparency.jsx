@@ -331,7 +331,7 @@ const Transparency = () => {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
             {documents.map((subtopic, index) => (
               <SubtopicSection
                 key={subtopic.title}
