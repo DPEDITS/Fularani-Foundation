@@ -4,7 +4,7 @@ const sendEmail = async (options) => {
     throw new Error("RESEND_API_KEY is not defined in environment variables");
   }
 
-  const fromEmail = process.env.RESEND_FROM_EMAIL || "Fularani Foundation <noreply@kb.fularanifoundation.org>";
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "Fularani Foundation <connect@fularanifoundation.org>";
 
   let response;
   try {
