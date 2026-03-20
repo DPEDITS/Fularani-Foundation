@@ -1,9 +1,15 @@
-name: CI/CD Pipeline
-
 on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   build-and-deploy:
