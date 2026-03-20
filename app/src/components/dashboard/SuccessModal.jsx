@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import logoImg from "../../assets/logo.jpg";
 
-const SuccessModal = ({ show, onClose, amount, formatCurrency, donorName }) => {
+const SuccessModal = ({ show, onClose, amount, formatCurrency, donorName, donorAvatar }) => {
   const [showShareSection, setShowShareSection] = useState(false);
   const [shareImageUrl, setShareImageUrl] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -57,50 +57,97 @@ const SuccessModal = ({ show, onClose, amount, formatCurrency, donorName }) => {
     ctx.roundRect(60, 60, 960, 8, 4);
     ctx.fill();
 
-    // Load logo and draw everything
-    const logo = new Image();
-    logo.crossOrigin = "anonymous";
-    logo.onload = () => {
-      // Logo
-      const logoSize = 140;
-      const logoX = (1080 - logoSize) / 2;
-      const logoY = 120;
+    // Load images
+    const loadImg = (src) =>
+      new Promise((resolve) => {
+        if (!src) return resolve(null);
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
+      });
 
-      // White circle behind logo
+    const createInitialAvatar = (name) => {
+      const c = document.createElement("canvas");
+      c.width = 140;
+      c.height = 140;
+      const cx = c.getContext("2d");
+      cx.fillStyle = "#f43f5e";
+      cx.fillRect(0, 0, 140, 140);
+      cx.fillStyle = "#ffffff";
+      cx.font = "bold 64px 'Segoe UI', Arial, sans-serif";
+      cx.textAlign = "center";
+      cx.textBaseline = "middle";
+      cx.fillText(name ? name.charAt(0).toUpperCase() : "D", 70, 75);
+      return c;
+    };
+
+    const loadAvatar = (src, name) =>
+      new Promise((resolve) => {
+        const fallback = createInitialAvatar(name);
+        if (!src) return resolve(fallback);
+        
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => {
+          // If the first attempt fails (sometimes happens with strict CORS), 
+          // try a CORS proxy as a fallback
+          const fallbackImg = new Image();
+          fallbackImg.crossOrigin = "anonymous";
+          fallbackImg.onload = () => resolve(fallbackImg);
+          fallbackImg.onerror = () => resolve(fallback);
+          fallbackImg.src = "https://corsproxy.io/?" + encodeURIComponent(src);
+        };
+        
+        // Cache busting prevents the browser from using a cached version without CORS headers
+        const sep = src.includes("?") ? "&" : "?";
+        img.src = src + sep + "cb=" + new Date().getTime();
+      });
+
+    const drawCircularImage = (ctx, img, x, y, size) => {
       ctx.fillStyle = "#ffffff";
       ctx.shadowColor = "rgba(0,0,0,0.08)";
       ctx.shadowBlur = 30;
       ctx.beginPath();
-      ctx.arc(
-        logoX + logoSize / 2,
-        logoY + logoSize / 2,
-        logoSize / 2 + 16,
-        0,
-        Math.PI * 2,
-      );
+      ctx.arc(x + size / 2, y + size / 2, size / 2 + 16, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Clip and draw logo
       ctx.save();
       ctx.beginPath();
-      ctx.arc(
-        logoX + logoSize / 2,
-        logoY + logoSize / 2,
-        logoSize / 2,
-        0,
-        Math.PI * 2,
-      );
+      ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
       ctx.clip();
-      ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+      ctx.drawImage(img, x, y, size, size);
       ctx.restore();
+    };
+
+    Promise.all([loadImg(logoImg), loadAvatar(donorAvatar, displayName)]).then(([logo, avatar]) => {
+      const size = 140;
+      const y = 120;
+
+      if (logo && avatar) {
+        const colabSpace = 60;
+        const totalWidth = size * 2 + colabSpace;
+        const startX = (1080 - totalWidth) / 2;
+
+        drawCircularImage(ctx, logo, startX, y, size);
+        
+        // Collab symbol
+        ctx.fillStyle = "#f43f5e";
+        ctx.font = "bold 36px 'Segoe UI', Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("✕", startX + size + colabSpace / 2, y + size / 2);
+
+        drawCircularImage(ctx, avatar, startX + size + colabSpace, y, size);
+      } else if (logo) {
+        drawCircularImage(ctx, logo, (1080 - size) / 2, y, size);
+      }
 
       drawText(ctx);
-    };
-    logo.onerror = () => {
-      drawText(ctx);
-    };
-    logo.src = logoImg;
+    });
 
     function drawText(ctx) {
       // "Fularani Foundation" text
@@ -202,7 +249,7 @@ const SuccessModal = ({ show, onClose, amount, formatCurrency, donorName }) => {
       const url = canvas.toDataURL("image/png");
       setShareImageUrl(url);
     }
-  }, [displayName, displayAmount]);
+  }, [displayName, displayAmount, donorAvatar]);
 
   useEffect(() => {
     if (show) {
@@ -555,3 +602,4 @@ const SuccessModal = ({ show, onClose, amount, formatCurrency, donorName }) => {
 };
 
 export default SuccessModal;
+           
