@@ -29,7 +29,7 @@ const ShareDonationModal = ({
 
   const websiteUrl = "https://kb.fularanifoundation.org";
 
-  // Generate share image using Canvas
+  // Generate premium share image using Canvas
   const generateShareImage = useCallback(() => {
     setGenerating(true);
     const canvas = document.createElement("canvas");
@@ -37,35 +37,44 @@ const ShareDonationModal = ({
     canvas.height = 1080;
     const ctx = canvas.getContext("2d");
 
-    // Background gradient
+    // 1. Premium Dark Background (Deep Slate/Indigo)
     const bgGrad = ctx.createLinearGradient(0, 0, 1080, 1080);
-    bgGrad.addColorStop(0, "#fff1f2");
-    bgGrad.addColorStop(0.4, "#ffe4e6");
-    bgGrad.addColorStop(1, "#fecdd3");
+    bgGrad.addColorStop(0, "#0f172a");     // slate-900
+    bgGrad.addColorStop(0.5, "#1e1b4b");   // indigo-950
+    bgGrad.addColorStop(1, "#020617");     // slate-950
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, 1080, 1080);
 
-    // Decorative circles
-    ctx.globalAlpha = 0.08;
-    ctx.fillStyle = "#f43f5e";
-    ctx.beginPath();
-    ctx.arc(900, 150, 200, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(180, 900, 250, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
+    // 2. Artistic Glowing Orbs for Depth
+    const addGlow = (x, y, r, color) => {
+      const grd = ctx.createRadialGradient(x, y, 0, x, y, r);
+      grd.addColorStop(0, color);
+      grd.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    };
+    
+    addGlow(150, 150, 700, "rgba(244, 63, 94, 0.15)");  // Rose top left glow
+    addGlow(900, 800, 800, "rgba(139, 92, 246, 0.12)"); // Violet bottom right glow
 
-    // Top accent bar
+    // 3. Subtle Grid Pattern Overlay (Premium texture)
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.02)";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 1080; i += 60) {
+      ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 1080); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(1080, i); ctx.stroke();
+    }
+
+    // 4. Accent Border Top
     const barGrad = ctx.createLinearGradient(0, 0, 1080, 0);
-    barGrad.addColorStop(0, "#f43f5e");
-    barGrad.addColorStop(1, "#ec4899");
+    barGrad.addColorStop(0, "#f43f5e"); // rose-500
+    barGrad.addColorStop(1, "#a855f7"); // purple-500
     ctx.fillStyle = barGrad;
-    ctx.beginPath();
-    ctx.roundRect(60, 60, 960, 8, 4);
-    ctx.fill();
+    ctx.fillRect(0, 0, 1080, 12);
 
-    // Load images
+    // Helper: Load standard images
     const loadImg = (src) =>
       new Promise((resolve) => {
         if (!src) return resolve(null);
@@ -76,21 +85,28 @@ const ShareDonationModal = ({
         img.src = src;
       });
 
+    // Helper: Create fallback avatar
     const createInitialAvatar = (name) => {
       const c = document.createElement("canvas");
-      c.width = 140;
-      c.height = 140;
+      c.width = 160;
+      c.height = 160;
       const cx = c.getContext("2d");
-      cx.fillStyle = "#f43f5e";
-      cx.fillRect(0, 0, 140, 140);
+      
+      const avGrad = cx.createLinearGradient(0, 0, 160, 160);
+      avGrad.addColorStop(0, "#f43f5e");
+      avGrad.addColorStop(1, "#ec4899");
+      cx.fillStyle = avGrad;
+      cx.fillRect(0, 0, 160, 160);
+      
       cx.fillStyle = "#ffffff";
-      cx.font = "bold 64px 'Segoe UI', Arial, sans-serif";
+      cx.font = "bold 72px 'Segoe UI', Arial, sans-serif";
       cx.textAlign = "center";
       cx.textBaseline = "middle";
-      cx.fillText(name ? name.charAt(0).toUpperCase() : "D", 70, 75);
+      cx.fillText(name ? name.charAt(0).toUpperCase() : "D", 80, 85);
       return c;
     };
 
+    // Helper: Load external avatar safely
     const loadAvatar = (src, name) =>
       new Promise((resolve) => {
         const fallback = createInitialAvatar(name);
@@ -99,52 +115,70 @@ const ShareDonationModal = ({
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.onload = () => resolve(img);
-        img.onerror = () => {
-          // If the first attempt fails (sometimes happens with strict CORS), 
-          // try a CORS proxy as a fallback
-          const fallbackImg = new Image();
-          fallbackImg.crossOrigin = "anonymous";
-          fallbackImg.onload = () => resolve(fallbackImg);
-          fallbackImg.onerror = () => resolve(fallback);
-          fallbackImg.src = "https://corsproxy.io/?" + encodeURIComponent(src);
-        };
-        
-        // Cache busting prevents the browser from using a cached version without CORS headers
-        const sep = src.includes("?") ? "&" : "?";
-        img.src = src + sep + "cb=" + new Date().getTime();
+        img.onerror = () => resolve(fallback);
+        img.src = src + (src.includes("?") ? "&" : "?") + "cb=" + new Date().getTime();
       });
 
+    // Helper: Draw circular image with glowing stroke and object-fit: cover
     const drawCircularImage = (ctx, img, x, y, size) => {
-      ctx.fillStyle = "#ffffff";
-      ctx.shadowColor = "rgba(0,0,0,0.08)";
+      // Outer Glow shadow
+      ctx.shadowColor = "rgba(244, 63, 94, 0.4)";
       ctx.shadowBlur = 30;
       ctx.beginPath();
-      ctx.arc(x + size / 2, y + size / 2, size / 2 + 16, 0, Math.PI * 2);
+      ctx.arc(x + size / 2, y + size / 2, size / 2 + 6, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
 
+      // Gradient border ring
+      const ringGrad = ctx.createLinearGradient(x, y, x + size, y + size);
+      ringGrad.addColorStop(0, "#f43f5e");
+      ringGrad.addColorStop(1, "#a855f7");
+      
+      ctx.fillStyle = ringGrad;
+      ctx.beginPath();
+      ctx.arc(x + size / 2, y + size / 2, size / 2 + 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // The image with object-fit: cover
       ctx.save();
       ctx.beginPath();
       ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
       ctx.clip();
-      ctx.drawImage(img, x, y, size, size);
+
+      const imgRatio = img.width / img.height;
+      let drawWidth = size;
+      let drawHeight = size;
+      let drawX = x;
+      let drawY = y;
+
+      if (imgRatio > 1) {
+        // Landscape: scale height to fit, width extends
+        drawWidth = size * imgRatio;
+        drawX = x - (drawWidth - size) / 2;
+      } else if (imgRatio < 1) {
+        // Portrait: scale width to fit, height extends
+        drawHeight = size / imgRatio;
+        drawY = y - (drawHeight - size) / 2;
+      }
+
+      ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
       ctx.restore();
     };
 
     Promise.all([loadImg(logoImg), loadAvatar(donorAvatar, displayName)]).then(([logo, avatar]) => {
-      const size = 140;
-      const y = 120;
+      const size = 150;
+      const y = 90;
 
       if (logo && avatar) {
-        const colabSpace = 60;
+        const colabSpace = 70;
         const totalWidth = size * 2 + colabSpace;
         const startX = (1080 - totalWidth) / 2;
 
         drawCircularImage(ctx, logo, startX, y, size);
         
-        // Collab symbol
-        ctx.fillStyle = "#f43f5e";
-        ctx.font = "bold 36px 'Segoe UI', Arial, sans-serif";
+        // Collab symbol (✕)
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 32px 'Segoe UI', Arial, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("✕", startX + size + colabSpace / 2, y + size / 2);
@@ -158,89 +192,108 @@ const ShareDonationModal = ({
     });
 
     function drawText(ctx) {
-      ctx.fillStyle = "#1d1d1f";
-      ctx.font = "bold 36px 'Segoe UI', Arial, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("Fularani Foundation", 540, 330);
+      ctx.textBaseline = "middle";
 
-      ctx.fillStyle = "#86868b";
-      ctx.font = "18px 'Segoe UI', Arial, sans-serif";
-      ctx.fillText("Empowering Dreams, Inspiring Humanity", 540, 368);
+      // "FULARANI FOUNDATION" text
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 46px 'Segoe UI', Arial, sans-serif";
+      // Adding letter spacing effect manually via padding isn't great in canvas, use uppercase and spacing
+      const foundationText = "FULARANI FOUNDATION".split("").join(String.fromCharCode(8202));
+      ctx.fillText(foundationText, 540, 290);
 
-      // Divider
+      // Tagline
+      ctx.fillStyle = "#94a3b8"; // slate-400
+      ctx.font = "600 20px 'Segoe UI', Arial, sans-serif";
+      ctx.fillText("EMPOWERING DREAMS, INSPIRING HUMANITY", 540, 340);
+
+      // Decorative Divider
       const divGrad = ctx.createLinearGradient(300, 0, 780, 0);
       divGrad.addColorStop(0, "rgba(244,63,94,0)");
-      divGrad.addColorStop(0.5, "rgba(244,63,94,0.3)");
+      divGrad.addColorStop(0.5, "rgba(244,63,94,0.6)");
       divGrad.addColorStop(1, "rgba(244,63,94,0)");
       ctx.strokeStyle = divGrad;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(300, 400);
-      ctx.lineTo(780, 400);
+      ctx.moveTo(250, 400);
+      ctx.lineTo(830, 400);
       ctx.stroke();
 
+      // Sparkle Icon & "IMMENSE GRATITUDE"
       ctx.fillStyle = "#f43f5e";
-      ctx.font = "bold 28px 'Segoe UI', Arial, sans-serif";
-      ctx.fillText("✨ THANK YOU ✨", 540, 465);
+      ctx.font = "800 32px 'Segoe UI', Arial, sans-serif";
+      ctx.fillText("✨ IMMENSE GRATITUDE ✨", 540, 460);
 
-      ctx.fillStyle = "#1d1d1f";
-      ctx.font = "bold 52px 'Segoe UI', Arial, sans-serif";
-      const upperName = displayName.toUpperCase();
-      const nameText =
-        upperName.length > 20 ? upperName.substring(0, 18) + "..." : upperName;
-      ctx.fillText(nameText, 540, 535);
-
-      ctx.fillStyle = "#86868b";
-      ctx.font = "22px 'Segoe UI', Arial, sans-serif";
-      ctx.fillText("for your generous donation of", 540, 585);
-
-      // Amount card
+      // Donor Name
       ctx.fillStyle = "#ffffff";
-      ctx.shadowColor = "rgba(244,63,94,0.15)";
+      ctx.font = "900 58px 'Segoe UI', Arial, sans-serif";
+      const upperName = displayName.toUpperCase();
+      const nameText = upperName.length > 20 ? upperName.substring(0, 18) + "..." : upperName;
+      ctx.fillText(nameText, 540, 530);
+
+      // "for your generous contribution of"
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "italic 400 26px 'Segoe UI', Arial, sans-serif";
+      ctx.fillText("for your generous contribution of", 540, 595);
+
+      // Amount Card Background - Glassmorphism
+      ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+      ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
       ctx.shadowBlur = 40;
       ctx.beginPath();
-      ctx.roundRect(280, 620, 520, 120, 24);
+      ctx.roundRect(260, 650, 560, 140, 30);
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      ctx.strokeStyle = "rgba(244,63,94,0.15)";
+      // Amount Card glowing Border
+      const cardBorderGrad = ctx.createLinearGradient(260, 650, 820, 790);
+      cardBorderGrad.addColorStop(0, "rgba(244,63,94,0.5)");
+      cardBorderGrad.addColorStop(1, "rgba(168,85,247,0.5)");
+      ctx.strokeStyle = cardBorderGrad;
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.roundRect(280, 620, 520, 120, 24);
+      ctx.roundRect(260, 650, 560, 140, 30);
       ctx.stroke();
 
-      const amtGrad = ctx.createLinearGradient(380, 0, 700, 0);
-      amtGrad.addColorStop(0, "#f43f5e");
-      amtGrad.addColorStop(1, "#ec4899");
+      // Amount Text (Perfectly Centered Vertically and Horizontally inside the Box)
+      // Box X starts at 260, width 560 -> Center X = 260 + (560 / 2) = 540
+      // Box Y starts at 650, height 140 -> Center Y = 650 + (140 / 2) = 720
+      const amtGrad = ctx.createLinearGradient(350, 0, 730, 0);
+      amtGrad.addColorStop(0, "#fb7185"); // rose-400
+      amtGrad.addColorStop(1, "#c084fc"); // purple-400
       ctx.fillStyle = amtGrad;
-      ctx.font = "bold 72px 'Segoe UI', Arial, sans-serif";
-      ctx.fillText(`₹${displayAmount.toLocaleString("en-IN")}`, 540, 705);
+      ctx.font = "900 85px 'Segoe UI', Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(`₹${displayAmount.toLocaleString("en-IN")}`, 540, 720); 
 
-      ctx.font = "40px Arial";
-      ctx.fillText("💝", 200, 690);
-      ctx.fillText("💝", 880, 690);
+      // Bottom Call to Action Text
+      ctx.fillStyle = "#e2e8f0"; // slate-200
+      ctx.font = "700 24px 'Segoe UI', Arial, sans-serif";
+      ctx.fillText("Your generosity will change lives!", 540, 860);
 
-      ctx.fillStyle = "#1d1d1f";
-      ctx.font = "bold 24px 'Segoe UI', Arial, sans-serif";
-      ctx.fillText("Your generosity will change lives!", 540, 810);
-
-      ctx.fillStyle = "#86868b";
-      ctx.font = "20px 'Segoe UI', Arial, sans-serif";
-      ctx.fillText("Every contribution makes a difference 🌟", 540, 850);
-
-      // Bottom bar
-      const btmGrad = ctx.createLinearGradient(0, 0, 1080, 0);
-      btmGrad.addColorStop(0, "#f43f5e");
-      btmGrad.addColorStop(1, "#ec4899");
-      ctx.fillStyle = btmGrad;
+      // Bottom Message Box (Glass)
+      ctx.fillStyle = "rgba(15, 23, 42, 0.6)"; // slate-900 transparent
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(60, 940, 960, 80, 20);
+      ctx.roundRect(140, 930, 800, 90, 25);
+      ctx.fill();
+      ctx.stroke();
+
+      // Bottom accent bar highlight
+      ctx.fillStyle = barGrad;
+      ctx.beginPath();
+      ctx.roundRect(140, 930, 800, 4, 4); 
       ctx.fill();
 
+      // Website URL perfectly centered in bottom box
+      // Center Y = 930 + (90 / 2) = 975
       ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 24px 'Segoe UI', Arial, sans-serif";
-      ctx.fillText("kb.fularanifoundation.org", 540, 988);
+      ctx.font = "800 28px 'Segoe UI', Arial, sans-serif";
+      ctx.fillText("kb.fularanifoundation.org", 540, 975);
 
+      // Convert drawing to an image URL for React to render
       const url = canvas.toDataURL("image/png");
       setShareImageUrl(url);
       setGenerating(false);
@@ -304,23 +357,74 @@ const ShareDonationModal = ({
   };
 
   const handleWhatsAppShare = async () => {
-    const success = await shareWithNativeApi("WhatsApp");
-    if (success) return;
-    handleDownloadImage();
-    const url = `https://wa.me/?text=${encodeURIComponent(shareCaption)}`;
-    window.open(url, "_blank");
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // Mobile handles image transmission beautifully via native share
+      const success = await shareWithNativeApi("WhatsApp");
+      if (success) return;
+    }
+
+    let imageCopied = false;
+    // DESKTOP: WhatsApp Web/App deep links do NOT support file attachments natively.
+    // Solution: Copy the image to clipboard & download fallback, then deep link app.
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.write) {
+        const response = await fetch(shareImageUrl);
+        const blob = await response.blob();
+        await navigator.clipboard.write([
+          new ClipboardItem({ [blob.type]: blob })
+        ]);
+        imageCopied = true;
+        alert("🖼️ Image copied to clipboard! Just hit Paste (Ctrl+V) in WhatsApp to attach it (the caption is already pre-filled).");
+      } else {
+        handleDownloadImage();
+      }
+    } catch (e) {
+      handleDownloadImage();
+    }
+
+    // Only copy the caption if we didn't firmly lock the image into the clipboard just now
+    if (!imageCopied) {
+      await handleCopyCaption();
+    }
+
+    // Trigger WhatsApp Desktop App explicitly via custom URI scheme
+    const url = `whatsapp://send?text=${encodeURIComponent(shareCaption)}`;
+    window.location.href = url;
+
+    // Fallback to Web if Desktop app is not installed
+    setTimeout(() => {
+      window.open(`https://wa.me/?text=${encodeURIComponent(shareCaption)}`, "_blank");
+    }, 1500);
   };
 
   const handleInstagramShare = async () => {
-    const success = await shareWithNativeApi("Instagram");
-    if (success) return;
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    // Bypassing native share sheet to target Instagram specifically:
+    // Browsers cannot push files mathematically to Instagram via deep link.
+    // We MUST download to camera roll -> Open IG Camera
+    
+    handleDownloadImage();
+    await handleCopyCaption();
+
     if (isMobile) {
-      window.location.href = "instagram://app";
+      alert("✨ Image saved & Caption copied! Select it from your gallery in Instagram.");
+      
+      // Try iOS Story Deep Link
+      window.location.href = "instagram://story-camera";
+      
+      // Android Intent Fallback
+      setTimeout(() => {
+        if (/Android/i.test(navigator.userAgent)) {
+          window.location.href = "intent://instagram.com/#Intent;package=com.instagram.android;scheme=https;end";
+        }
+      }, 1000);
     } else {
       window.open("https://www.instagram.com", "_blank");
+      alert("✨ Image downloaded & Caption copied! Ready to post on Instagram.");
     }
-    handleDownloadImage();
   };
 
   const handleFacebookShare = async () => {
@@ -371,7 +475,7 @@ const ShareDonationModal = ({
         </div>
 
         {/* Scrollable content */}
-        <div className="overflow-y-auto p-6 md:p-8 relative z-10 custom-scrollbar flex-1 pb-24">
+        <div className="overflow-y-auto p-6 md:p-8 relative z-10 custom-scrollbar flex-1 pb-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="text-left">
@@ -538,7 +642,7 @@ const ShareDonationModal = ({
         </div>
 
         {/* Sticky Footer */}
-        <div className="p-4 bg-white/80 backdrop-blur-md border-t border-gray-100 flex gap-2 w-full z-20 absolute bottom-0">
+        <div className="p-4 bg-white border-t border-gray-100 flex gap-2 w-full z-20 shrink-0">
           <button
             onClick={onClose}
             className="flex-1 py-3 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-rose-500/20 active:scale-95"
