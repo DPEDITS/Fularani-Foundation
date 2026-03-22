@@ -644,8 +644,8 @@
 
     function initGyro() {
       if (gyroRequested) return;
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission().then(state => {
+      if (window.DeviceOrientationEvent && typeof window.DeviceOrientationEvent.requestPermission === 'function') {
+        window.DeviceOrientationEvent.requestPermission().then(state => {
           if (state === 'granted') window.addEventListener('deviceorientation', handleGyro);
         }).catch(err => console.log(err));
       } else {
@@ -655,23 +655,25 @@
     }
 
     function handleGyro(e) {
-      if (e.gamma === null || e.beta === null) return;
+      // Guard against events with no actual orientation data (Desktop browsers sometimes fire these)
+      if (e.gamma == null && e.beta == null) return;
+      
       hasGyroData = true;
-      const x = Math.max(-1, Math.min(1, e.gamma / 30));
-      // Assume device is held at roughly a 40 degree angle
-      const y = Math.max(-1, Math.min(1, (e.beta - 40) / 30));
+      const gamma = e.gamma || 0;
+      const beta = e.beta || 0;
+      
+      const x = Math.max(-1, Math.min(1, gamma / 30));
+      const y = Math.max(-1, Math.min(1, (beta - 40) / 30));
+      
       updateEyesDirect(x, y);
       // Subtle body tilt
       buddyWrapper.style.transform = `rotateY(${x * 12}deg) rotateX(${y * -8}deg)`;
     }
 
-    if (window.DeviceOrientationEvent) {
-      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        document.addEventListener('touchstart', initGyro, { once: true });
-        document.addEventListener('click', initGyro, { once: true });
-      } else {
-        initGyro();
-      }
+    if (isMobile) {
+      document.addEventListener('touchstart', initGyro, { once: true });
+    } else {
+      initGyro();
     }
 
     // ===== VISUAL INTERACTIONS =====
