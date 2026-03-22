@@ -24,6 +24,7 @@ import ResetPassword from "./pages/ResetPassword";
 import LegalPolicy from "./pages/LegalPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import Transparency from "./pages/Transparency";
+import SEO from "./components/SEO";
 
 const App = () => {
   const location = useLocation();
@@ -39,6 +40,7 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEO />
       <Navbar />
       <ScrollToTop />
       <main>
