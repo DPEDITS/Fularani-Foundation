@@ -33,6 +33,16 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve offline page when network fails
 self.addEventListener('fetch', (event) => {
+  // 1. Bypass Service Worker for external scripts (Meta Pixel, Google, etc.)
+  // These should ALWAYS come from the network, never the cache.
+  if (
+    event.request.url.includes('facebook') || 
+    event.request.url.includes('google') || 
+    !event.request.url.startsWith(self.location.origin)
+  ) {
+    return; // Let the browser handle standard network fetching
+  }
+
   // Handle navigation requests (page loads) — show offline page
   if (event.request.mode === 'navigate') {
     event.respondWith(
@@ -45,13 +55,16 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Handle cached assets (logo, etc.)
+  // Handle cached assets (logo, etc.) — for internal assets only
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
         return cachedResponse;
       }
       return fetch(event.request);
+    }).catch(() => {
+      // Return nothing if fetch fails for non-cached assets
+      return; 
     })
   );
 });
