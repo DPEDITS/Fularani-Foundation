@@ -71,6 +71,7 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <a
                 href="/donor-register"
+                onClick={() => window.fbq?.('track', 'InitiateCheckout', { content_name: 'Hero Donate Button' })}
                 className="bg-accent hover:bg-accent/80 text-secondary w-full sm:w-auto px-6 py-4 lg:px-10 lg:py-5 rounded-xl text-base lg:text-lg font-black uppercase tracking-tight transition-all shadow-2xl shadow-accent/30 hover:translate-y-[-4px] flex items-center justify-center gap-3 group"
               >
                 Donate Now

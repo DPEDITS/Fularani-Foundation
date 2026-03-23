@@ -360,6 +360,15 @@ const DonorRegister = () => {
         }
         await registerVolunteer(formData);
       }
+
+      // Track successful registration in Meta Pixel
+      if (window.fbq) {
+        window.fbq('track', 'CompleteRegistration', { 
+          content_name: role === 'donor' ? 'Donor Sign Up' : 'Volunteer Sign Up',
+          status: 'success'
+        });
+      }
+
       setSuccess(true);
       setTimeout(
         () =>
@@ -398,6 +407,15 @@ const DonorRegister = () => {
         panHolderName: panHolderName,
         username: form.username,
       });
+
+      // Track successful PAN completion in Meta Pixel
+      if (window.fbq) {
+        window.fbq('track', 'CompleteRegistration', { 
+          content_name: 'Google User PAN Verified',
+          status: 'success'
+        });
+      }
+
       setSuccess(true);
       setTimeout(() => safeNavigate(navigate, "/donor-dashboard"), 2000);
     } catch (err) {
