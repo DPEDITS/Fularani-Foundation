@@ -38,6 +38,13 @@ const App = () => {
 
   const shouldHideFooter = hideFooterRoutes.some(route => location.pathname.startsWith(route));
 
+  // Meta Pixel: Track PageView on route change
+  React.useEffect(() => {
+    if (window.fbq) {
+      window.fbq('track', 'PageView');
+    }
+  }, [location.pathname]);
+
   return (
     <div className="min-h-screen bg-white">
       <SEO />
