@@ -38,10 +38,14 @@ const App = () => {
 
   const shouldHideFooter = hideFooterRoutes.some(route => location.pathname.startsWith(route));
 
-  // Meta Pixel: Track PageView on route change
+  // Meta Pixel: Track PageView on route change (only if not blocked by client)
   React.useEffect(() => {
-    if (window.fbq) {
-      window.fbq('track', 'PageView');
+    try {
+      if (window.fbq) {
+        window.fbq('track', 'PageView');
+      }
+    } catch (e) {
+      console.log("Meta Pixel was blocked by your browser/ad-blocker.");
     }
   }, [location.pathname]);
 
