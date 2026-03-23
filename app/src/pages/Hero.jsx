@@ -44,15 +44,15 @@ const Hero = () => {
       <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/10 -skew-x-12 translate-x-1/2 z-0 hidden lg:block"></div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex-grow flex flex-col-reverse lg:flex-row items-center pt-11">
+      <div className="relative z-10 flex-grow flex flex-col lg:flex-row items-center pt-24 lg:pt-0">
         {/* Left Side: Impact Text */}
-        <div className="w-full lg:w-1/2 px-6 py-10 md:px-12 lg:px-20 lg:py-0 lg:pt-0">
+        <div className="w-full lg:w-1/2 px-6 py-12 md:px-12 lg:px-20 flex flex-col justify-center">
           <Motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-5xl md:text-7xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-3 lg:mb-8 ">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-4 lg:mb-8 ">
               Empowering Dreams <br />
               <span className="text-accent underline decoration-primary decoration-4 lg:decoration-8 underline-offset-4 lg:underline-offset-8">
                 inspiring
@@ -63,12 +63,12 @@ const Hero = () => {
               </span>
             </h1>
 
-            <p className="text-base md:text-xl text-muted-foreground max-w-xl mb-6 lg:mb-12 font-bold leading-tight">
+            <p className="text-sm sm:text-base md:text-xl text-muted-foreground max-w-xl mb-8 lg:mb-12 font-bold leading-tight">
               A systemic approach to Education, Sustainability, and Healthcare
               in India. Join the Fularani movement today.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <a
                 href="/donor-register"
                 onClick={() => window.fbq?.('track', 'InitiateCheckout', { content_name: 'Hero Donate Button' })}
@@ -82,7 +82,7 @@ const Hero = () => {
               </a>
               <a
                 href="/missions"
-                className="hidden sm:flex bg-secondary hover:bg-black text-white w-full sm:w-auto px-6 py-4 lg:px-10 lg:py-5 rounded-xl text-base lg:text-lg font-black uppercase tracking-tight transition-all items-center justify-center gap-3 group"
+                className="bg-secondary hover:bg-black text-white w-full sm:w-auto px-6 py-4 lg:px-10 lg:py-5 rounded-xl text-base lg:text-lg font-black uppercase tracking-tight transition-all flex items-center justify-center gap-3 group"
               >
                 Our Work
                 <ArrowRight
@@ -93,21 +93,21 @@ const Hero = () => {
             </div>
 
             {/* Trust Badges */}
-            <div className="mt-6 lg:mt-8 flex flex-wrap justify-center sm:justify-start items-center gap-x-8 gap-y-4 border-t border-muted pt-4 lg:pt-8">
+            <div className="mt-8 lg:mt-12 flex flex-wrap justify-center sm:justify-start items-center gap-x-8 gap-y-4 border-t border-muted pt-6 lg:pt-8">
               <div className="flex items-center gap-2">
-                <ShieldCheck size={24} className="text-primary" />
+                <ShieldCheck size={20} className="text-primary md:w-6 md:h-6" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-secondary/60">
                   Verified NGO
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Heart size={24} className="text-accent" />
+                <Heart size={20} className="text-accent md:w-6 md:h-6" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-secondary/60">
                   100% Transparency
                 </span>
               </div>
-              <div className="w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2">
-                <div className="w-6 h-6 rounded-md bg-green-500/10 flex items-center justify-center">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <div className="w-5 h-5 md:w-6 md:h-6 rounded-md bg-green-500/10 flex items-center justify-center">
                   <span className="text-[10px] font-black text-green-600">
                     %
                   </span>
@@ -121,15 +121,15 @@ const Hero = () => {
         </div>
 
         {/* Right Side: Impact Imagery (Now Video) */}
-        <div className="block w-full lg:w-1/2 h-[50vh] lg:h-screen relative overflow-hidden bg-secondary">
+        <div className="w-full lg:w-1/2 h-[35vh] sm:h-[45vh] lg:h-screen relative overflow-hidden bg-secondary">
           {/* Floating Badge */}
-          <div className="hidden md:inline-flex absolute top-10 right-10 z-[40] items-center gap-2 bg-white/90 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-2xl shadow-black/10 border border-white/20 overflow-hidden">
+          <div className="hidden sm:inline-flex absolute top-6 right-6 lg:top-10 lg:right-10 z-[40] items-center gap-2 bg-white/90 backdrop-blur-xl px-4 py-2 rounded-full shadow-2xl border border-white/20">
             <Motion.span
               animate={{ backgroundColor: impactBadges[currentBadge].color }}
               transition={{ duration: 0.8 }}
-              className="w-2.5 h-2.5 rounded-full animate-pulse shrink-0 shadow-[0_0_10px_rgba(0,0,0,0.1)]"
+              className="w-2 h-2 rounded-full animate-pulse"
             ></Motion.span>
-            <div className="h-4 flex items-center justify-center relative min-w-[210px]">
+            <div className="h-4 flex items-center justify-center relative min-w-[180px]">
               <AnimatePresence mode="wait">
                 <Motion.span
                   key={currentBadge}
@@ -137,7 +137,7 @@ const Hero = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.4, ease: "easeOut" }}
-                  className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary whitespace-nowrap absolute text-center"
+                  className="text-[9px] font-black uppercase tracking-[0.2em] text-secondary absolute"
                 >
                   {impactBadges[currentBadge].text}
                 </Motion.span>
