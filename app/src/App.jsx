@@ -24,6 +24,7 @@ import ResetPassword from "./pages/ResetPassword";
 import LegalPolicy from "./pages/LegalPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import Transparency from "./pages/Transparency";
+import SEO from "./components/SEO";
 
 const App = () => {
   const location = useLocation();
@@ -37,8 +38,20 @@ const App = () => {
 
   const shouldHideFooter = hideFooterRoutes.some(route => location.pathname.startsWith(route));
 
+  // Meta Pixel: Track PageView on route change (only if not blocked by client)
+  React.useEffect(() => {
+    try {
+      if (window.fbq) {
+        window.fbq('track', 'PageView');
+      }
+    } catch (e) {
+      console.log("Meta Pixel was blocked by your browser/ad-blocker.");
+    }
+  }, [location.pathname]);
+
   return (
     <div className="min-h-screen bg-white">
+      <SEO />
       <Navbar />
       <ScrollToTop />
       <main>
