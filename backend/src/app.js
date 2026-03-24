@@ -12,7 +12,20 @@ const app = express();
 app.set("trust proxy", 1);
 
 // --- Security headers ---
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "script-src": ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://pagead2.googlesyndication.com"],
+        "frame-src": ["'self'", "https://accounts.google.com"],
+        "connect-src": ["'self'", "https://api.fularanifoundation.org", "https://accounts.google.com"],
+      },
+    },
+  })
+);
 
 // --- Specific route limiters only ---
 
@@ -34,11 +47,13 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        logger.warn("Origin not allowed by CORS:", origin);
-        callback(new Error("Not allowed by CORS"));
+        console.warn("Origin NOT allowed by CORS:", origin);
+        callback(null, false); // Instead of error, return false to let it pass but without headers (standard way to fail CORS)
       }
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
   })
 );
 

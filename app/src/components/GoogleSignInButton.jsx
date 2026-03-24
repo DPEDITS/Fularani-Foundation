@@ -30,6 +30,13 @@ const GoogleSignInButton = ({ onSuccess, onError, disabled = false, text = "cont
     const initializeGoogle = () => {
       if (!window.google?.accounts?.id || isInitialized.current) return;
 
+      // Track globally to avoid the 'called multiple times' error
+      if (window._gsi_initialized_id === clientId) {
+        isInitialized.current = true;
+        renderButton();
+        return;
+      }
+
       try {
         window.google.accounts.id.initialize({
           client_id: clientId,
@@ -38,21 +45,25 @@ const GoogleSignInButton = ({ onSuccess, onError, disabled = false, text = "cont
           cancel_on_tap_outside: true,
         });
 
-        if (buttonRef.current) {
-          window.google.accounts.id.renderButton(buttonRef.current, {
-            type: "standard",
-            theme: "outline",
-            size: "large",
-            text: text,
-            shape: "pill",
-            width: buttonRef.current.offsetWidth || 380,
-            logo_alignment: "left",
-          });
-        }
-
+        window._gsi_initialized_id = clientId;
         isInitialized.current = true;
+        renderButton();
       } catch (error) {
         console.error("Google Sign-In initialization error:", error);
+      }
+    };
+
+    const renderButton = () => {
+      if (buttonRef.current && window.google?.accounts?.id) {
+        window.google.accounts.id.renderButton(buttonRef.current, {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          text: text,
+          shape: "pill",
+          width: buttonRef.current.offsetWidth || 380,
+          logo_alignment: "left",
+        });
       }
     };
 
