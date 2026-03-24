@@ -35,6 +35,7 @@ const Footer = () => {
       // { label: "Success Stories", to: "/gallery" }, // Assuming stories are here or in a separate stories page
       { label: "Contact Us", to: "/contact" },
       { label: "CSR Partnership", to: "/csr-partnership" },
+      { label: "Our Team", to: "/our-team" },
     ],
     legal: [
       { label: "Privacy Policy", to: "/legal-policy" },
