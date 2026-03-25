@@ -1,11 +1,13 @@
 import { ArrowRight, Heart } from "lucide-react";
 import missionHealthcareImg from "../assets/missionHealthcare.png";
-
-import { Link } from "react-router-dom";
+import { safeLocationRedirect } from "../utils/safeNavigate";
 
 const MissionHealthcare = () => (
-  <section className="apple-card group overflow-hidden">
-    <div className="grid md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8 items-center">
+  <section 
+    onClick={() => safeLocationRedirect("/missions/healthcare")}
+    className="apple-card group overflow-hidden cursor-pointer"
+  >
+    <div className="grid md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8 items-center text-left">
       {/* TEXT */}
       <div>
         <div className="w-10 h-10 rounded-full bg-red-50 text-[#ff3b30] flex items-center justify-center mb-6">
@@ -24,16 +26,13 @@ const MissionHealthcare = () => (
           with physical challenges, restoring independence and dignity.
         </p>
 
-        <Link
-          to="/missions/healthcare"
-          className="inline-flex items-center gap-1.5 mt-8 text-[#0066cc] hover:underline font-medium text-[17px] group"
-        >
+        <div className="inline-flex items-center gap-1.5 mt-8 text-[#0066cc] group-hover:underline font-medium text-[17px]">
           Explore program{" "}
           <ArrowRight
             size={18}
             className="group-hover:translate-x-1 transition-transform"
           />
-        </Link>
+        </div>
       </div>
 
       {/* VISUAL */}

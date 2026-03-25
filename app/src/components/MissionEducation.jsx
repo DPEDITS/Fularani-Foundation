@@ -1,10 +1,13 @@
 import { ArrowRight, School } from "lucide-react";
 import missionEducationImg from "../assets/missionEducation.jpeg";
-import { Link } from "react-router-dom";
+import { safeLocationRedirect } from "../utils/safeNavigate";
 
 const MissionEducation = () => (
-  <section className="apple-card group overflow-hidden">
-    <div className="grid md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8 items-center">
+  <section
+    onClick={() => safeLocationRedirect("/missions/education")}
+    className="apple-card group overflow-hidden cursor-pointer"
+  >
+    <div className="grid md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8 items-center text-left">
       {/* TEXT */}
       <div>
         <div className="w-10 h-10 rounded-full bg-blue-50 text-[#0071e3] flex items-center justify-center mb-6">
@@ -24,16 +27,13 @@ const MissionEducation = () => (
           environments.
         </p>
 
-        <Link
-          to="/missions/education"
-          className="inline-flex items-center gap-1.5 mt-8 text-[#0066cc] hover:underline font-medium text-[17px] group"
-        >
+        <div className="inline-flex items-center gap-1.5 mt-8 text-[#0066cc] group-hover:underline font-medium text-[17px]">
           Explore program{" "}
           <ArrowRight
             size={18}
             className="group-hover:translate-x-1 transition-transform"
           />
-        </Link>
+        </div>
       </div>
 
       {/* VISUAL */}

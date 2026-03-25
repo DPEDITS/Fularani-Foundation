@@ -1,8 +1,11 @@
 import { ArrowRight, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { safeLocationRedirect } from "../utils/safeNavigate";
 
 const MissionThalassemia = () => (
-  <section className="apple-card group overflow-hidden border-2 border-red-100 shadow-2xl shadow-red-500/5">
+  <section 
+    onClick={() => safeLocationRedirect("/donor-register")}
+    className="apple-card group overflow-hidden border-2 border-red-100 shadow-2xl shadow-red-500/5 cursor-pointer text-left"
+  >
     <div className="grid md:grid-cols-2 gap-8 md:gap-12 p-6 md:p-14 items-center">
       {/* TEXT */}
       <div className="relative">
@@ -41,16 +44,13 @@ const MissionThalassemia = () => (
         </div>
 
         <div className="mt-8 md:mt-10 flex flex-wrap gap-4">
-          <Link
-            to="/donor-register"
-            className="inline-flex items-center justify-center w-full sm:w-auto gap-2 px-6 py-3 md:px-8 md:py-4 bg-[#ff3b30] text-white rounded-2xl font-black text-[14px] md:text-[16px] uppercase tracking-wider hover:bg-[#d73128] transition-all shadow-lg shadow-red-500/20 group hover:-translate-y-1"
-          >
+          <div className="inline-flex items-center justify-center w-full sm:w-auto gap-2 px-6 py-3 md:px-8 md:py-4 bg-[#ff3b30] text-white rounded-2xl font-black text-[14px] md:text-[16px] uppercase tracking-wider hover:bg-[#d73128] transition-all shadow-lg shadow-red-500/20 group hover:-translate-y-1">
             Emergency Donate{" "}
             <ArrowRight
               size={18}
               className="group-hover:translate-x-1 transition-transform lg:w-5 lg:h-5"
             />
-          </Link>
+          </div>
         </div>
       </div>
 
