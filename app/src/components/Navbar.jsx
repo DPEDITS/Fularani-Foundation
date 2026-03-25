@@ -152,6 +152,7 @@ const Navbar = () => {
     { name: "Our Missions", link: "/missions" },
     { name: "CSR Partnership", link: "/csr-partnership" },
     { name: "Our Works", link: "/gallery" },
+    { name: "Transparency Docs", link: "/transparency" },
     { name: "Contact", link: "/contact" },
   ];
 
