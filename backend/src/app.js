@@ -92,8 +92,20 @@ app.use("/api/documents", documentRouter);
 
 // --- Error handler ---
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
+  let statusCode = err.statusCode || 500;
+  let message = err.message || "Internal Server Error";
+
+  // Handle Multer errors explicitly
+  if (err.name === "MulterError") {
+    statusCode = 400; // Bad Request
+    if (err.code === "LIMIT_FILE_SIZE") {
+      statusCode = 413; // Payload Too Large
+      message = "File too large. Maximum size allowed is 5MB.";
+    } else if (err.code === "LIMIT_UNEXPECTED_FILE") {
+      message = "Too many files uploaded at once. Maximum allowed is 500.";
+    }
+  }
+
   const errors = err.errors || [];
   const isProduction = process.env.NODE_ENV === "production";
 

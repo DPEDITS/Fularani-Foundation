@@ -4,14 +4,14 @@ import { Users, Heart, Target, Award } from "lucide-react";
 
 const leadership = [
   {
-    name: "Manoj Kumar Swain",
-    designation: "Founder",
-    image: "https://via.placeholder.com/400x400?text=Manoj+Kumar+Swain",
+    name: "Kalinga Biswal",
+    designation: "President",
+    image: "https://res.cloudinary.com/dnbgja6dx/image/upload/v1774402269/Kalinga_Biswal_nng6y9.jpg",
   },
   {
-    name: "Kalinga Biswal",
-    designation: "CEO",
-    image: "https://via.placeholder.com/400x400?text=Kalinga+Biswal",
+    name: "Manoj Kumar Swain",
+    designation: "Treasurer",
+    image: "https://res.cloudinary.com/dnbgja6dx/image/upload/v1774402075/Manoj_Swain_skag5d.jpg",
   },
 ];
 
@@ -19,17 +19,17 @@ const developers = [
   {
     name: "Abhijeet Dutta",
     designation: "Website Developer",
-    image: "https://via.placeholder.com/400x400?text=Abhijeet+Dutta",
+    image: "https://res.cloudinary.com/dnbgja6dx/image/upload/v1774002900/h1xsoyitoj5zevwyvrh7.jpg",
   },
   {
     name: "Debashish Parida",
     designation: "Website Developer",
-    image: "https://via.placeholder.com/400x400?text=Debashish+Parida",
+    image: "https://res.cloudinary.com/dnbgja6dx/image/upload/v1773989216/nhd7yidigeomxjtcsu2d.jpg",
   },
   {
     name: "Abhijeet Dash",
     designation: "Website Developer",
-    image: "https://via.placeholder.com/400x400?text=Abhijeet+Dash",
+    image: "https://res.cloudinary.com/dnbgja6dx/image/upload/v1773989749/b6yobhp0l5476j4fbhsq.jpg",
   },
 ];
 
@@ -42,7 +42,7 @@ const TeamMemberCard = ({ member, index }) => (
     className="group relative w-full max-w-[280px] sm:max-w-none sm:w-[240px] md:w-[260px] mb-12 sm:mb-8 mx-auto sm:mx-0"
   >
     {/* Image Container */}
-    <div className="aspect-[4/5] overflow-hidden bg-muted grayscale group-hover:grayscale-0 transition-all duration-700 shadow-lg">
+    <div className="aspect-[4/5] overflow-hidden bg-muted transition-all duration-700 shadow-lg">
       <img
         src={member.image}
         alt={member.name}

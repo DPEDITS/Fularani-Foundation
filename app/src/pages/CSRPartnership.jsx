@@ -177,7 +177,7 @@ const CSRPartnership = () => {
         </div>
       </div>
 
-      {/* Trust & Stats Section */}
+      {/* Trust & Stats Section 
       <section className="py-12 md:py-24 px-4 md:px-6 bg-secondary text-white relative overflow-hidden">
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
 
@@ -235,6 +235,7 @@ const CSRPartnership = () => {
           </div>
         </div>
       </section>
+      */}
 
       {/* Ways to Collaborate */}
       <section className="py-12 md:py-32 bg-white px-4 md:px-6 relative z-10">

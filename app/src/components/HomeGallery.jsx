@@ -28,7 +28,7 @@ const HomeGallery = () => {
 
                 <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="bg-[#f5f5f7] p-8 rounded-[2rem] text-center">
-                        <div className="text-[32px] font-bold text-[#1d1d1f] mb-1">500+</div>
+                        <div className="text-[32px] font-bold text-[#1d1d1f] mb-1">100+</div>
                         <div className="text-[13px] font-semibold text-[#86868b] uppercase tracking-wider">Volunteers</div>
                     </div>
                     <div className="bg-[#f5f5f7] p-8 rounded-[2rem] text-center">

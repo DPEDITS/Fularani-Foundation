@@ -176,7 +176,7 @@ const Missions = () => {
               </span>
             </h2>
             <p className="text-xl md:text-2xl text-white/80 mb-16 max-w-[700px] mx-auto font-bold leading-tight">
-              Join our community of 1000+ volunteers and donors. Together, we
+              Join our community of 100+ volunteers and donors. Together, we
               can reach more people and transform more lives.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
