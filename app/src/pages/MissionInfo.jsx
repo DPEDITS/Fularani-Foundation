@@ -28,12 +28,36 @@ const MissionInfo = () => {
         const allItems = response.data || [];
 
         // Filter images specific to this mission
-        const relevantImages = allItems
-          .filter((item) => item.category === mission.galleryCategory)
-          .map((item) => item.imageUrl)
-          .slice(0, 4); // Take top 4 for the showcase
+        const relevantItems = allItems.filter(
+          (item) => item.category === mission.galleryCategory
+        );
 
-        setGalleryImages(relevantImages);
+        // Shuffle all available items first
+        const shuffledItems = relevantItems.sort(() => Math.random() - 0.5);
+
+        const selectedItems = [];
+        const seenTitles = new Set();
+        const fallbackItems = [];
+
+        // Try to pick up to 4 images with explicitly different titles
+        for (const item of shuffledItems) {
+          if (!seenTitles.has(item.title)) {
+            seenTitles.add(item.title);
+            selectedItems.push(item);
+          } else {
+            fallbackItems.push(item);
+          }
+
+          if (selectedItems.length === 4) break;
+        }
+
+        // If we couldn't find 4 unique titles, pad with the duplicates
+        while (selectedItems.length < 4 && fallbackItems.length > 0) {
+          selectedItems.push(fallbackItems.shift());
+        }
+
+        const topImages = selectedItems.map((item) => item.imageUrl);
+        setGalleryImages(topImages);
       } catch (error) {
         console.error("Failed to load mission gallery:", error);
       } finally {

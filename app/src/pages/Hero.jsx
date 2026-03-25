@@ -71,6 +71,7 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <a
                 href="/donor-register"
+                onClick={() => window.fbq?.('track', 'InitiateCheckout', { content_name: 'Hero Donate Button' })}
                 className="bg-accent hover:bg-accent/80 text-secondary w-full sm:w-auto px-6 py-4 lg:px-10 lg:py-5 rounded-xl text-base lg:text-lg font-black uppercase tracking-tight transition-all shadow-2xl shadow-accent/30 hover:translate-y-[-4px] flex items-center justify-center gap-3 group"
               >
                 Donate Now
@@ -169,29 +170,29 @@ const Hero = () => {
               <div className="flex -space-x-2.5 md:-space-x-3 md:mb-1 shrink-0">
                 {recentDonors.length > 0
                   ? recentDonors.map((donor, i) => (
-                      <div
-                        key={donor._id || i}
-                        className="w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white overflow-hidden bg-primary"
-                      >
-                        <img
-                          src={getSecureCloudinaryUrl(donor.avatar)}
-                          alt={donor.username}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.style.display = "none";
-                            e.target.parentElement.innerHTML = `<span class="w-full h-full flex items-center justify-center text-[8px] md:text-[10px] font-black text-white uppercase">${(donor.username || "FF").slice(0, 2)}</span>`;
-                          }}
-                        />
-                      </div>
-                    ))
+                    <div
+                      key={donor._id || i}
+                      className="w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white overflow-hidden bg-primary"
+                    >
+                      <img
+                        src={getSecureCloudinaryUrl(donor.avatar)}
+                        alt={donor.username}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          e.target.parentElement.innerHTML = `<span class="w-full h-full flex items-center justify-center text-[8px] md:text-[10px] font-black text-white uppercase">${(donor.username || "FF").slice(0, 2)}</span>`;
+                        }}
+                      />
+                    </div>
+                  ))
                   : [1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        className={`w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[7px] md:text-[8px] font-black text-white`}
-                      >
-                        FF
-                      </div>
-                    ))}
+                    <div
+                      key={i}
+                      className={`w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center text-[7px] md:text-[8px] font-black text-white`}
+                    >
+                      FF
+                    </div>
+                  ))}
                 <div className="w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-white bg-accent flex items-center justify-center text-[9px] md:text-[10px] font-black text-secondary">
                   +{totalDonorsCount > 5000 ? totalDonorsCount : "5k"}
                 </div>

@@ -152,6 +152,7 @@ const Navbar = () => {
     { name: "Our Missions", link: "/missions" },
     { name: "CSR Partnership", link: "/csr-partnership" },
     { name: "Our Works", link: "/gallery" },
+    { name: "Transparency Docs", link: "/transparency" },
     { name: "Contact", link: "/contact" },
   ];
 
@@ -282,12 +283,14 @@ const Navbar = () => {
               <div className="flex items-center gap-1 sm:gap-4 font-black">
                 <Link
                   to="/donor-register?role=volunteer"
+                  onClick={() => window.fbq?.('track', 'Lead', { content_name: 'Volunteer Join Button' })}
                   className="hidden sm:block text-[13px] font-black text-secondary/60 hover:text-primary uppercase tracking-tight transition-colors py-2 px-4"
                 >
                   Join Us
                 </Link>
                 <Link
                   to="/donor-register"
+                  onClick={() => window.fbq?.('track', 'InitiateCheckout', { content_name: 'Navbar Donate Button' })}
                   className={isHomePage ? "hidden lg:block" : "block"}
                 >
                   <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 lg:px-6 lg:py-2.5 rounded-lg text-[11px] lg:text-[13px] font-black uppercase tracking-tight shadow-md lg:shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap">
@@ -359,10 +362,13 @@ const Navbar = () => {
                         Join Us
                       </Link>
                       {!isHomePage && (
-                        <Link
+                      <Link
                           to="/donor-register"
+                          onClick={() => {
+                            window.fbq?.('track', 'InitiateCheckout', { content_name: 'Mobile Menu Donate Button' });
+                            setIsMobileMenuOpen(false);
+                          }}
                           className="block text-center py-3 bg-accent text-secondary rounded-xl font-black uppercase tracking-tight text-sm"
-                          onClick={() => setIsMobileMenuOpen(false)}
                         >
                           Donate Now
                         </Link>

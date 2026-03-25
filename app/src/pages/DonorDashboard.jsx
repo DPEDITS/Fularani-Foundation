@@ -153,6 +153,16 @@ const DonorDashboard = () => {
             };
 
             await createDonation(donationData);
+
+            // Track successful donation in Meta Pixel
+            if (window.fbq) {
+              window.fbq('track', 'Donate', { 
+                value: parseFloat(amount), 
+                currency: 'INR',
+                content_name: isRecurring ? 'Monthly Subscription' : 'One-time Donation'
+              });
+            }
+
             await fetchDashboardData();
             setShowDonationModal(false);
             setSuccessAmount(parseInt(amount));
@@ -481,6 +491,7 @@ const DonorDashboard = () => {
         amount={successAmount}
         formatCurrency={formatCurrency}
         donorName={user?.username}
+        donorAvatar={user?.avatar ? getSecureCloudinaryUrl(user.avatar) : null}
       />
       <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
     </main>

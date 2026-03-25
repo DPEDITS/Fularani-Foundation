@@ -38,6 +38,14 @@ const Contact = () => {
         );
       }
       setSubmitStatus("success");
+      
+      // Track Contact Form Submission in Meta Pixel
+      if (window.fbq) {
+        window.fbq('track', 'Contact', {
+          content_name: form.subject || 'General Inquiry'
+        });
+      }
+
       setForm({ name: "", email: "", phone: "", subject: "", message: "" });
       setTimeout(() => setSubmitStatus(null), 5000);
     } catch (error) {

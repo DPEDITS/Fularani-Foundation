@@ -12,7 +12,20 @@ const app = express();
 app.set("trust proxy", 1);
 
 // --- Security headers ---
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: { policy: "unsafe-none" }, // Change to unsafe-none for debugging COOP issues
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "script-src": ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://pagead2.googlesyndication.com"],
+        "frame-src": ["'self'", "https://accounts.google.com"],
+        "connect-src": ["'self'", "https://api.fularanifoundation.org", "https://accounts.google.com"],
+      },
+    },
+  })
+);
 
 // --- Specific route limiters only ---
 
@@ -23,6 +36,7 @@ const allowedOrigins = [
   "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
+  "https://fularanifoundation.org",
   "https://kb.fularanifoundation.org",
   "https://fularanikb-c7hhn0k6i-fularanifoundation-7390s-projects.vercel.app",
 ].filter(Boolean);
@@ -30,14 +44,25 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) {
+        return callback(null, true);
+      }
+      // Normalize origin for comparison (remove trailing slashes)
+      const normalizedOrigin = origin.replace(/\/$/, "");
+      const isAllowed = allowedOrigins.some(ao => ao?.replace(/\/$/, "") === normalizedOrigin);
+      
+      if (isAllowed) {
         callback(null, true);
       } else {
-        logger.warn("Origin not allowed by CORS:", origin);
-        callback(new Error("Not allowed by CORS"));
+        console.warn("CORS Rejection - Origin:", origin, "Allowed:", allowedOrigins);
+        callback(null, false);
       }
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   })
 );
 
@@ -91,8 +116,20 @@ app.use("/api/documents", documentRouter);
 
 // --- Error handler ---
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
+  let statusCode = err.statusCode || 500;
+  let message = err.message || "Internal Server Error";
+
+  // Handle Multer errors explicitly
+  if (err.name === "MulterError") {
+    statusCode = 400; // Bad Request
+    if (err.code === "LIMIT_FILE_SIZE") {
+      statusCode = 413; // Payload Too Large
+      message = "File too large. Maximum size allowed is 5MB.";
+    } else if (err.code === "LIMIT_UNEXPECTED_FILE") {
+      message = "Too many files uploaded at once. Maximum allowed is 500.";
+    }
+  }
+
   const errors = err.errors || [];
   const isProduction = process.env.NODE_ENV === "production";
 

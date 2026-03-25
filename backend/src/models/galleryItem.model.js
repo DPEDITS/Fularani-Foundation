@@ -13,7 +13,7 @@ const galleryItemSchema = new Schema(
     },
     description: {
       type: String,
-      required: true,
+      required: false,
     },
     category: {
       type: String,
@@ -21,7 +21,7 @@ const galleryItemSchema = new Schema(
     },
     uploadedBy: {
       type: String,
-      required: true,
+      required: false,
     },
   },
   { timestamps: true },

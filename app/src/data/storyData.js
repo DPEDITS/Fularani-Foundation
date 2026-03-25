@@ -5,9 +5,10 @@ import pitambar4 from "../assets/storyImage/pitambar_4.png";
 import gacchaChai1 from "../assets/storyImage/gaccha_chai_1.jpeg";
 import gacchaChai2 from "../assets/storyImage/gaccha_chai_2.jpeg";
 import openGym from "../assets/storyImage/open_gym.jpeg";
-import innovationHealthcare from "../assets/storyImage/innovation_healthcare.png";
+import innovationHealthcare from "../assets/storyImage/innovation_healthcare_2.jpg";
 import bloodBankModernization from "../assets/storyImage/blood_bank.png";
 import prashantiSanskarImg from "../assets/storyImage/prashanti_sanskar.png";
+import innovationHealthcare2 from "../assets/storyImage/innovation_healthcare_2.jpg";
 
 export const storyData = [
   // {
@@ -166,7 +167,7 @@ export const storyData = [
     author: "Fularani Foundation",
     date: "February 10, 2026",
     tags: ["Impact", "Healthcare", "Innovation"],
-    images: [],
+    images: [innovationHealthcare2],
     content: [{ type: "paragraph", text: "" }],
   },
   {

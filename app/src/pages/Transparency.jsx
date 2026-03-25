@@ -54,68 +54,61 @@ const SubtopicSection = ({ subtopic, index, isSuperAdmin, onEdit, onDelete }) =>
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="px-5 md:px-6 pb-5 md:pb-6 pt-2 border-t border-white/5">
-              <div className="overflow-x-auto -mx-2">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-white/10 text-gray-500 text-[10px] md:text-xs uppercase tracking-widest font-bold bg-white/[0.01]">
-                      <th className="py-4 px-2 md:px-4 w-1/2 rounded-tl-lg">Document Name</th>
-                      <th className="py-4 px-2 md:px-4 text-right rounded-tr-lg">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {subtopic.documents.map((doc, docIdx) => (
-                      <tr 
-                        key={doc.id} 
-                        className={`transition-colors group hover:bg-white/[0.03] cursor-pointer ${
-                          docIdx !== subtopic.documents.length - 1 ? "border-b border-white/5" : ""
-                        }`}
-                        onClick={() => window.open(doc.link, "_blank")}
-                        title="Click to View Document"
+            <div className="px-2 md:px-6 pb-5 md:pb-6 pt-2 border-t border-white/5">
+              {/* Header - Hidden on very small screens or made more compact */}
+              <div className="flex border-b border-white/10 text-gray-500 text-[10px] md:text-xs uppercase tracking-widest font-bold bg-white/[0.01] py-3 px-2 md:px-4">
+                <div className="flex-1">Document Name</div>
+                <div className="w-24 md:w-32 text-right">Action</div>
+              </div>
+              
+              <div className="divide-y divide-white/5">
+                {subtopic.documents.map((doc) => (
+                  <div 
+                    key={doc.id}
+                    className="flex items-center justify-between py-4 px-2 md:px-4 hover:bg-white/[0.03] transition-colors group cursor-pointer"
+                    onClick={() => window.open(doc.link, "_blank")}
+                  >
+                    {/* Doc Info */}
+                    <div className="flex items-center gap-2 md:gap-3 text-gray-300 font-medium min-w-0 pr-2">
+                      <div className="p-1.5 md:p-2 bg-primary/10 rounded-lg text-primary/70 group-hover:bg-primary group-hover:text-white transition-all shrink-0">
+                        <FileText size={14} className="md:w-[18px] md:h-[18px]" />
+                      </div>
+                      <span className="truncate text-[11px] md:text-sm">{doc.name}</span>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+                      <a
+                        href={doc.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center px-2.5 py-1.5 md:px-4 md:py-2 bg-white/5 hover:bg-primary text-white text-[10px] md:text-sm font-semibold rounded-lg transition-all border border-white/10 hover:border-transparent min-w-[50px] md:min-w-[70px]"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <td className="py-4 px-2 md:px-4">
-                          <div className="flex items-center gap-2 md:gap-3 text-gray-300 font-medium overflow-hidden">
-                            <div className="p-1.5 md:p-2 bg-primary/10 rounded-lg text-primary/70 group-hover:bg-primary group-hover:text-white transition-all shrink-0">
-                                <FileText size={16} className="md:w-[18px] md:h-[18px]" />
-                            </div>
-                            <span className="truncate text-xs md:text-sm">{doc.name}</span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-2 md:px-4 text-right">
-                          <div className="inline-flex items-center gap-1.5 md:gap-2">
-                            <a
-                              href={doc.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 bg-white/5 hover:bg-primary text-white text-[10px] md:text-sm font-semibold rounded-lg transition-all border border-white/10 hover:border-transparent"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <span>View</span>
-                            </a>
-                            {isSuperAdmin && (
-                              <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-                                <button
-                                  onClick={() => onEdit(doc, subtopic.title)}
-                                  className="p-1.5 md:p-2 bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-white rounded-lg transition-all border border-amber-500/20 hover:border-transparent"
-                                  title="Edit"
-                                >
-                                  <Pencil size={12} className="md:w-[14px] md:h-[14px]" />
-                                </button>
-                                <button
-                                  onClick={() => onDelete(doc)}
-                                  className="p-1.5 md:p-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all border border-red-500/20 hover:border-transparent"
-                                  title="Delete"
-                                >
-                                  <Trash2 size={12} className="md:w-[14px] md:h-[14px]" />
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        View
+                      </a>
+                      
+                      {isSuperAdmin && (
+                        <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => onEdit(doc, subtopic.title)}
+                            className="p-1.5 md:p-2 bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-white rounded-lg transition-all border border-amber-500/20"
+                            title="Edit"
+                          >
+                            <Pencil size={12} className="md:w-[14px] md:h-[14px]" />
+                          </button>
+                          <button
+                            onClick={() => onDelete(doc)}
+                            className="p-1.5 md:p-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all border border-red-500/20"
+                            title="Delete"
+                          >
+                            <Trash2 size={12} className="md:w-[14px] md:h-[14px]" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </motion.div>
@@ -331,7 +324,7 @@ const Transparency = () => {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
             {documents.map((subtopic, index) => (
               <SubtopicSection
                 key={subtopic.title}

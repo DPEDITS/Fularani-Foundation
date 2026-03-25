@@ -1,7 +1,7 @@
 # 🌸 Fularani Foundation – Official Website
 
 This repository contains the source code for **fularanifoundation.org**, the official website of **Fularani Foundation**.
-The website is built using **React + Vite**, ensuring fast performance, scalability, and a modern development workflow.
+The platform is a full-stack web application contained within a unified monorepo. It leverages **React + Vite** for the frontend and **Node.js + Express** for the backend, assuring fast performance, scalability, and seamless development.
 
 ---
 
@@ -16,53 +16,57 @@ This website serves as the digital presence of the foundation, providing informa
 
 ## 🚀 Tech Stack
 
-* **Frontend Library:** React.js
-* **Build Tool:** Vite
-* **Language:** JavaScript (JSX)
-* **Styling:** CSS / Tailwind CSS
-* **Routing:** React Router DOM
-* **State Management:** React Hooks / Context API
-* **Version Control:** Git & GitHub
-* **Deployment:** Vercel / Netlify (planned)
+* **Frontend:** React.js, Vite, Tailwind CSS, React Router DOM
+* **Backend:** Node.js, Express.js
+* **Database:** MongoDB & Mongoose
+* **Tooling:** Concurrently (for running both servers simultaneously)
+* **Deployment:** Vercel (Frontend via `vercel.json`) / Render (via `render.yaml`)
 
 ---
 
 ## 📂 Project Structure
 
 ```bash
-fularanifoundation.org/
-├── public/                 # Static assets
-├── src/
-│   ├── assets/             # Images, icons, fonts
-│   ├── components/         # Reusable UI components
-│   ├── pages/              # Application pages
-│   ├── layouts/            # Layout components
-│   ├── routes/             # Routing configuration
-│   ├── styles/             # Global & component styles
-│   ├── data/               # Static or mock data
-│   ├── utils/              # Helper functions
-│   ├── hooks/              # Custom React hooks
-│   ├── context/            # Context providers
-│   ├── App.jsx             # Main App component
-│   └── main.jsx            # Application entry point
-├── .env.example            # Environment variables template
-├── index.html              # Root HTML file
-├── vite.config.js          # Vite configuration
-├── package.json            # Dependencies & scripts
-├── .gitignore              # Git ignore rules
-└── README.md               # Documentation
+Fularani-Foundation/
+├── app/                  # Frontend Application (React + Vite)
+│   ├── public/           # Static assets, robots.txt, sitemap.xml
+│   ├── src/
+│   │   ├── assets/       # Images, icons, fonts
+│   │   ├── components/   # Reusable UI components
+│   │   ├── pages/        # Application pages
+│   │   ├── services/     # API services
+│   │   └── App.jsx       # Main App component
+│   ├── index.html        # Root HTML file
+│   └── package.json      # Frontend dependencies
+│
+├── backend/              # Backend API Server (Node.js + Express)
+│   ├── src/
+│   │   ├── controllers/  # Route handlers
+│   │   ├── db/           # Database configuration
+│   │   ├── models/       # Mongoose data models
+│   │   ├── routes/       # API routes
+│   │   └── app.js        # Express app configuration
+│   └── package.json      # Backend dependencies
+│
+├── package.json          # Root workspace configuration & scripts
+├── dev.bat               # Windows batch script for starting the project
+├── render.yaml           # Deployment configuration for Render
+└── README.md             # Project documentation
 ```
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-* ⚡ Fast build & hot reload with Vite
-* 📱 Fully responsive design
-* 🧩 Modular and reusable components
-* 🧭 Client-side routing with React Router
-* 🚀 Scalable architecture
-* 🌐 Deployment-ready
+* ⚡ **Fast & Modern UI:** Built with Vite and React for snappy, hot-reloadable development.
+* 🤝 **Unified Full-Stack Workflow:** Start both frontend and backend together instantly using `npm run dev`.
+* 🔐 **Authentication & Role-Based Access:** Secure login logic supporting Admin, Volunteer, and Donor roles.
+* 💳 **Donation & Payment Gateway:** Live payment endpoints built to seamlessly capture donations and manage donor records.
+* 🙋 **Volunteer Registration System:** Ready-to-use workflows for onboarding and managing new volunteers at scale.
+* 📊 **Admin Dashboard:** Centralized control functionality to administrate content, galleries, and incoming contributions.
+* 📸 **Gallery & Content Management:** Built-in upload and showcase capabilities extending beyond just blogs.
+* 🔌 **Robust RESTful Backend:** Node.js/Express architecture handling complex data schemas and file storage seamlessly.
+* 🌐 **Production Ready:** Pre-configured with Sitemap, Robots mapping, and deployment properties for Render and Vercel.
 
 ---
 
@@ -72,10 +76,13 @@ fularanifoundation.org/
 
 * **Node.js** v18 or higher
 * **npm** or **yarn**
+* **MongoDB** connection accessible locally or via Cloud
 
 ---
 
 ### Installation
+
+Our root `package.json` includes custom scripts to make installation a breeze.
 
 ```bash
 # Clone the repository
@@ -84,53 +91,59 @@ git clone https://github.com/DPEDITS/Fularani-Foundation.git
 # Navigate into the project folder
 cd Fularani-Foundation
 
-# Install dependencies
-npm install
+# Install everything at once (Root + App + Backend)
+npm run install-all
 ```
 
 ---
 
 ### Run Development Server
 
+You don't need to open multiple terminals to develop. The root package uses `concurrently` to spin up both projects simultaneously!
+
 ```bash
+# Start both Frontend and Backend concurrently
 npm run dev
 ```
 
+*(Windows users can also simply double-click `dev.bat` or run `.\dev.bat`)*
+
 Open your browser at:
-👉 [http://localhost:5173](http://localhost:5173)
-
----
-
-## 🏗️ Build for Production
-
-```bash
-npm run build
-npm run preview
-```
+👉 **Frontend:** [http://localhost:5173](http://localhost:5173) 
 
 ---
 
 ## 🔐 Environment Variables
 
-Create a `.env` file in the root directory:
+You need to establish separate environment configuration files for both the frontend and backend. 
 
+**Frontend (`app/.env`)**
+Create an `.env` file in the `app/` directory (use `app/.env.sample` as a reference):
 ```env
 VITE_SITE_URL=https://fularanifoundation.org
+VITE_API_BASE_URL=http://localhost:8000/api/v1
 ```
 
-Add more variables as backend services are integrated.
+**Backend (`backend/.env`)**
+Create an `.env` file in the `backend/` directory (use `backend/.env.sample` as a reference):
+```env
+PORT=8000
+MONGODB_URI=your_mongodb_connection_string
+CORS_ORIGIN=http://localhost:5173
+```
 
 ---
 
-## 🔮 Future Enhancements
+## 🏗️ Build for Production
 
-* Admin dashboard
-* Donation & payment gateway
-* Volunteer registration system
-* Blog & news management
-* Backend API integration
-* Authentication & role-based access
-* Analytics & performance tracking
+To build the frontend for production manually:
+```bash
+cd app
+npm run build
+npm run preview
+```
+
+However, the architecture natively supports automated deployments platforms setting up the build directory via respective platform configurations (e.g. `render.yaml`).
 
 ---
 
@@ -156,7 +169,7 @@ You are free to use, modify, and distribute this project with proper attribution
 ## 👨‍💻 Developed & Maintained By
 
 **Fularani Foundation – Web Team**
-Built with ❤️ using **React + Vite**
+Built with ❤️ using **React + Vite** & **Nodejs + Express**
 
 ---
 

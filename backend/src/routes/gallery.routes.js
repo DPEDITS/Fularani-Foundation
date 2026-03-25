@@ -8,11 +8,7 @@ const galleryRouter = Router();
 galleryRouter.route("/upload").post(
     verifyJWT,
     verifyAdmin,
-    upload.fields([
-        {
-            name: "imageUrl",
-        }
-    ]),
+    upload.array("images", 500),
     createGalleryItem
 )
 

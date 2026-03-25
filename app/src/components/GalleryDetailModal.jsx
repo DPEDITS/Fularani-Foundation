@@ -1,5 +1,6 @@
 import React from "react";
 import { getSecureCloudinaryUrl } from "../utils/imageUtils";
+import LazyImage from "./LazyImage";
 import { motion as Motion } from "motion/react";
 import { X, ArrowRight } from "lucide-react";
 import { safeLocationRedirect } from "../utils/safeNavigate";
@@ -23,10 +24,11 @@ const GalleryDetailModal = ({ item, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex-1 bg-black relative flex items-center justify-center overflow-hidden">
-          <img
-            src={getSecureCloudinaryUrl(item.src)}
+          <LazyImage
+            src={item.src}
             alt={item.title}
-            className="max-h-[80vh] w-full object-contain"
+            className="w-full h-full"
+            imgClassName="max-h-[80vh] w-full object-contain"
           />
           <button
             onClick={onClose}
@@ -64,7 +66,7 @@ const GalleryDetailModal = ({ item, onClose }) => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-8 pt-12 border-t border-secondary/5">
+{/* <div className="grid grid-cols-2 gap-8 pt-12 border-t border-secondary/5">
                 <div>
                   <div className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] mb-2">
                     Source
@@ -83,7 +85,7 @@ const GalleryDetailModal = ({ item, onClose }) => {
                       : "Present"}
                   </p>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 

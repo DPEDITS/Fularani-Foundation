@@ -178,12 +178,15 @@ const Missions = () => {
               </span>
             </h2>
             <p className="text-xl md:text-2xl text-white/80 mb-16 max-w-[700px] mx-auto font-bold leading-tight">
-              Join our community of 1000+ volunteers and donors. Together, we
+              Join our community of 100+ volunteers and donors. Together, we
               can reach more people and transform more lives.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <button
-                onClick={() => safeLocationRedirect("/volunteer-login")}
+                onClick={() => {
+                  window.fbq?.('track', 'Lead', { content_name: 'Mission Page Bottom CTA' });
+                  safeLocationRedirect("/volunteer-login");
+                }}
                 className="w-full sm:w-auto bg-secondary text-white px-12 py-6 rounded-2xl text-lg font-black uppercase tracking-tight hover:bg-black transition-all flex items-center justify-center gap-3 group"
               >
                 Join the Mission{" "}
@@ -192,8 +195,9 @@ const Missions = () => {
                   className="group-hover:translate-x-2 transition-transform"
                 />
               </button>
-              <a
+               <a
                 href="/contact"
+                onClick={() => window.fbq?.('track', 'Contact', { content_name: 'Mission Page Contact Link' })}
                 className="w-full sm:w-auto bg-transparent border-2 border-white/30 text-white px-12 py-6 rounded-2xl text-lg font-black uppercase tracking-tight hover:bg-white/10 transition-all flex items-center justify-center gap-3 group"
               >
                 Contact Us

@@ -12,7 +12,18 @@ export default defineConfig({
     },
   },
   server: {
-    host: true,        // 👈 exposes to local network
-    port: 5173,        // optional (default)
+    host: true,        
+    port: 5173,        
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          gsap: ['gsap'],
+          ui: ['lucide-react', '@tabler/icons-react', 'motion']
+        }
+      }
+    }
+  }
 });
