@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { storyData } from "../data/storyData";
 import { safeNavigate } from "../utils/safeNavigate";
+import { getAllGalleryItems } from "../services/galleryService";
 import {
   ArrowLeft,
   ArrowRight,
@@ -10,9 +11,10 @@ import {
   User,
   Share2,
   Facebook,
-  Twitter,
   Linkedin,
 } from "lucide-react";
+
+import SEO from "../components/SEO";
 
 const StoryInfo = () => {
   const { id } = useParams();
@@ -24,9 +26,33 @@ const StoryInfo = () => {
   const nextStory =
     storyIndex < storyData.length - 1 ? storyData[storyIndex + 1] : null;
 
+  const [dynamicGallery, setDynamicGallery] = useState([]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    const fetchGallery = async () => {
+      if (id === "innovation-in-healthcare") {
+        try {
+          const response = await getAllGalleryItems();
+          const allItems = response.data || [];
+          const fetchedImages = allItems
+            .filter(
+              (item) => item.title && item.title.toLowerCase().includes("blood")
+            )
+            .map((item) => item.imageUrl);
+          setDynamicGallery(fetchedImages);
+        } catch (error) {
+          console.error("Failed to fetch gallery items:", error);
+        }
+      } else {
+        setDynamicGallery([]);
+      }
+    };
+    fetchGallery();
   }, [id]);
+
+  const [copied, setCopied] = React.useState(false);
 
   if (!story) {
     return (
@@ -63,8 +89,79 @@ const StoryInfo = () => {
     content,
   } = story;
 
+  const combinedImages = [...(images || []), ...dynamicGallery];
+
+  const sharePost = async (platform) => {
+    const url = window.location.href;
+    const imageUrl = getSecureCloudinaryUrl(coverImage);
+    const caption = `${title}\n\nRead the complete story here: ${url}`;
+    
+    const encodedUrl = encodeURIComponent(url);
+    const encodedText = encodeURIComponent(caption);
+
+    let shareUrl = "";
+    switch (platform) {
+      case "facebook":
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+        break;
+      case "twitter":
+        // Twitter supports 'text' and 'url' separately
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodeURIComponent(title + "\n\nRead the complete story here:")}`;
+        break;
+      case "linkedin":
+        // LinkedIn primarily uses the URL for scraping OG tags
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+        break;
+      case "native":
+        if (navigator.share) {
+          try {
+            const shareData = {
+              title: title,
+              text: caption,
+              url: url,
+            };
+
+            // Attempt to share as file if image is available and supported
+            if (navigator.canShare && navigator.canShare({ files: [] }) && imageUrl) {
+              try {
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+                const file = new File([blob], `${id}-preview.jpg`, { type: blob.type });
+                
+                if (navigator.canShare({ files: [file] })) {
+                  shareData.files = [file];
+                }
+              } catch (err) {
+                console.warn("Could not fetch image for file sharing:", err);
+              }
+            }
+
+            await navigator.share(shareData);
+            return;
+          } catch (err) {
+            console.error("Share failed:", err);
+          }
+        } else {
+          // Fallback: Copy to clipboard
+          navigator.clipboard.writeText(url);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          return;
+        }
+        return;
+      default:
+        return;
+    }
+    window.open(shareUrl, "_blank", "width=600,height=400");
+  };
+
   return (
     <article className="min-h-screen bg-white pt-24 pb-20">
+      <SEO 
+        title={title} 
+        description={shortDescription || subtitle} 
+        image={getSecureCloudinaryUrl(coverImage)} 
+      />
       <div className="max-w-[1000px] mx-auto px-6">
         {/* BREADCRUMB */}
         <Link
@@ -106,33 +203,43 @@ const StoryInfo = () => {
             <span className="text-sm font-bold text-secondary mr-2">
               Share:
             </span>
-            <a
-              href="https://www.facebook.com/fularaniorg"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => sharePost("facebook")}
               className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-[#1877F2] transition-colors"
+              title="Share on Facebook"
             >
               <Facebook size={18} />
-            </a>
-            <a
-              href="https://x.com/fularaniorg"
-              target="_blank"
-              rel="noopener noreferrer"
+            </button>
+            <button
+              onClick={() => sharePost("twitter")}
               className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-black transition-colors"
+              title="Share on X"
             >
-              <Twitter size={18} />
-            </a>
-            <a
-              href="https://in.linkedin.com/company/fularanifoundation"
-              target="_blank"
-              rel="noopener noreferrer"
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="w-[18px] h-[18px] fill-current">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+              </svg>
+            </button>
+            <button
+              onClick={() => sharePost("linkedin")}
               className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-blue-50 text-secondary hover:text-[#0A66C2] transition-colors"
+              title="Share on LinkedIn"
             >
               <Linkedin size={18} />
-            </a>
-            <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 text-secondary transition-colors">
-              <Share2 size={18} />
             </button>
+            <div className="relative">
+              <button
+                onClick={() => sharePost("native")}
+                className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 text-secondary transition-colors"
+                title="Share or Copy Link"
+              >
+                <Share2 size={18} />
+              </button>
+              {copied && (
+                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] font-bold px-3 py-1 rounded shadow-lg whitespace-nowrap animate-bounce">
+                  Link Copied!
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -214,14 +321,34 @@ const StoryInfo = () => {
             })}
         </div>
 
+        {/* TRANSPARENCY CTA */}
+        <div className="mt-16 p-8 md:p-12 bg-secondary rounded-[32px] text-center relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/20 transition-colors"></div>
+          <div className="relative z-10">
+            <h3 className="text-2xl md:text-3xl font-black text-white mb-4 lowercase tracking-tight">
+              committed to <span className="text-primary italic">transparency.</span>
+            </h3>
+            <p className="text-white/60 font-bold mb-8 max-w-lg mx-auto text-sm md:text-base">
+              We believe in 100% financial openness. Explore our detailed reports and see exactly how every contribution makes an impact.
+            </p>
+            <Link
+              to="/transparency"
+              className="inline-flex items-center gap-3 bg-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-white hover:text-secondary transition-all shadow-xl shadow-primary/20"
+            >
+              View Financial Documentation
+              <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+
         {/* GALLERY SECTION */}
-        {images && images.length > 0 && (
+        {combinedImages && combinedImages.length > 0 && (
           <div className="mt-16 mb-16">
             <h3 className="text-2xl font-black text-secondary mb-6 border-l-4 border-primary pl-4">
               Gallery
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {images.map((img, index) => (
+              {combinedImages.map((img, index) => (
                 <div
                   key={index}
                   className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"

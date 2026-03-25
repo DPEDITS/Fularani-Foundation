@@ -25,7 +25,7 @@ const GalleryUploadModal = ({
         if (mode === "file") {
             setUploadFormData(prev => ({ ...prev, imageLink: "" }));
         } else {
-            setUploadFormData(prev => ({ ...prev, imageUrl: null }));
+            setUploadFormData(prev => ({ ...prev, imageFiles: [] }));
         }
     };
 
@@ -140,21 +140,57 @@ const GalleryUploadModal = ({
                                     <label className="text-[10px] font-black text-secondary/30 uppercase tracking-[0.2em] mb-3 block ml-1">
                                         Visual File
                                     </label>
-                                    <div className="h-40 rounded-3xl bg-muted/20 border-2 border-dashed border-secondary/10 flex flex-col items-center justify-center cursor-pointer transition-all hover:border-primary/50 relative overflow-hidden group">
+                                    <div className="min-h-40 py-6 rounded-3xl bg-muted/20 border-2 border-dashed border-secondary/10 flex flex-col items-center justify-center cursor-pointer transition-all hover:border-primary/50 relative overflow-hidden group">
                                         <input
                                             type="file"
                                             accept="image/*"
+                                            multiple
                                             onChange={handleFileChange}
                                             className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                                            required={!editingItem && uploadMode === "file"}
+                                            required={!editingItem && uploadMode === "file" && uploadFormData.imageFiles.length === 0}
                                         />
                                         <div className="p-4 rounded-2xl bg-white/50 mb-3 group-hover:scale-110 transition-transform">
                                             <Upload className="text-primary" size={24} />
                                         </div>
-                                        <span className="text-[10px] font-black uppercase text-secondary/40 px-6 text-center">
-                                            {uploadFormData.imageUrl ? uploadFormData.imageUrl.name : "Select photo from device"}
-                                        </span>
+                                        <div className="text-center px-6">
+                                            <span className="text-[10px] font-black uppercase text-secondary/40 block mb-1">
+                                                {uploadFormData.imageFiles.length > 0 
+                                                    ? `${uploadFormData.imageFiles.length} files selected` 
+                                                    : "Select photos from device"}
+                                            </span>
+                                            <span className="text-[9px] font-bold text-secondary/20 uppercase tracking-widest">
+                                                JPG, PNG or WEBP (MAX. 100)
+                                            </span>
+                                        </div>
                                     </div>
+
+                                    {/* Selected Files List */}
+                                    {uploadFormData.imageFiles.length > 0 && (
+                                        <div className="mt-4 flex flex-wrap gap-2">
+                                            {uploadFormData.imageFiles.map((file, idx) => (
+                                                <div 
+                                                    key={idx} 
+                                                    className="flex items-center gap-2 px-3 py-1.5 bg-muted/30 rounded-lg border border-secondary/5 group/item"
+                                                >
+                                                    <span className="text-[9px] font-black text-secondary/60 truncate max-w-[120px]">
+                                                        {file.name}
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setUploadFormData(prev => ({
+                                                                ...prev,
+                                                                imageFiles: prev.imageFiles.filter((_, i) => i !== idx)
+                                                            }));
+                                                        }}
+                                                        className="text-secondary/20 hover:text-red-500 transition-colors"
+                                                    >
+                                                        <X size={12} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </Motion.div>
                             ) : (
                                 <Motion.div
@@ -223,7 +259,12 @@ const GalleryUploadModal = ({
                         className="w-full h-20 bg-primary text-white rounded-3xl font-black text-xl hover:shadow-2xl hover:shadow-primary/20 transition-all disabled:opacity-50 active:scale-95 flex items-center justify-center gap-3"
                     >
                         {isUploading ? (
-                            <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                            <div className="flex items-center gap-3">
+                                <div className="w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                                <span className="text-sm font-black uppercase tracking-widest">
+                                    Uploading {uploadFormData.files?.length || 1} Moments...
+                                </span>
+                            </div>
                         ) : (
                             <>
                                 {editingItem ? "Update Story" : "Publish Moment"}

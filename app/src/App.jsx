@@ -25,6 +25,7 @@ import LegalPolicy from "./pages/LegalPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import Transparency from "./pages/Transparency";
 import SEO from "./components/SEO";
+import OurTeam from "./pages/OurTeam";
 
 const App = () => {
   const location = useLocation();
@@ -76,6 +77,7 @@ const App = () => {
           <Route path="/legal-policy" element={<LegalPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           <Route path="/transparency" element={<Transparency />} />
+          <Route path="/our-team" element={<OurTeam />} />
         </Routes>
       </main>
       {!shouldHideFooter && <Footer />}

@@ -19,7 +19,7 @@ export const missions = [
       "Our Mission Green initiative is a comprehensive approach to environmental stewardship. We organize community-led tree planting events, educational workshops on waste reduction, and partnerships with local governments to improve waste management infrastructure. By involving youth and local communities, we ensure that these changes are sustainable and deeply rooted in the culture.",
     stats: [
       { label: "Trees Planted", value: "500+", icon: Leaf },
-      { label: "Volunteers", value: "500+", icon: Globe },
+      { label: "Volunteers", value: "100+", icon: Globe },
     ],
     galleryCategory: "Mission Green",
     theme: {

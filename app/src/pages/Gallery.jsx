@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { motion as Motion, AnimatePresence } from "motion/react";
-import { Plus, Edit2, Trash2, Filter } from "lucide-react";
+import LazyImage from "../components/LazyImage";
+import { Plus, Filter, Search, Edit2, Trash2 } from "lucide-react";
 import {
   getAllGalleryItems,
   createGalleryItem,
@@ -13,6 +14,7 @@ import { getVolunteerUser } from "../services/volunteerService";
 import { getAdminUser } from "../services/adminService";
 import GalleryDetailModal from "../components/GalleryDetailModal";
 import GalleryUploadModal from "../components/GalleryUploadModal";
+import { galleryItems as staticGalleryItems } from "../data/galleryData";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -59,7 +61,7 @@ const Gallery = () => {
     category: "",
     description: "",
     uploadedBy: "",
-    imageUrl: null,
+    imageFiles: [],
     imageLink: "",
   });
 
@@ -68,7 +70,6 @@ const Gallery = () => {
     "Mission Education",
     "Mission Green",
     "Mission Healthcare",
-    "Mission Thalassemia",
   ];
 
   useEffect(() => {
@@ -85,9 +86,19 @@ const Gallery = () => {
           ...item,
           id: item._id,
           src: item.imageUrl,
-        }))
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setItems(adaptedItems);
+        }));
+      
+      // Combine with static items
+      const combinedItems = [
+        ...staticGalleryItems,
+        ...adaptedItems
+      ].sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+        return dateB - dateA;
+      });
+
+      setItems(combinedItems);
     } catch (err) {
       console.error("Failed to fetch gallery items:", err);
       setError("Failed to load gallery images. Please try again later.");
@@ -102,19 +113,46 @@ const Gallery = () => {
   };
 
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setUploadFormData((prev) => ({ ...prev, imageUrl: e.target.files[0] }));
+    if (e.target.files && e.target.files.length > 0) {
+      setUploadFormData((prev) => ({ 
+        ...prev, 
+        imageFiles: Array.from(e.target.files) 
+      }));
     }
   };
 
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
     if (
-      (!uploadFormData.imageUrl && !uploadFormData.imageLink && !editingItem) ||
+      (uploadFormData.imageFiles.length === 0 && !uploadFormData.imageLink && !editingItem) ||
       !uploadFormData.title ||
       !uploadFormData.category
     )
       return;
+
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const validFiles = [];
+    const oversizedFiles = [];
+
+    if (uploadFormData.imageFiles.length > 0) {
+      uploadFormData.imageFiles.forEach((file) => {
+        if (file.size > MAX_FILE_SIZE) {
+          oversizedFiles.push(file.name);
+        } else {
+          validFiles.push(file);
+        }
+      });
+    }
+
+    if (
+      validFiles.length === 0 &&
+      !uploadFormData.imageLink &&
+      !editingItem &&
+      oversizedFiles.length > 0
+    ) {
+      alert(`All selected files exceed 5MB and cannot be uploaded:\n\n${oversizedFiles.join('\n')}`);
+      return;
+    }
 
     try {
       setIsUploading(true);
@@ -126,8 +164,14 @@ const Gallery = () => {
         "uploadedBy",
         uploadFormData.uploadedBy || currentUser?.username || "Anonymous",
       );
-      if (uploadFormData.imageUrl) {
-        formData.append("imageUrl", uploadFormData.imageUrl);
+      if (validFiles.length > 0) {
+        validFiles.forEach((file) => {
+          if (editingItem) {
+            formData.append("imageUrl", file);
+          } else {
+            formData.append("images", file);
+          }
+        });
       } else if (uploadFormData.imageLink) {
         formData.append("imageLink", uploadFormData.imageLink);
       }
@@ -145,10 +189,16 @@ const Gallery = () => {
         category: "",
         description: "",
         uploadedBy: "",
-        imageUrl: null,
+        imageFiles: [],
         imageLink: "",
       });
       await fetchGalleryItems();
+
+      if (oversizedFiles.length > 0) {
+        alert(
+          `The following images exceeded 5MB and were skipped:\n\n${oversizedFiles.join('\n')}`
+        );
+      }
     } catch (error) {
       console.error("Operation failed", error);
     } finally {
@@ -163,7 +213,7 @@ const Gallery = () => {
       category: item.category,
       description: item.description,
       uploadedBy: item.uploadedBy,
-      imageUrl: null,
+      imageFiles: [],
       imageLink: item.src || "",
     });
     setIsUploadModalOpen(true);
@@ -283,10 +333,11 @@ const Gallery = () => {
                   className="group relative bg-muted/20 rounded-[40px] overflow-hidden aspect-[4/5] cursor-pointer"
                   onClick={() => setSelectedImage(item)}
                 >
-                  <img
-                    src={getSecureCloudinaryUrl(item.src)}
+                  <LazyImage
+                    src={item.src}
                     alt={item.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    imgClassName="transition-transform duration-1000"
+                    className="absolute inset-0 w-full h-full"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/10 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
                   <div className="absolute inset-0 p-10 flex flex-col justify-end text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
@@ -296,15 +347,7 @@ const Gallery = () => {
                     <h3 className="text-3xl font-black leading-[0.9] tracking-tighter mb-6 lowercase">
                       {item.title}
                     </h3>
-                    <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-xs font-black border border-white/20">
-                          {item.uploadedBy.charAt(0).toUpperCase()}
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-white/60">
-                          {item.uploadedBy}
-                        </span>
-                      </div>
+                    <div className="flex items-center justify-end opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
                       {isAuthorizedUser && (
                         <div className="flex gap-2">
                           <button

@@ -12,42 +12,62 @@ const createGalleryItem = asyncHandler(async (req, res) => {
   if (!title || !category) {
     throw new ApiError(400, "Title and category are required");
   }
-  const imageUrlLocalPath = req.files?.imageUrl?.[0]?.path;
-  let imageUrl;
-  if (imageUrlLocalPath) {
-    const uploadResult = await uploadOnCloudinary(imageUrlLocalPath);
-    if (uploadResult) imageUrl = uploadResult.secure_url;
-  } else if (imageLink) {
-    imageUrl = imageLink;
+
+  const files = req.files || [];
+  
+  if (files.length === 0 && !imageLink) {
+    throw new ApiError(400, "At least one image or image link is required");
   }
 
-  if (!imageUrl) {
-    throw new ApiError(400, "Image or image link is required");
+  let createdItems = [];
+
+  if (files.length > 0) {
+    console.log(`[Gallery] Processing ${files.length} uploads...`);
+    // Process files one by one to ensure stability and avoid rate limits/timeouts
+    for (const file of files) {
+      if (!file.path) continue;
+      try {
+        const uploadResult = await uploadOnCloudinary(file.path);
+        if (uploadResult) {
+          const newItem = await GalleryItem.create({
+            title,
+            category,
+            imageUrl: uploadResult.secure_url,
+            uploadedBy: uploadedBy || "",
+            description: description || "",
+          });
+          createdItems.push(newItem);
+          console.log(`[Gallery] Uploaded and saved: ${file.originalname}`);
+        }
+      } catch (error) {
+        console.error(`[Gallery] Failed to process ${file.originalname}:`, error);
+        // Continue with next file
+      }
+    }
+  } else if (imageLink) {
+    // Handle single image link
+    const galleryItem = await GalleryItem.create({
+      title,
+      category,
+      imageUrl: imageLink,
+      uploadedBy: uploadedBy || "",
+      description: description || "",
+    });
+    createdItems.push(galleryItem);
   }
-  const galleryItem = await GalleryItem.create({
-    title,
-    category,
-    imageUrl,
-    uploadedBy: uploadedBy || "",
-    description: description || "",
-  });
-  const createdGalleryItem = await GalleryItem.findById(galleryItem._id).select(
-    "-password -refreshToken",
-  );
-  if (!createdGalleryItem) {
-    throw new ApiError(
-      500,
-      "Something went wrong while creating the gallery item",
-    );
+
+  if (createdItems.length === 0) {
+    throw new ApiError(500, "All uploads failed. Please try again.");
   }
+
   return res
     .status(201)
     .json(
       new ApiResponse(
-        200,
-        createdGalleryItem,
-        "Gallery item created Successfully",
-      ),
+        201,
+        createdItems.length === 1 ? createdItems[0] : createdItems,
+        `${createdItems.length} Gallery item(s) created successfully`
+      )
     );
 });
 

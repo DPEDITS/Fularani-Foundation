@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const SEO = () => {
+const SEO = ({ title, description, image }) => {
   const location = useLocation();
 
   useEffect(() => {
@@ -18,24 +18,30 @@ const SEO = () => {
       '/volunteer-register': 'Volunteer Registration',
       '/legal-policy': 'Legal Policy',
       '/terms': 'Terms & Conditions',
-      '/transparency': 'Transparency'
+      '/transparency': 'Transparency',
+      '/our-team': 'Our Team'
     };
 
-    // If param is present, default to a base string
-    let matchedTitle = 'Best NGO in Odisha';
-    for (const [path, title] of Object.entries(routeTitles)) {
-      // exact match or prefix for dynamic routes
-      if (location.pathname === path || (path !== '/' && location.pathname.startsWith(`${path}/`))) {
-        matchedTitle = title;
-        break;
-      }
+    // Use props if provided, otherwise default to route-based title
+    let matchedTitle = title || 'Best NGO in Odisha';
+    
+    if (!title) {
+        for (const [path, t] of Object.entries(routeTitles)) {
+          if (location.pathname === path || (path !== '/' && location.pathname.startsWith(`${path}/`))) {
+            matchedTitle = t;
+            break;
+          }
+        }
     }
 
     const pageTitle = `Fularani Foundation | ${matchedTitle}`;
     
-    // Fallback description
+    // Use description prop or default
     const defaultDesc = 'Fularani Foundation is the best operating NGO in Odisha, India. We are dedicated to #EducationForAll, #MissionHealthcare, #MissionGreen, and Mission Thalassemia. Join us in uplifting lives and empowering communities across Odisha.';
-    const pageDescription = defaultDesc;
+    const pageDescription = description || defaultDesc;
+
+    // Use image prop or default logo/banner
+    const pageImage = image || 'https://fularanifoundation.org/logo.png'; // Fallback to a default logo if none provided
 
     // Update document title
     document.title = pageTitle;
@@ -65,6 +71,11 @@ const SEO = () => {
     setMetaTag(`property="og:title"`, 'og:title', pageTitle);
     setMetaTag(`property="twitter:title"`, 'twitter:title', pageTitle);
 
+    // Image Meta
+    setMetaTag(`property="og:image"`, 'og:image', pageImage);
+    setMetaTag(`property="twitter:image"`, 'twitter:image', pageImage);
+    setMetaTag(`property="twitter:card"`, 'twitter:card', 'summary_large_image');
+
     // Dynamic Canonical URL handling
     const currentUrl = `https://fularanifoundation.org${location.pathname}`;
     setMetaTag(`property="og:url"`, 'og:url', currentUrl);
@@ -78,7 +89,7 @@ const SEO = () => {
     }
     canonical.setAttribute('href', currentUrl);
 
-  }, [location.pathname]);
+  }, [location.pathname, title, description, image]);
 
   return null;
 };
