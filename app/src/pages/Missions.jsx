@@ -29,15 +29,17 @@ const Missions = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center md:text-left mb-20"
+            className="text-center md:text-left mb-12"
           >
-            <div className="inline-block bg-accent px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-6">
+            <div className="inline-block bg-accent px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
               Impact & Initiatives
             </div>
-            <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-10 lowercase">
+            <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-8 lowercase">
               Changing lives, <br />
               <span className="text-white bg-primary px-6 py-2 inline-block -rotate-1 mt-2">
-                one mission at a time.
+              Empowering change
+              <br /> 
+              on every front.
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground leading-tight max-w-[800px] font-bold">
@@ -47,7 +49,7 @@ const Missions = () => {
             </p>
           </Motion.div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             <StatCard
               end={500}
               suffix="+"
@@ -77,7 +79,7 @@ const Missions = () => {
       </section>
 
       {/* MISSIONS GRID */}
-      <section className="py-12 px-6 bg-muted/10 border-y border-secondary/5 relative z-10">
+      <section className="py-5 px-6 bg-muted/10 border-y border-secondary/5 relative z-10">
         <div className="max-w-[1200px] mx-auto space-y-32">
           <Motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -85,7 +87,7 @@ const Missions = () => {
             viewport={{ once: true }}
             className="text-center md:text-left"
           >
-            <h2 className="text-4xl md:text-6xl font-black text-secondary tracking-tighter leading-none mb-6 lowercase">
+            <h2 className="text-4xl md:text-6xl font-black text-secondary tracking-tighter leading-none mb-5 lowercase">
               Our{" "}
               <span className="text-primary italic underline decoration-accent decoration-8 underline-offset-8">
                 Dedicated
@@ -98,7 +100,7 @@ const Missions = () => {
             </p>
           </Motion.div>
 
-          <div className="space-y-16">
+          <div className="space-y-10">
             <Motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -128,7 +130,7 @@ const Missions = () => {
       </section>
 
       {/* UPCOMING MISSIONS */}
-      <section className="py-15 px-6 bg-secondary text-white relative overflow-hidden">
+      <section className="py-10 px-6 bg-secondary text-white relative overflow-hidden">
         {/* Decorative pulse element */}
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
 
