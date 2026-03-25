@@ -31,21 +31,21 @@ const Missions = () => {
             transition={{ duration: 0.8 }}
             className="text-center md:text-left mb-12"
           >
-            <div className="inline-block bg-accent px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
+            <div className="inline-block bg-accent px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
               Impact & Initiatives
             </div>
             <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-8 lowercase">
               Changing lives, <br />
-              <span className="text-white bg-primary px-6 py-2 inline-block -rotate-1 mt-2">
+              <span className="text-white bg-primary px-2 py-2 inline-block -rotate-1 mt-2">
               Empowering change
               <br /> 
               on every front.
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground leading-tight max-w-[800px] font-bold">
+            <p className="text-md md:text-2xl text-muted-foreground leading-tight max-w-[800px] font-bold">
               Fularani Foundation is committed to creating systemic social
               impact through focused initiatives in healthcare, education,
-              environment, and humanitarian relief.
+              environment.
             </p>
           </Motion.div>
 
