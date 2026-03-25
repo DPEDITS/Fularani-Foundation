@@ -14,7 +14,7 @@ app.set("trust proxy", 1);
 // --- Security headers ---
 app.use(
   helmet({
-    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+    crossOriginOpenerPolicy: { policy: "unsafe-none" }, // Change to unsafe-none for debugging COOP issues
     crossOriginResourcePolicy: { policy: "cross-origin" },
     contentSecurityPolicy: {
       directives: {
@@ -44,16 +44,25 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) {
+        return callback(null, true);
+      }
+      // Normalize origin for comparison (remove trailing slashes)
+      const normalizedOrigin = origin.replace(/\/$/, "");
+      const isAllowed = allowedOrigins.some(ao => ao?.replace(/\/$/, "") === normalizedOrigin);
+      
+      if (isAllowed) {
         callback(null, true);
       } else {
-        console.warn("Origin NOT allowed by CORS:", origin);
-        callback(null, false); // Instead of error, return false to let it pass but without headers (standard way to fail CORS)
+        console.warn("CORS Rejection - Origin:", origin, "Allowed:", allowedOrigins);
+        callback(null, false);
       }
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   })
 );
 
