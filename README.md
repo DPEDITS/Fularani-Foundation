@@ -180,4 +180,4 @@ Built with ❤️ using **React + Vite** & **Nodejs + Express**
 | Developer 1 | [@DPEDITS](https://github.com/DPEDITS)                       | ![](https://github.com/DPEDITS.png?size=100)            |
 | Developer 2 | [@Abhijeet-Dashy](https://github.com/Abhijeet-Dashy)         | ![](https://github.com/Abhijeet-Dashy.png?size=100)     |
 | Developer 3 | [@abhijeetdutta-1908](https://github.com/abhijeetdutta-1908) | ![](https://github.com/abhijeetdutta-1908.png?size=100) |
-| Developer 4 | [@abhijeetdutta-1908](https://github.com/Mr-pankajghosh) | ![](https://github.com/Mr-pankajghosh.png?size=100) |
+| Developer 4 | [@Mr-pankajghosh](https://github.com/Mr-pankajghosh) | ![](https://github.com/Mr-pankajghosh.png?size=100) |
