@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "motion/react";
-import { Users, Linkedin, Mail, Twitter, ShieldCheck, Code, Calculator } from "lucide-react";
+import { Users, Linkedin, Mail, Github, ShieldCheck, Code, Calculator } from "lucide-react";
 
 const leadership = [
   {
@@ -9,6 +9,8 @@ const leadership = [
     image: "https://res.cloudinary.com/dnbgja6dx/image/upload/v1774402269/Kalinga_Biswal_nng6y9.jpg",
     icon: ShieldCheck,
     color: "#0071e3",
+    linkedin: "https://www.linkedin.com/in/kalingabiswal/",
+    email: "fularanifoundation@gmail.com",
   },
   {
     name: "Manoj Kumar Swain",
@@ -26,6 +28,9 @@ const developers = [
     image: "https://res.cloudinary.com/dnbgja6dx/image/upload/v1774002900/h1xsoyitoj5zevwyvrh7.jpg",
     icon: Code,
     color: "#34c759",
+    linkedin: "https://www.linkedin.com/in/abhijeet-dutta-19082005ad/",
+    github: "https://github.com/abhijeetdutta-1908",
+    email: "abhijeetduttaam@gmail.com",
   },
   {
     name: "Debashish Parida",
@@ -33,6 +38,9 @@ const developers = [
     image: "https://res.cloudinary.com/dnbgja6dx/image/upload/v1773989216/nhd7yidigeomxjtcsu2d.jpg",
     icon: Code,
     color: "#34c759",
+    linkedin: "https://www.linkedin.com/in/debashish-parida-421496276/",
+    github: "https://github.com/DPEDITS",
+    email: "debashishparida75@gmail.com",
   },
   {
     name: "Abhijeet Dash",
@@ -40,6 +48,9 @@ const developers = [
     image: "https://res.cloudinary.com/dnbgja6dx/image/upload/v1773989749/b6yobhp0l5476j4fbhsq.jpg",
     icon: Code,
     color: "#34c759",
+    linkedin: "https://www.linkedin.com/in/abhijeet-dashy/",
+    github: "https://github.com/Abhijeet-Dashy",
+    email: "abhijeetdashy@gmail.com",
   },
   {
     name: "Pankaj Ghosh",
@@ -47,6 +58,9 @@ const developers = [
     image: "https://res.cloudinary.com/dnbgja6dx/image/upload/v1774967810/WhatsApp_Image_2026-03-31_at_8.05.05_PM_rzjso9.jpg",
     icon: Code,
     color: "#34c759",
+    linkedin: "https://in.linkedin.com/in/pankaj-ghosh",
+    github: "https://github.com/pankaj-ghosh",
+    email: "ghoshpankaj260@gmail.com",
   }
 ];
 
@@ -86,9 +100,15 @@ const TeamMemberCard = ({ member, index }) => (
 
     {/* Socials */}
     <div className="flex justify-center gap-4 pt-6 border-t border-black/5 opacity-40 group-hover:opacity-100 transition-opacity">
-      <Linkedin size={16} className="text-secondary/60 hover:text-primary transition-colors cursor-pointer" />
-      <Twitter size={16} className="text-secondary/60 hover:text-primary transition-colors cursor-pointer" />
-      <Mail size={16} className="text-secondary/60 hover:text-primary transition-colors cursor-pointer" />
+      <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-secondary/60 hover:text-primary transition-colors">
+        <Linkedin size={16} />
+      </a>
+      <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-secondary/60 hover:text-primary transition-colors">
+        <Github size={16} />
+      </a>
+      <a href={`mailto:${member.email}`} className="text-secondary/60 hover:text-primary transition-colors">
+        <Mail size={16} />
+      </a>
     </div>
   </motion.div>
 );
