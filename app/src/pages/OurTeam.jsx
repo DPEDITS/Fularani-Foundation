@@ -41,6 +41,13 @@ const developers = [
     icon: Code,
     color: "#34c759",
   },
+  {
+    name: "Pankaj Ghosh",
+    designation: "App Developer",
+    image: "https://res.cloudinary.com/dnbgja6dx/image/upload/v1774967810/WhatsApp_Image_2026-03-31_at_8.05.05_PM_rzjso9.jpg",
+    icon: Code,
+    color: "#34c759",
+  }
 ];
 
 const TeamMemberCard = ({ member, index }) => (
