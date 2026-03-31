@@ -60,20 +60,20 @@ const Stories = () => {
 
         <div
           ref={scrollContainerRef}
-          className="flex gap-4 md:gap-8 overflow-x-auto pb-12 snap-x snap-mandatory no-scrollbar"
+          className="flex gap-4 md:gap-8 overflow-x-auto pb-10 snap-x snap-mandatory no-scrollbar rounded-xl"
         >
           {stories.map((story, index) => (
             <Link
               key={story.id}
               to={`/stories/${story.id}`}
-              className="min-w-[85vw] md:min-w-[500px] snap-start bg-white shadow-2xl overflow-hidden group border border-secondary/5 cursor-pointer hover:shadow-3xl transition-shadow"
+              className="min-w-[85vw] md:min-w-[500px] snap-start shadow-lg bg-white overflow-hidden group border border-secondary/5 cursor-pointer rounded-xl hover:shadow-2xl duration-300 hover:scale-101"
             >
-              <div className="flex flex-col md:flex-row h-full">
+              <div className="flex flex-col md:flex-row h-full rounded-xl">
                 <div className="w-full md:w-2/5 h-40 md:h-auto overflow-hidden relative">
                   <img
                     src={getSecureCloudinaryUrl(story.coverImage)}
                     alt={story.title}
-                    className="w-full h-full object-cover transition-all duration-700 hover:scale-110"
+                    className="w-full h-full object-cover transition-all duration-700 hover:scale-110 rounded-xl"
                   />
                   <div className="absolute top-4 left-4 bg-primary px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-wider text-white">
                     {story.category}
