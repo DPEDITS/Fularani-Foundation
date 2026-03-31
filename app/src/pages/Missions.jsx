@@ -100,31 +100,45 @@ const Missions = () => {
             </p>
           </Motion.div>
 
-          <div className="space-y-10">
-            <Motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-            >
-              <MissionEducation />
-            </Motion.div>
-            <Motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
-              <MissionHealthcare />
-            </Motion.div>
-            <Motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-            >
-              <MissionGreen />
-            </Motion.div>
+          <div className="relative max-w-[1200px] mx-auto mt-16">
+            {/* Timeline Vertical Line */}
+            <div className="absolute left-[16px] md:left-[40px] top-[40px] bottom-[40px] w-[4px] bg-primary/20 rounded-full hidden sm:block"></div>
+
+            <div className="space-y-12 md:space-y-20">
+              <Motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="relative sm:pl-16 md:pl-[100px]"
+              >
+                {/* Timeline Dot */}
+                <div className="hidden sm:block absolute left-[16px] md:left-[40px] top-1/2 -translate-y-1/2 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border-[4px] md:border-[6px] border-primary z-10 -translate-x-[10px] md:-translate-x-[14px] shadow-lg ring-4 ring-white"></div>
+                <MissionEducation />
+              </Motion.div>
+
+              <Motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="relative sm:pl-16 md:pl-[100px]"
+              >
+                <div className="hidden sm:block absolute left-[16px] md:left-[40px] top-1/2 -translate-y-1/2 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border-[4px] md:border-[6px] border-primary z-10 -translate-x-[10px] md:-translate-x-[14px] shadow-lg ring-4 ring-white"></div>
+                <MissionHealthcare />
+              </Motion.div>
+
+              <Motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="relative sm:pl-16 md:pl-[100px]"
+              >
+                <div className="hidden sm:block absolute left-[16px] md:left-[40px] top-1/2 -translate-y-1/2 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border-[4px] md:border-[6px] border-primary z-10 -translate-x-[10px] md:-translate-x-[14px] shadow-lg ring-4 ring-white"></div>
+                <MissionGreen />
+              </Motion.div>
+            </div>
           </div>
         </div>
       </section>
