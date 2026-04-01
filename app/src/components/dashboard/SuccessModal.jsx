@@ -7,7 +7,7 @@ import {
   Copy,
   CheckCheck,
 } from "lucide-react";
-import logoImg from "../../assets/logo.jpg";
+import logoImg from "../../assets/logo.png";
 
 const SuccessModal = ({ show, onClose, amount, formatCurrency, donorName, donorAvatar }) => {
   const [showShareSection, setShowShareSection] = useState(false);
