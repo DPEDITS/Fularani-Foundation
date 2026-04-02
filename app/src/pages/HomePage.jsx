@@ -168,8 +168,6 @@ const Home = () => {
 
       <main>
         <Hero />
-        <TrustStrip />
-
         {/* ── OUR PROJECTS SO FAR ── */}
         <section className="py-20 md:py-32 px-6 bg-white border-y border-secondary/5 relative overflow-hidden">
           {/* Decorative background elements matching the site theme */}
