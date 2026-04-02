@@ -60,7 +60,7 @@ const Stories = () => {
 
         <div
           ref={scrollContainerRef}
-          className="flex gap-4 md:gap-8 overflow-x-auto pb-10 snap-x snap-mandatory no-scrollbar rounded-xl"
+          className="flex gap-4 md:gap-8 overflow-x-auto pb-17  snap-x snap-mandatory no-scrollbar rounded-xl"
         >
           {stories.map((story, index) => (
             <Link

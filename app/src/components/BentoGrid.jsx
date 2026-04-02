@@ -8,8 +8,8 @@ import {
   Heart,
 } from "lucide-react";
 import { motion as Motion } from "motion/react";
-import educationBg from "../assets/AI/education_bg.png";
-import greenBg from "../assets/AI/green_bg.png";
+import EducationImage from "../assets/Edu.jpeg";
+import greenImage from "../assets/GreenImage.jpg";
 import healthcareBg from "../assets/AI/healthcare_bg.png";
 import thalassemiaBg from "../assets/AI/thalassemia_bg.png";
 
@@ -74,7 +74,7 @@ const BentoGrid = () => {
           >
             <div
               className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110 opacity-60"
-              style={{ backgroundImage: `url(${educationBg})` }}
+              style={{ backgroundImage: `url(${EducationImage})` }}
             ></div>
             <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/40 to-transparent"></div>
 
@@ -110,7 +110,7 @@ const BentoGrid = () => {
           >
             <div
               className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110 opacity-50 grayscale hover:grayscale-0 transition-all"
-              style={{ backgroundImage: `url(${greenBg})` }}
+              style={{ backgroundImage: `url(${greenImage})` }}
             ></div>
             <div className="absolute inset-0 bg-gradient-to-r from-[#34c759]/90 via-[#34c759]/40 to-transparent"></div>
 

@@ -18,102 +18,95 @@ const getDownloadLink = (url) => {
 };
 
 const SubtopicSection = ({ subtopic, index, isSuperAdmin, onEdit, onDelete }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.05 }}
-      className="bg-white/[0.02] border border-white/10 rounded-2xl overflow-hidden shadow-sm mb-6"
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.5, delay: index * 0.06 }}
+      className="group relative bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/8 rounded-3xl overflow-hidden hover:border-primary/30 transition-all duration-500 hover:shadow-[0_8px_40px_-12px_rgba(0,102,204,0.15)] flex flex-col"
     >
-      <div 
-        className="p-5 md:p-6 flex justify-between items-center cursor-pointer hover:bg-white/[0.04] transition-colors"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <h2 className="text-lg md:text-xl font-bold text-white flex items-center gap-4">
-          <span className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-semibold shrink-0 border border-primary/20">
-            {index + 1}
+      {/* Hover glow effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+      {/* Card Header */}
+      <div className="relative p-5 md:p-6 border-b border-white/5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-2xl bg-primary/15 flex items-center justify-center text-primary shrink-0 border border-primary/20 group-hover:bg-primary group-hover:text-white transition-all duration-500">
+              <FileText size={18} />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-base md:text-lg font-bold text-white capitalize truncate">
+                {subtopic.title}
+              </h2>
+              <p className="text-[11px] text-gray-500 font-medium mt-0.5">
+                {subtopic.documents.length} document{subtopic.documents.length !== 1 ? "s" : ""}
+              </p>
+            </div>
+          </div>
+          <span className="px-2.5 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-wider rounded-lg border border-primary/15 shrink-0">
+            {subtopic.documents.length}
           </span>
-          <span className="capitalize">{subtopic.title}</span>
-        </h2>
-        <motion.div 
-          animate={{ rotate: isOpen ? 180 : 0 }} 
-          transition={{ duration: 0.3 }}
-          className="text-gray-400 p-2 bg-white/5 rounded-full"
-        >
-          <ChevronDown size={20} />
-        </motion.div>
+        </div>
       </div>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
+      {/* Document List */}
+      <div className="relative flex-1 p-3 md:p-4 space-y-1.5">
+        {subtopic.documents.map((doc) => (
+          <div
+            key={doc.id}
+            className="flex items-center gap-2.5 p-2.5 md:p-3 rounded-xl hover:bg-white/[0.05] transition-all cursor-pointer group/doc"
+            onClick={() => window.open(doc.link, "_blank")}
           >
-            <div className="px-2 md:px-6 pb-5 md:pb-6 pt-2 border-t border-white/5">
-              {/* Header - Hidden on very small screens or made more compact */}
-              <div className="flex border-b border-white/10 text-gray-500 text-[10px] md:text-xs uppercase tracking-widest font-bold bg-white/[0.01] py-3 px-2 md:px-4">
-                <div className="flex-1">Document Name</div>
-                <div className="w-24 md:w-32 text-right">Action</div>
-              </div>
-              
-              <div className="divide-y divide-white/5">
-                {subtopic.documents.map((doc) => (
-                  <div 
-                    key={doc.id}
-                    className="flex items-center justify-between py-4 px-2 md:px-4 hover:bg-white/[0.03] transition-colors group cursor-pointer"
-                    onClick={() => window.open(doc.link, "_blank")}
-                  >
-                    {/* Doc Info */}
-                    <div className="flex items-center gap-2 md:gap-3 text-gray-300 font-medium min-w-0 pr-2">
-                      <div className="p-1.5 md:p-2 bg-primary/10 rounded-lg text-primary/70 group-hover:bg-primary group-hover:text-white transition-all shrink-0">
-                        <FileText size={14} className="md:w-[18px] md:h-[18px]" />
-                      </div>
-                      <span className="truncate text-[11px] md:text-sm">{doc.name}</span>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
-                      <a
-                        href={doc.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center px-2.5 py-1.5 md:px-4 md:py-2 bg-white/5 hover:bg-primary text-white text-[10px] md:text-sm font-semibold rounded-lg transition-all border border-white/10 hover:border-transparent min-w-[50px] md:min-w-[70px]"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        View
-                      </a>
-                      
-                      {isSuperAdmin && (
-                        <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            onClick={() => onEdit(doc, subtopic.title)}
-                            className="p-1.5 md:p-2 bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-white rounded-lg transition-all border border-amber-500/20"
-                            title="Edit"
-                          >
-                            <Pencil size={12} className="md:w-[14px] md:h-[14px]" />
-                          </button>
-                          <button
-                            onClick={() => onDelete(doc)}
-                            className="p-1.5 md:p-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all border border-red-500/20"
-                            title="Delete"
-                          >
-                            <Trash2 size={12} className="md:w-[14px] md:h-[14px]" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="p-1.5 bg-white/5 rounded-lg text-gray-500 group-hover/doc:text-primary group-hover/doc:bg-primary/10 transition-all shrink-0">
+              <FileText size={14} />
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <span className="text-[12px] md:text-[13px] text-gray-300 font-medium truncate flex-1 group-hover/doc:text-white transition-colors">
+              {doc.name}
+            </span>
+            <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover/doc:opacity-100 transition-opacity">
+              <a
+                href={doc.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-1.5 bg-primary/20 hover:bg-primary text-primary hover:text-white rounded-lg transition-all"
+                onClick={(e) => e.stopPropagation()}
+                title="View"
+              >
+                <Eye size={12} />
+              </a>
+              <a
+                href={getDownloadLink(doc.link)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-1.5 bg-white/5 hover:bg-white/15 text-gray-400 hover:text-white rounded-lg transition-all"
+                onClick={(e) => e.stopPropagation()}
+                title="Download"
+              >
+                <Download size={12} />
+              </a>
+              {isSuperAdmin && (
+                <>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onEdit(doc, subtopic.title); }}
+                    className="p-1.5 bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-white rounded-lg transition-all"
+                    title="Edit"
+                  >
+                    <Pencil size={12} />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onDelete(doc); }}
+                    className="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-all"
+                    title="Delete"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </motion.div>
   );
 };
@@ -271,7 +264,7 @@ const Transparency = () => {
       <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
       <div className="fixed bottom-0 left-0 w-[400px] h-[400px] bg-accent/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-      <div className="max-w-4xl mx-auto px-6 relative z-10">
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -324,7 +317,7 @@ const Transparency = () => {
             </p>
           </div>
         ) : (
-          <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {documents.map((subtopic, index) => (
               <SubtopicSection
                 key={subtopic.title}

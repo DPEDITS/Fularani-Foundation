@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { motion as Motion, AnimatePresence } from "motion/react";
 import LazyImage from "../components/LazyImage";
-import { Plus, Filter, Search, Edit2, Trash2 } from "lucide-react";
+import { Plus, Filter, Search, Edit2, Trash2, X, Tag, Check } from "lucide-react";
 import {
   getAllGalleryItems,
   createGalleryItem,
@@ -50,6 +50,8 @@ const Gallery = () => {
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [activeCategory, setActiveCategory] = useState("All");
+  const [selectedTitles, setSelectedTitles] = useState([]);
+  const [isTitleFilterOpen, setIsTitleFilterOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -232,10 +234,44 @@ const Gallery = () => {
     }
   };
 
-  const filteredItems =
-    activeCategory === "All"
+  // Extract unique titles dynamically — scoped to active category
+  const uniqueTitles = useMemo(() => {
+    const pool = activeCategory === "All"
       ? items
       : items.filter((item) => item.category === activeCategory);
+    const titleSet = new Set(pool.map((item) => item.title).filter(Boolean));
+    return [...titleSet].sort();
+  }, [items, activeCategory]);
+
+  // Auto-clear selected titles that no longer exist in the current category
+  useEffect(() => {
+    setSelectedTitles((prev) =>
+      prev.filter((t) => uniqueTitles.includes(t))
+    );
+  }, [uniqueTitles]);
+
+  const handleTitleToggle = (title) => {
+    setSelectedTitles((prev) =>
+      prev.includes(title)
+        ? prev.filter((t) => t !== title)
+        : [...prev, title]
+    );
+  };
+
+  const clearTitleFilters = () => {
+    setSelectedTitles([]);
+  };
+
+  const filteredItems = useMemo(() => {
+    let result = items;
+    if (activeCategory !== "All") {
+      result = result.filter((item) => item.category === activeCategory);
+    }
+    if (selectedTitles.length > 0) {
+      result = result.filter((item) => selectedTitles.includes(item.title));
+    }
+    return result;
+  }, [items, activeCategory, selectedTitles]);
 
   return (
     <div className="min-h-screen bg-white text-secondary overflow-x-hidden">
@@ -279,24 +315,125 @@ const Gallery = () => {
         </div>
       </section>
 
-      <div className="sticky top-[72px] z-40 bg-white/90 backdrop-blur-xl border-y border-secondary/5 py-6 px-6">
-        <div className="max-w-[1200px] mx-auto flex items-center gap-8 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-3 shrink-0">
-            <Filter size={18} className="text-primary" />
-            <span className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">
-              Filter
-            </span>
+      <div className="sticky top-[72px] z-40 bg-white/90 backdrop-blur-xl border-y border-secondary/5 py-4 px-6">
+        <div className="max-w-[1200px] mx-auto">
+          {/* Category Filter Row */}
+          <div className="flex items-center gap-8 overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-3 shrink-0">
+              <Filter size={18} className="text-primary" />
+              <span className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">
+                Category
+              </span>
+            </div>
+            <div className="flex gap-3">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-tight transition-all whitespace-nowrap ${activeCategory === category ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-muted/30 text-secondary/60 hover:bg-muted/50"}`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="flex gap-3">
-            {categories.map((category) => (
+
+          {/* Title Filter Row */}
+          <div className="mt-4 border-t border-secondary/5 pt-4">
+            <div className="flex items-center gap-4 mb-3">
               <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-tight transition-all whitespace-nowrap ${activeCategory === category ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-muted/30 text-secondary/60 hover:bg-muted/50"}`}
+                onClick={() => setIsTitleFilterOpen(!isTitleFilterOpen)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-tight transition-all ${
+                  selectedTitles.length > 0
+                    ? "bg-accent text-secondary shadow-lg shadow-accent/20"
+                    : "bg-muted/30 text-secondary/60 hover:bg-muted/50"
+                }`}
               >
-                {category}
+                <Tag size={14} />
+                Filter by Title
+                {selectedTitles.length > 0 && (
+                  <span className="ml-1 bg-secondary text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center">
+                    {selectedTitles.length}
+                  </span>
+                )}
               </button>
-            ))}
+
+              {selectedTitles.length > 0 && (
+                <button
+                  onClick={clearTitleFilters}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-tight text-destructive/70 hover:text-destructive hover:bg-destructive/5 transition-all"
+                >
+                  <X size={12} />
+                  Clear All
+                </button>
+              )}
+            </div>
+
+            <AnimatePresence>
+              {isTitleFilterOpen && (
+                <Motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex flex-wrap gap-2 pb-2">
+                    {uniqueTitles.map((title) => {
+                      const isSelected = selectedTitles.includes(title);
+                      const count = items.filter((i) => i.title === title).length;
+                      return (
+                        <button
+                          key={title}
+                          onClick={() => handleTitleToggle(title)}
+                          className={`group/chip flex items-center gap-2 pl-3 pr-3 py-2 rounded-full text-[11px] font-bold transition-all duration-300 border ${
+                            isSelected
+                              ? "bg-primary text-white border-primary shadow-lg shadow-primary/15 scale-[1.02]"
+                              : "bg-white text-secondary/70 border-secondary/10 hover:border-primary/30 hover:bg-primary/5 hover:text-secondary"
+                          }`}
+                        >
+                          <span className={`w-4 h-4 rounded-md flex items-center justify-center transition-all duration-300 ${
+                            isSelected
+                              ? "bg-white/25"
+                              : "bg-secondary/5 group-hover/chip:bg-primary/10"
+                          }`}>
+                            {isSelected && <Check size={10} strokeWidth={3} />}
+                          </span>
+                          {title}
+                          <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-md transition-all ${
+                            isSelected
+                              ? "bg-white/20 text-white"
+                              : "bg-secondary/5 text-secondary/40"
+                          }`}>
+                            {count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </Motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Active title pills (always visible when filter is closed) */}
+            {!isTitleFilterOpen && selectedTitles.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {selectedTitles.map((title) => (
+                  <span
+                    key={title}
+                    className="flex items-center gap-1.5 bg-primary/10 text-primary pl-3 pr-2 py-1.5 rounded-full text-[11px] font-bold"
+                  >
+                    {title}
+                    <button
+                      onClick={() => handleTitleToggle(title)}
+                      className="w-4 h-4 rounded-full bg-primary/20 hover:bg-primary hover:text-white flex items-center justify-center transition-all"
+                    >
+                      <X size={8} strokeWidth={3} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -318,7 +455,7 @@ const Gallery = () => {
             </Motion.div>
           ) : (
             <Motion.div
-              key={activeCategory}
+              key={`${activeCategory}-${selectedTitles.join(",")}`}
               variants={containerVariants}
               initial="hidden"
               animate="show"
