@@ -1,21 +1,66 @@
 import MissionGreen from "../components/MissionGreen";
-
 import MissionEducation from "../components/MissionEducation";
 import MissionHealthcare from "../components/MissionHealthcare";
-import MissionThalassemia from "../components/MissionThalassemia";
 import { useEffect, useState } from "react";
 import { motion as Motion } from "motion/react";
 import { safeLocationRedirect } from "../utils/safeNavigate";
+import { missions } from "../data/missions";
 import {
+  ChevronDown,
   ArrowRight,
   Globe,
   Leaf,
   Heart,
-  School,
   ShieldCheck,
+  Sparkles,
 } from "lucide-react";
 
+const groupedSubdivisions = [
+  {
+    key: "education",
+    eyebrow: "Education Projects",
+    title: "Sub-division projects under Mission Education",
+    projectIds: ["jeevan-kaushal", "career-connect"],
+    cardClassName: "border-blue-100 bg-blue-50/60",
+    badgeClassName: "bg-blue-100 text-[#0071e3]",
+    linkClassName: "text-[#0071e3]",
+  },
+  {
+    key: "healthcare",
+    eyebrow: "Healthcare Projects",
+    title: "Sub-division projects under Mission Healthcare",
+    projectIds: [
+      "mission-mobility",
+      "mission-period-pride",
+      "healthy-bhadrak-gym",
+      "donation-wall",
+      "thalassemia",
+    ],
+    cardClassName: "border-red-100 bg-red-50/60",
+    badgeClassName: "bg-red-100 text-[#ff3b30]",
+    linkClassName: "text-[#ff3b30]",
+  },
+  {
+    key: "green",
+    eyebrow: "Green Projects",
+    title: "Sub-division projects under Mission Green",
+    projectIds: ["waste-to-wealth", "krishi-sakha-ai"],
+    cardClassName: "border-green-100 bg-green-50/60",
+    badgeClassName: "bg-green-100 text-[#34c759]",
+    linkClassName: "text-[#198754]",
+  },
+];
+
 const Missions = () => {
+  const [activeMission, setActiveMission] = useState("");
+
+  const subdivisionProjects = groupedSubdivisions.map((group) => ({
+    ...group,
+    projects: group.projectIds
+      .map((projectId) => missions.find((mission) => mission.id === projectId))
+      .filter(Boolean),
+  }));
+
   return (
     <div className="bg-white min-h-screen overflow-hidden">
       {/* Background Graphic Elements */}
@@ -23,7 +68,7 @@ const Missions = () => {
       <div className="absolute top-1/2 left-0 w-64 h-64 bg-accent/5 rounded-full blur-[120px] -translate-x-1/2"></div>
 
       {/* PAGE HEADER */}
-      <section className="pt-25 pb-20 px-6 relative z-10">
+      <section className="pt-24 pb-16 px-6 relative z-10">
         <div className="max-w-[1200px] mx-auto">
           <div className="grid gap-10 lg:grid-cols-[1.4fr_0.9fr] items-start">
             <Motion.div
@@ -32,10 +77,10 @@ const Missions = () => {
               transition={{ duration: 0.8 }}
               className="text-center md:text-left mb-12"
             >
-              <div className="inline-block bg-accent px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
+              <div className="inline-block bg-accent px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-[0.18em] text-secondary mb-4">
                 Impact & Initiatives
               </div>
-              <h1 className="text-6xl md:text-8xl lg:text-[90px] font-black text-secondary leading-[0.9] tracking-tighter mb-8 lowercase">
+              <h1 className="text-[2.8rem] md:text-6xl lg:text-[4.6rem] font-black text-secondary leading-[0.92] tracking-tighter mb-6 lowercase">
                 Changing lives, <br />
                 <span className="text-white bg-primary px-2 py-2 inline-block -rotate-1 mt-2">
                   Empowering change
@@ -43,7 +88,7 @@ const Missions = () => {
                   on every front.
                 </span>
               </h1>
-              <p className="text-md md:text-2xl text-muted-foreground leading-tight max-w-[800px] font-bold">
+              <p className="text-base md:text-xl text-muted-foreground leading-snug max-w-[720px] font-semibold">
                 Fularani Foundation is committed to creating systemic social
                 impact through focused initiatives in healthcare, education,
                 environment.
@@ -89,119 +134,107 @@ const Missions = () => {
       </section>
 
       {/* MISSIONS GRID */}
-      <section className="py-5 px-6 bg-muted/10 border-y border-secondary/5 relative z-10">
-        <div className="max-w-[1200px] mx-auto space-y-32">
+      <section className="py-6 px-6 bg-muted/10 border-y border-secondary/5 relative z-10">
+        <div className="max-w-[1200px] mx-auto space-y-24">
           <Motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             className="text-center md:text-left"
           >
-            <h2 className="text-4xl md:text-6xl font-black text-secondary tracking-tighter leading-none mb-5 lowercase">
+            <h2 className="text-3xl md:text-5xl font-black text-secondary tracking-tighter leading-[0.95] mb-4 lowercase">
               Our{" "}
               <span className="text-primary italic underline decoration-accent decoration-8 underline-offset-8">
                 Dedicated
               </span>{" "}
               Missions
             </h2>
-            <p className="text-xl text-muted-foreground font-bold max-w-[600px] leading-tight">
+            <p className="text-base md:text-lg text-muted-foreground font-semibold max-w-[560px] leading-snug">
               Tailored programs designed to address specific social needs and
               drive sustainable change in the heart of India.
             </p>
           </Motion.div>
 
-          <div className="relative max-w-[1200px] mx-auto mt-16">
-            {/* Timeline Vertical Line */}
-            <div className="absolute left-[16px] md:left-[40px] top-[40px] bottom-[40px] w-[4px] bg-primary/20 rounded-full hidden sm:block"></div>
+          <div className="max-w-[1200px] mx-auto mt-14 space-y-5">
+            {subdivisionProjects.map((group, index) => {
+              const isActive = activeMission === group.key;
+              const ParentMissionCard =
+                group.key === "education"
+                  ? MissionEducation
+                  : group.key === "healthcare"
+                    ? MissionHealthcare
+                    : MissionGreen;
 
-            <div className="space-y-12 md:space-y-20">
-              <Motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="relative sm:pl-16 md:pl-[100px]"
-              >
-                {/* Timeline Dot */}
-                <div className="hidden sm:block absolute left-[16px] md:left-[40px] top-1/2 -translate-y-1/2 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border-[4px] md:border-[6px] border-primary z-10 -translate-x-[10px] md:-translate-x-[14px] shadow-lg ring-4 ring-white"></div>
-                <MissionEducation />
-              </Motion.div>
+              return (
+                <Motion.div
+                  key={group.key}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 + index * 0.08 }}
+                  className="rounded-[32px] border border-secondary/10 bg-white shadow-lg overflow-hidden"
+                >
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveMission((current) =>
+                        current === group.key ? "" : group.key
+                      )
+                    }
+                    className="w-full text-left"
+                  >
+                    <div className="flex items-center justify-between gap-4 p-5 md:p-6 border-b border-secondary/5 bg-white">
+                      <div>
+                        <div
+                          className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${group.badgeClassName}`}
+                        >
+                          <Sparkles size={12} />
+                          {group.eyebrow}
+                        </div>
+                        <h3 className="mt-3 text-xl md:text-2xl font-black text-secondary tracking-tight">
+                          {group.title.replace("Sub-division projects under ", "")}
+                        </h3>
+                        <p className="mt-1 text-sm md:text-[15px] text-muted-foreground font-medium">
+                          Tap to {isActive ? "hide" : "view"} all projects under this mission.
+                        </p>
+                      </div>
 
-              <Motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="relative sm:pl-16 md:pl-[100px]"
-              >
-                <div className="hidden sm:block absolute left-[16px] md:left-[40px] top-1/2 -translate-y-1/2 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border-[4px] md:border-[6px] border-primary z-10 -translate-x-[10px] md:-translate-x-[14px] shadow-lg ring-4 ring-white"></div>
-                <MissionHealthcare />
-              </Motion.div>
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary/5 text-secondary">
+                        <ChevronDown
+                          size={22}
+                          className={`transition-transform duration-300 ${isActive ? "rotate-180" : ""}`}
+                        />
+                      </div>
+                    </div>
+                  </button>
 
-              <Motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="relative sm:pl-16 md:pl-[100px]"
-              >
-                <div className="hidden sm:block absolute left-[16px] md:left-[40px] top-1/2 -translate-y-1/2 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border-[4px] md:border-[6px] border-primary z-10 -translate-x-[10px] md:-translate-x-[14px] shadow-lg ring-4 ring-white"></div>
-                <MissionGreen />
-              </Motion.div>
-            </div>
+                  {isActive && (
+                    <div className="p-5 md:p-6 space-y-6 bg-[#fcfcfd]">
+                      <ParentMissionCard />
+                      <SubDivisionProjects group={group} />
+                    </div>
+                  )}
+                </Motion.div>
+              );
+            })}
           </div>
-        </div>
-      </section>
-
-      {/* UPCOMING MISSIONS */}
-      <section className="py-10 px-6 bg-secondary text-white relative overflow-hidden">
-        {/* Decorative pulse element */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
-
-        <div className="max-w-[1200px] mx-auto space-y-10 relative z-10">
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 text-left">
-            <div className="max-w-2xl text-left">
-              <span className="inline-block bg-primary px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-white mb-6">
-                Future Impact
-              </span>
-              <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none lowercase">
-                upcoming <br />
-                <span className="text-secondary bg-accent px-4 py-1 inline-block rotate-1 mt-2">
-                  initiatives.
-                </span>
-              </h2>
-            </div>
-            <p className="text-xl text-white/60 font-medium max-w-[400px] leading-tight pb-2 text-left">
-              Critical projects requiring immediate collective action and
-              heartfelt support.
-            </p>
-          </div>
-
-          <Motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="space-y-12"
-          >
-            <MissionThalassemia />
-          </Motion.div>
         </div>
       </section>
 
       {/* CALL TO ACTION */}
-      <section className="py-32 px-6 relative z-10">
-        <div className="max-w-[1200px] mx-auto bg-primary text-white p-12 md:p-24 rounded-[40px] text-center relative overflow-hidden shadow-2xl shadow-primary/30">
+      <section className="py-24 px-6 relative z-10">
+        <div className="max-w-[1200px] mx-auto bg-primary text-white p-10 md:p-18 rounded-[40px] text-center relative overflow-hidden shadow-2xl shadow-primary/30">
           {/* Abstract background element */}
           <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
 
           <div className="relative z-10">
-            <h2 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.8] mb-12 lowercase">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.85] mb-8 lowercase">
               Want to make <br />
               <span className="text-secondary bg-accent px-6 py-2 inline-block -rotate-1 mt-4">
                 an impact?
               </span>
             </h2>
-            <p className="text-xl md:text-2xl text-white/80 mb-16 max-w-[700px] mx-auto font-bold leading-tight">
+            <p className="text-base md:text-xl text-white/80 mb-12 max-w-[620px] mx-auto font-semibold leading-snug">
               Join our community of 100+ volunteers and donors. Together, we
               can reach more people and transform more lives.
             </p>
@@ -211,18 +244,15 @@ const Missions = () => {
                   window.fbq?.('track', 'Lead', { content_name: 'Mission Page Bottom CTA' });
                   safeLocationRedirect("/volunteer-login");
                 }}
-                className="w-full sm:w-auto bg-secondary text-white px-12 py-6 rounded-2xl text-lg font-black uppercase tracking-tight hover:bg-black transition-all flex items-center justify-center gap-3 group"
+                className="w-full sm:w-auto bg-secondary text-white px-10 py-4 rounded-2xl text-base font-black uppercase tracking-tight flex items-center justify-center gap-3"
               >
                 Join the Mission{" "}
-                <ArrowRight
-                  size={24}
-                  className="group-hover:translate-x-2 transition-transform"
-                />
+                <ArrowRight size={24} />
               </button>
                <a
                 href="/contact"
                 onClick={() => window.fbq?.('track', 'Contact', { content_name: 'Mission Page Contact Link' })}
-                className="w-full sm:w-auto bg-transparent border-2 border-white/30 text-white px-12 py-6 rounded-2xl text-lg font-black uppercase tracking-tight hover:bg-white/10 transition-all flex items-center justify-center gap-3 group"
+                className="w-full sm:w-auto bg-transparent border-2 border-white/30 text-white px-10 py-4 rounded-2xl text-base font-black uppercase tracking-tight flex items-center justify-center gap-3"
               >
                 Contact Us
               </a>
@@ -230,6 +260,68 @@ const Missions = () => {
           </div>
         </div>
       </section>
+    </div>
+  );
+};
+
+const SubDivisionProjects = ({ group }) => {
+  if (!group?.projects?.length) return null;
+
+  return (
+    <div className="rounded-[28px] border border-secondary/10 bg-white p-5 md:p-6 shadow-sm">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <div
+            className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] ${group.badgeClassName}`}
+          >
+            <Sparkles size={12} />
+            {group.eyebrow}
+          </div>
+          <h3 className="mt-3 text-xl md:text-[1.7rem] font-black text-secondary tracking-tight leading-tight">
+            {group.title}
+          </h3>
+        </div>
+        <p className="text-sm md:text-[15px] font-medium text-muted-foreground max-w-lg leading-snug">
+          Each project below is linked to its own detailed mission page.
+        </p>
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {group.projects.map((project) => (
+          <button
+            key={project.id}
+            type="button"
+            onClick={() => safeLocationRedirect(`/missions/${project.id}`)}
+            className={`rounded-[22px] border p-4 md:p-5 text-left ${group.cardClassName}`}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm"
+                style={{ color: project.theme?.color }}
+              >
+                {project.icon ? <project.icon size={22} /> : <Sparkles size={22} />}
+              </div>
+              <span className="rounded-full bg-white px-3 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-secondary/60">
+                {project.subtitle}
+              </span>
+            </div>
+
+            <h4 className="mt-4 text-lg md:text-xl font-black text-secondary leading-snug tracking-tight">
+              {project.title}
+            </h4>
+            <p className="mt-2.5 text-[14px] leading-6 text-secondary/70 font-medium">
+              {project.description}
+            </p>
+
+            <div
+              className={`mt-4 inline-flex items-center gap-2 text-[12px] font-black uppercase tracking-[0.14em] ${group.linkClassName}`}
+            >
+              Explore project
+              <ArrowRight size={16} />
+            </div>
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
@@ -256,11 +348,11 @@ const StatCard = ({ end, suffix = "", label, icon }) => {
   }, [end]);
 
   return (
-    <div className="flex flex-col items-center md:items-start group">
-      <div className="w-14 h-14 rounded-2xl bg-primary/5 text-primary flex items-center justify-center mb-6 transition-all group-hover:bg-primary group-hover:text-white group-hover:scale-110 shadow-sm">
+    <div className="flex flex-col items-center md:items-start">
+      <div className="w-12 h-12 rounded-2xl bg-primary/5 text-primary flex items-center justify-center mb-4 shadow-sm">
         {icon}
       </div>
-      <h3 className="text-5xl md:text-6xl font-black text-secondary leading-none mb-2 tracking-tighter">
+      <h3 className="text-3xl md:text-4xl font-black text-secondary leading-none mb-2 tracking-tighter">
         {count.toLocaleString()}
         {suffix}
       </h3>

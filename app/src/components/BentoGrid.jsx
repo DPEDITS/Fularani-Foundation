@@ -42,7 +42,7 @@ const BentoGrid = () => {
             <div className="inline-block bg-primary px-4 py-1 rounded-sm text-[12px] font-black uppercase tracking-[0.2em] text-white mb-6">
               Empowerment in Action
             </div>
-            <h2 className="text-6xl md:text-8xl font-black text-secondary tracking-tighter leading-[0.85] lowercase">
+            <h2 className="text-6xl md:text-8xl lg:text-7xl font-black text-secondary tracking-tighter leading-[0.85] lowercase">
               our core <br />
               <span className="text-secondary bg-accent px-4 py-1 inline-block -rotate-1 mt-4">
                 missions.

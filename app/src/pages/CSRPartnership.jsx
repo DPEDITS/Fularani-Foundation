@@ -151,7 +151,7 @@ const CSRPartnership = () => {
             <div className="inline-block bg-accent px-3 md:px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-4 md:mb-6">
               Partnership for Growth
             </div>
-            <h1 className="text-5xl md:text-8xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-6 md:mb-10 lowercase">
+            <h1 className="text-5xl md:text-8xl lg:text-[90px] font-black text-secondary leading-[0.9] tracking-tighter mb-6 md:mb-10 lowercase">
               Partner for <br />
               <span className="text-white bg-primary px-4 md:px-6 py-1 md:py-2 inline-block -rotate-1 mt-2">
                 impactful change.

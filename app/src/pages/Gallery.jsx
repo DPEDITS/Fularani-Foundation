@@ -36,6 +36,17 @@ const itemVariants = {
   },
 };
 
+const mosaicLayouts = [
+  "md:col-span-2 xl:col-span-7 md:row-span-3 xl:row-span-4",
+  "md:col-span-1 xl:col-span-5 md:row-span-2 xl:row-span-2",
+  "md:col-span-1 xl:col-span-5 md:row-span-2 xl:row-span-2",
+  "md:col-span-1 xl:col-span-4 md:row-span-2 xl:row-span-3",
+  "md:col-span-1 xl:col-span-4 md:row-span-2 xl:row-span-3",
+  "md:col-span-2 xl:col-span-4 md:row-span-2 xl:row-span-3",
+];
+
+const getMosaicLayout = (index) => mosaicLayouts[index % mosaicLayouts.length];
+
 const Gallery = () => {
   const donor = getDonorUser();
   const volunteer = getVolunteerUser();
@@ -273,6 +284,9 @@ const Gallery = () => {
     return result;
   }, [items, activeCategory, selectedTitles]);
 
+  const featuredItems = filteredItems.slice(0, 3);
+  const mosaicItems = filteredItems.slice(3);
+
   return (
     <div className="min-h-screen bg-white text-secondary overflow-x-hidden">
       <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2 z-0 hidden lg:block"></div>
@@ -288,7 +302,7 @@ const Gallery = () => {
             <div className="inline-block bg-accent px-4 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-6">
               Visual Chronicles
             </div>
-            <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-10 lowercase">
+            <h1 className="text-6xl md:text-8xl lg:text-[90px] font-black text-secondary leading-[0.9] tracking-tighter mb-10 lowercase">
               Moments of <br />
               <span className="text-white bg-primary px-6 py-2 inline-block -rotate-1 mt-2">
                 hope & impact.
@@ -438,7 +452,7 @@ const Gallery = () => {
         </div>
       </div>
 
-      <main className="max-w-[1200px] mx-auto py-24 px-6 relative z-10">
+      <main className="max-w-[1200px] mx-auto py-20 px-6 relative z-10">
         <AnimatePresence>
           {loading ? (
             <Motion.div
@@ -460,54 +474,160 @@ const Gallery = () => {
               initial="hidden"
               animate="show"
               exit={{ opacity: 0, transition: { duration: 0.2 } }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              className="space-y-10"
             >
-              {filteredItems.map((item) => (
-                <Motion.div
-                  key={item.id}
-                  variants={itemVariants}
-                  layout
-                  className="group relative bg-muted/20 rounded-[40px] overflow-hidden aspect-[4/5] cursor-pointer"
-                  onClick={() => setSelectedImage(item)}
-                >
-                  <LazyImage
-                    src={item.src}
-                    alt={item.title}
-                    imgClassName="transition-transform duration-1000"
-                    className="absolute inset-0 w-full h-full"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/10 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
-                  <div className="absolute inset-0 p-10 flex flex-col justify-end text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                    <span className="inline-block px-3 py-1 bg-primary text-white rounded-lg text-[10px] font-black uppercase tracking-widest mb-4 w-fit">
-                      {item.category}
-                    </span>
-                    <h3 className="text-3xl font-black leading-[0.9] tracking-tighter mb-6 lowercase">
-                      {item.title}
-                    </h3>
-                    <div className="flex items-center justify-end opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
-                      {isAuthorizedUser && (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEdit(item);
-                            }}
-                            className="p-3 rounded-xl bg-white/10 hover:bg-accent hover:text-secondary transition-all"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          <button
-                            onClick={(e) => handleDelete(e, item.id)}
-                            className="p-3 rounded-xl bg-white/10 hover:bg-red-500 transition-all"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+              {featuredItems.length > 0 && (
+                <section className="grid grid-cols-1 xl:grid-cols-[1.45fr_0.85fr] gap-5">
+                  {featuredItems[0] && (
+                    <Motion.div
+                      variants={itemVariants}
+                      layout
+                      onClick={() => setSelectedImage(featuredItems[0])}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setSelectedImage(featuredItems[0]);
+                        }
+                      }}
+                      className="relative min-h-[420px] md:min-h-[520px] rounded-[36px] overflow-hidden text-left bg-secondary cursor-pointer"
+                    >
+                      <LazyImage
+                        src={featuredItems[0].src}
+                        alt={featuredItems[0].title}
+                        className="absolute inset-0 w-full h-full"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                      <div className="absolute inset-x-0 bottom-0 p-6 md:p-8 text-white">
+                        <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-md px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
+                          {featuredItems[0].category}
+                        </span>
+                        <h2 className="text-3xl md:text-5xl font-black leading-[0.92] tracking-tight lowercase max-w-2xl">
+                          {featuredItems[0].title}
+                        </h2>
+                        {featuredItems[0].description && (
+                          <p className="mt-3 max-w-xl text-sm md:text-base text-white/80 font-medium leading-relaxed">
+                            {featuredItems[0].description}
+                          </p>
+                        )}
+                      </div>
+                    </Motion.div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-5">
+                    {featuredItems.slice(1, 3).map((item) => (
+                      <Motion.div
+                        key={item.id}
+                        variants={itemVariants}
+                        layout
+                        onClick={() => setSelectedImage(item)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setSelectedImage(item);
+                          }
+                        }}
+                        className="relative min-h-[250px] rounded-[30px] overflow-hidden text-left bg-secondary cursor-pointer"
+                      >
+                        <LazyImage
+                          src={item.src}
+                          alt={item.title}
+                          className="absolute inset-0 w-full h-full"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 p-5 md:p-6 text-white">
+                          <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-md px-3 py-1 text-[9px] font-black uppercase tracking-[0.18em] mb-3">
+                            {item.category}
+                          </span>
+                          <h3 className="text-xl md:text-2xl font-black leading-tight tracking-tight lowercase">
+                            {item.title}
+                          </h3>
                         </div>
-                      )}
-                    </div>
+                      </Motion.div>
+                    ))}
                   </div>
-                </Motion.div>
-              ))}
+                </section>
+              )}
+
+              {mosaicItems.length > 0 && (
+                <section className="space-y-5">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary/40">
+                        Visual Archive
+                      </p>
+                      <h2 className="mt-2 text-2xl md:text-3xl font-black tracking-tight text-secondary lowercase">
+                        A more curated view of our gallery
+                      </h2>
+                    </div>
+                    <p className="hidden md:block max-w-sm text-sm text-muted-foreground font-medium leading-relaxed text-right">
+                      Larger frames highlight key moments while smaller panels support the story around them.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 auto-rows-[150px] md:auto-rows-[160px] gap-5">
+                    {mosaicItems.map((item, index) => (
+                      <Motion.div
+                        key={item.id}
+                        variants={itemVariants}
+                        layout
+                        onClick={() => setSelectedImage(item)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setSelectedImage(item);
+                          }
+                        }}
+                        className={`relative overflow-hidden rounded-[30px] border border-secondary/10 bg-white text-left cursor-pointer ${getMosaicLayout(index)}`}
+                      >
+                        <LazyImage
+                          src={item.src}
+                          alt={item.title}
+                          className="absolute inset-0 w-full h-full"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 via-secondary/25 to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 p-5 md:p-6 text-white">
+                          <div className="flex items-end justify-between gap-4">
+                            <div>
+                              <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-md px-3 py-1 text-[9px] font-black uppercase tracking-[0.18em] mb-3">
+                                {item.category}
+                              </span>
+                              <h3 className="text-lg md:text-2xl font-black leading-[0.95] tracking-tight lowercase max-w-[18rem]">
+                                {item.title}
+                              </h3>
+                            </div>
+
+                            {isAuthorizedUser && (
+                              <div className="flex gap-2 shrink-0">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEdit(item);
+                                  }}
+                                  className="p-2.5 rounded-xl bg-white/12 backdrop-blur-md text-white"
+                                >
+                                  <Edit2 size={15} />
+                                </button>
+                                <button
+                                  onClick={(e) => handleDelete(e, item.id)}
+                                  className="p-2.5 rounded-xl bg-white/12 backdrop-blur-md text-white"
+                                >
+                                  <Trash2 size={15} />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </Motion.div>
+                    ))}
+                  </div>
+                </section>
+              )}
             </Motion.div>
           )}
         </AnimatePresence>
