@@ -10,6 +10,7 @@ import Gallery from "./pages/Gallery";
 import DonorLogin from "./pages/DonorLogin";
 import DonorRegister from "./pages/DonorRegister";
 import DonorDashboard from "./pages/DonorDashboard";
+import AnonymousDonate from "./pages/AnonymousDonate";
 import Contact from "./pages/Contact";
 import VolunteerLogin from "./pages/VolunteerLogin";
 import VolunteerRegister from "./pages/VolunteerRegister";
@@ -31,6 +32,7 @@ const App = () => {
   const hideFooterRoutes = [
     "/donor-login",
     "/donor-register",
+    "/anonymous-donate",
     "/volunteer-login",
     "/volunteer-register",
     "/reset-password"
@@ -65,6 +67,7 @@ const App = () => {
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/donor-login" element={<DonorLogin />} />
           <Route path="/donor-register" element={<DonorRegister />} />
+          <Route path="/anonymous-donate" element={<AnonymousDonate />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/volunteer-login" element={<VolunteerLogin />} />
           <Route path="/volunteer-register" element={<VolunteerRegister />} />

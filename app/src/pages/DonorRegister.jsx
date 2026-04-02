@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link, useLocation } from "react-router-dom";
 import { safeNavigate } from "../utils/safeNavigate";
 import { motion as Motion, AnimatePresence } from "motion/react";
 import {
@@ -37,14 +37,12 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
 
 const DonorRegister = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
-  const [role, setRole] = useState(() => {
-    const roleParam = searchParams.get("role");
-    if (roleParam) return roleParam;
-    return window.location.pathname.includes("volunteer")
+  const role =
+    searchParams.get("role") === "volunteer" || location.pathname.includes("volunteer")
       ? "volunteer"
       : "donor";
-  });
 
   const [form, setForm] = useState({
     username: "",
@@ -116,18 +114,10 @@ const DonorRegister = () => {
 
   const totalSteps = role === "donor" ? 2 : 4;
 
-  // Sync role state with URL parameters
   useEffect(() => {
-    const roleParam = searchParams.get("role");
-    const isVolunteerPath = window.location.pathname.includes("volunteer");
-    const newRole = (roleParam === "volunteer" || isVolunteerPath) ? "volunteer" : "donor";
-
-    if (newRole !== role) {
-      setRole(newRole);
-      setCurrentStep(1);
-      setError("");
-    }
-  }, [searchParams, role]);
+    setCurrentStep(1);
+    setError("");
+  }, [role]);
 
   useEffect(() => {
     if (role === "donor" && isAuthenticated()) {
@@ -556,6 +546,8 @@ const DonorRegister = () => {
     setError(errorMsg || "Google sign-up failed");
   };
 
+  const isCompactDonorStep = role === "donor" && currentStep === 1;
+
   if (success) {
     return (
       <div className="bg-white min-h-screen flex items-center justify-center p-4">
@@ -579,13 +571,13 @@ const DonorRegister = () => {
   }
 
   return (
-    <div className="bg-[#f8fafc] min-h-screen flex flex-col overflow-hidden relative font-sans selection:bg-primary/20">
+    <div className="bg-[#f8fafc] h-screen flex flex-col overflow-hidden relative font-sans selection:bg-primary/20">
       {/* Abstract Background Orbs */}
       <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] z-0 animate-pulse"></div>
       <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px] z-0"></div>
 
-      <div className="flex-grow flex items-center justify-center p-6 relative z-10 py-16">
-        <div className="w-full max-w-[1100px] grid lg:grid-cols-2 gap-16 items-center">
+      <div className="flex-grow min-h-0 flex items-center justify-center px-4 pt-20 pb-4 md:px-6 md:pt-24 md:pb-6 relative z-10 overflow-hidden">
+        <div className="w-full max-w-[1040px] grid lg:grid-cols-2 gap-10 items-center h-full min-h-0 overflow-hidden">
           {/* Left Side: Dynamic Branding & Progress */}
           <Motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -696,37 +688,35 @@ const DonorRegister = () => {
           <Motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 relative overflow-hidden w-full max-w-[480px] mx-auto lg:mr-0 lg:ml-auto"
+            className={`bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 relative overflow-hidden overflow-y-auto no-scrollbar w-full mx-auto lg:mr-0 lg:ml-auto max-h-[calc(100vh-7rem)] ${isCompactDonorStep ? "max-w-[520px] p-5 md:p-6" : "max-w-[480px] p-6 md:p-8"}`}
           >
             {/* Soft background glow for the card */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
             {/* Role Switcher */}
-            <div className="relative flex items-center bg-slate-50 p-1 rounded-xl mb-6 border border-slate-100/50">
+            <div className={`relative flex items-center bg-slate-50 p-1 rounded-xl border border-slate-100/50 ${isCompactDonorStep ? "mb-4" : "mb-6"}`}>
               <div
                 className={`absolute h-[calc(100%-8px)] w-[calc(50%-4px)] bg-primary rounded-[10px] shadow-md shadow-primary/20 transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) ${role === "volunteer" ? "translate-x-[calc(100%+8px)]" : ""}`}
               />
               <button
                 type="button"
                 onClick={() => {
-                  setRole("donor");
                   safeNavigate(navigate, "/donor-register");
                   setCurrentStep(1);
                   setError("");
                 }}
-                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "donor" ? "text-white" : "text-secondary/40"}`}
+                className={`flex-1 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${isCompactDonorStep ? "py-2.5" : "py-3"} ${role === "donor" ? "text-white" : "text-secondary/40"}`}
               >
                 Donor
               </button>
               <button
                 type="button"
                 onClick={() => {
-                  setRole("volunteer");
                   safeNavigate(navigate, "/donor-register?role=volunteer");
                   setCurrentStep(1);
                   setError("");
                 }}
-                className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${role === "volunteer" ? "text-white" : "text-secondary/40"}`}
+                className={`flex-1 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl relative z-10 transition-colors ${isCompactDonorStep ? "py-2.5" : "py-3"} ${role === "volunteer" ? "text-white" : "text-secondary/40"}`}
               >
                 Volunteer
               </button>
@@ -736,7 +726,7 @@ const DonorRegister = () => {
               <Motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-red-50 border-2 border-red-200 rounded-2xl"
+                className={`bg-red-50 border-2 border-red-200 rounded-2xl ${isCompactDonorStep ? "p-3" : "p-4"}`}
               >
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white flex-shrink-0 mt-0.6">
@@ -758,7 +748,7 @@ const DonorRegister = () => {
                   handleSubmit(e);
                 }
               }}
-              className="space-y-5"
+              className={isCompactDonorStep ? "space-y-4" : "space-y-5"}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -775,12 +765,12 @@ const DonorRegister = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="space-y-4"
+                    className="space-y-3"
                   >
                     {/* Google Sign-Up Button */}
-                    <div className="mb-0 min-h-[44px]">
+                    <div className="mb-0 min-h-[40px]">
                       {googleLoading ? (
-                        <div className="w-full h-12 flex items-center justify-center bg-muted/20 rounded-2xl">
+                        <div className="w-full h-11 flex items-center justify-center bg-muted/20 rounded-2xl">
                           <Loader2 className="w-5 h-5 animate-spin text-primary" />
                           <span className="ml-2 text-xs font-bold text-secondary/60 uppercase tracking-wider">Signing up with Google...</span>
                         </div>
@@ -795,7 +785,7 @@ const DonorRegister = () => {
                     </div>
 
                     {/* Divider */}
-                    <div className="flex items-center gap-4 py-1">
+                    <div className="flex items-center gap-3 py-0.5">
                       <div className="flex-1 h-[1px] bg-secondary/10"></div>
                       <span className="text-[10px] font-bold text-secondary/30 uppercase tracking-[0.2em]">or</span>
                       <div className="flex-1 h-[1px] bg-secondary/10"></div>
@@ -804,6 +794,7 @@ const DonorRegister = () => {
                     <Field
                       label="Username (Name on PAN)"
                       icon={<User size={18} />}
+                      compact={isCompactDonorStep}
                       name="username"
                       value={form.username}
                       onChange={handleChange}
@@ -814,6 +805,7 @@ const DonorRegister = () => {
                     <Field
                       label="Email"
                       icon={<Mail size={18} />}
+                      compact={isCompactDonorStep}
                       name="email"
                       type="email"
                       value={form.email}
@@ -822,10 +814,11 @@ const DonorRegister = () => {
                       isValid={getFieldValidation("email", form.email)}
                       placeholder="you@example.com"
                     />
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <Field
                         label="Password"
                         icon={<Lock size={18} />}
+                        compact={isCompactDonorStep}
                         name="password"
                         type={showPassword ? "text" : "password"}
                         value={form.password}
@@ -839,6 +832,7 @@ const DonorRegister = () => {
                       <Field
                         label="Confirm"
                         icon={<Lock size={18} />}
+                        compact={isCompactDonorStep}
                         type={showConfirmPassword ? "text" : "password"}
                         name="confirmPassword"
                         value={form.confirmPassword}
@@ -1274,12 +1268,12 @@ const DonorRegister = () => {
                 )}
               </AnimatePresence>
 
-              <div className="flex gap-4 pt-4">
+              <div className={`flex gap-3 ${isCompactDonorStep ? "pt-2" : "pt-4"}`}>
                 {currentStep > 1 && !isGooglePanMode && (
                   <button
                     type="button"
                     onClick={prevStep}
-                    className="flex-1 h-14 bg-slate-50 text-secondary border border-slate-100 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all"
+                    className={`flex-1 bg-slate-50 text-secondary border border-slate-100 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all ${isCompactDonorStep ? "h-12" : "h-14"}`}
                   >
                     Back
                   </button>
@@ -1288,7 +1282,7 @@ const DonorRegister = () => {
                   <button
                     type="button"
                     onClick={nextStep}
-                    className="flex-[2] h-14 bg-primary text-white rounded-2xl font-bold text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:opacity-90 transition-all active:scale-[0.98]"
+                    className={`flex-[2] bg-primary text-white rounded-2xl font-bold text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:opacity-90 transition-all active:scale-[0.98] ${isCompactDonorStep ? "h-12" : "h-14"}`}
                   >
                     Next <ArrowRight size={18} />
                   </button>
@@ -1296,7 +1290,7 @@ const DonorRegister = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-[2] h-14 bg-accent text-secondary rounded-2xl font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-xl shadow-accent/20 active:scale-95 disabled:opacity-50"
+                    className={`flex-[2] bg-accent text-secondary rounded-2xl font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-xl shadow-accent/20 active:scale-95 disabled:opacity-50 ${isCompactDonorStep ? "h-12" : "h-14"}`}
                   >
                     {loading ? (
                       <Loader2 className="w-6 h-6 animate-spin" />
@@ -1310,7 +1304,16 @@ const DonorRegister = () => {
               </div>
             </form>
 
-            <div className="mt-8 text-center pt-2">
+            <div className={`text-center ${isCompactDonorStep ? "mt-5 pt-1" : "mt-8 pt-2"}`}>
+              {role === "donor" && (
+                <Link
+                  to="/anonymous-donate"
+                  className={`flex w-full items-center justify-center rounded-2xl border border-primary/15 bg-primary/5 px-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-primary transition-colors hover:bg-primary/10 ${isCompactDonorStep ? "mb-4 py-3" : "mb-5 py-4"}`}
+                >
+                  Direct Donate Without Login
+                </Link>
+              )}
+
               <p className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">
                 Already registered?{" "}
                 <Link
@@ -1332,30 +1335,30 @@ const DonorRegister = () => {
   );
 };
 
-const Field = ({ label, icon, toggleShow, isShowing, isValid, ...props }) => {
+const Field = ({ label, icon, toggleShow, isShowing, isValid, compact = false, ...props }) => {
   const getBorderColor = () => {
     if (isValid === null || isValid === undefined) return "border-transparent";
     return isValid ? "border-green-500" : "border-red-500";
   };
 
   return (
-    <div className="space-y-1.5">
-      <label className="text-[10px] font-bold text-secondary/40 uppercase tracking-[0.2em] ml-2">
+    <div className={compact ? "space-y-1" : "space-y-1.5"}>
+      <label className={`font-bold text-secondary/40 uppercase tracking-[0.2em] ml-2 ${compact ? "text-[9px]" : "text-[10px]"}`}>
         {label}
       </label>
       <div className="relative">
-        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary/20 flex items-center">
+        <div className={`absolute top-1/2 -translate-y-1/2 text-secondary/20 flex items-center ${compact ? "left-4" : "left-5"}`}>
           {icon}
         </div>
         <input
           {...props}
-          className={`w-full h-14 pl-14 ${toggleShow ? "pr-14" : "pr-5"} rounded-2xl bg-slate-50 border border-slate-100 ${getBorderColor()} outline-none font-semibold text-secondary text-base placeholder:text-slate-300 transition-all duration-300 focus:ring-2 focus:ring-primary/10`}
+          className={`w-full rounded-2xl bg-slate-50 border border-slate-100 ${getBorderColor()} outline-none font-semibold text-secondary placeholder:text-slate-300 transition-all duration-300 focus:ring-2 focus:ring-primary/10 ${compact ? "h-12 pl-12 text-[15px]" : "h-14 pl-14 text-base"} ${toggleShow ? (compact ? "pr-12" : "pr-14") : (compact ? "pr-4" : "pr-5")}`}
         />
         {toggleShow && (
           <button
             type="button"
             onClick={toggleShow}
-            className="absolute right-5 top-1/2 -translate-y-1/2 text-secondary/30 transition-colors hover:text-primary"
+            className={`absolute top-1/2 -translate-y-1/2 text-secondary/30 transition-colors hover:text-primary ${compact ? "right-4" : "right-5"}`}
           >
             {isShowing ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>

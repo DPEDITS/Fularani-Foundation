@@ -94,6 +94,8 @@ const MissionInfo = () => {
     subtitle,
     description,
     longDescription,
+    sections,
+    csrOpportunity,
     stats,
     theme,
     icon: Icon,
@@ -175,13 +177,53 @@ const MissionInfo = () => {
             <div>
               <div className="prose prose-lg prose-slate text-lg text-secondary/80 leading-relaxed font-medium">
                 <p>{longDescription}</p>
-                <p className="marginTop-6">
-                  We are committed to making a long-term difference. Your
-                  support enables us to expand our reach, improve our resources,
-                  and touch more lives. Join us in this journey of
-                  transformation.
-                </p>
               </div>
+
+              {Array.isArray(sections) && sections.length > 0 && (
+                <div className="mt-12 space-y-8">
+                  {sections.map((section) => (
+                    <div
+                      key={section.title}
+                      className="rounded-3xl bg-white p-8 shadow-sm border border-black/5"
+                    >
+                      <h3 className="text-2xl font-black text-secondary mb-4">
+                        {section.title}
+                      </h3>
+                      {section.body && (
+                        <p className="text-base md:text-lg text-secondary/80 leading-relaxed font-medium">
+                          {section.body}
+                        </p>
+                      )}
+                      {Array.isArray(section.items) && section.items.length > 0 && (
+                        <ul className="mt-5 space-y-3">
+                          {section.items.map((item) => (
+                            <li
+                              key={item}
+                              className="flex items-start gap-3 text-secondary/80 font-medium leading-relaxed"
+                            >
+                              <span
+                                className={`mt-2 h-2.5 w-2.5 rounded-full ${theme.bg}`}
+                              ></span>
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+
+                  {csrOpportunity && (
+                    <div className="rounded-3xl bg-secondary p-8 text-white shadow-xl">
+                      <h3 className="text-2xl font-black mb-4">
+                        CSR Opportunity
+                      </h3>
+                      <p className="text-base md:text-lg text-white/85 leading-relaxed font-medium">
+                        {csrOpportunity}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* GALLERY SECTION */}
               {/* Only show if we have images or are loading */}

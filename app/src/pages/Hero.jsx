@@ -52,7 +52,7 @@ const Hero = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-5xl md:text-7xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-3 lg:mb-8 ">
+            <h1 className="text-4xl md:text-7xl lg:text-[90px] font-black text-secondary leading-[0.9] tracking-tighter mb-3 lg:mb-8 ">
               Empowering Dreams <br />
               <span className="text-accent underline decoration-primary decoration-4 lg:decoration-8 underline-offset-4 lg:underline-offset-8">
                 inspiring
@@ -64,7 +64,7 @@ const Hero = () => {
             </h1>
 
             <p className="text-base md:text-xl text-muted-foreground max-w-xl mb-6 lg:mb-12 font-bold leading-tight">
-              A systemic approach to Education, Sustainability, and Healthcare
+              A systemic approach to Education, Healthcare, and Sustainability
               in India. Join the Fularani movement today.
             </p>
 

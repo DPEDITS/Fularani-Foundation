@@ -15,6 +15,7 @@ const ALLOWED_ROUTES = [
   "/gallery",
   "/donor-login",
   "/donor-register",
+  "/anonymous-donate",
   "/contact",
   "/volunteer-login",
   "/volunteer-register",

@@ -25,55 +25,65 @@ const Missions = () => {
       {/* PAGE HEADER */}
       <section className="pt-25 pb-20 px-6 relative z-10">
         <div className="max-w-[1200px] mx-auto">
-          <Motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center md:text-left mb-12"
-          >
-            <div className="inline-block bg-accent px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
-              Impact & Initiatives
-            </div>
-            <h1 className="text-6xl md:text-8xl lg:text-[100px] font-black text-secondary leading-[0.9] tracking-tighter mb-8 lowercase">
-              Changing lives, <br />
-              <span className="text-white bg-primary px-2 py-2 inline-block -rotate-1 mt-2">
-              Empowering change
-              <br /> 
-              on every front.
-              </span>
-            </h1>
-            <p className="text-md md:text-2xl text-muted-foreground leading-tight max-w-[800px] font-bold">
-              Fularani Foundation is committed to creating systemic social
-              impact through focused initiatives in healthcare, education,
-              environment.
-            </p>
-          </Motion.div>
+          <div className="grid gap-10 lg:grid-cols-[1.4fr_0.9fr] items-start">
+            <Motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center md:text-left mb-12"
+            >
+              <div className="inline-block bg-accent px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
+                Impact & Initiatives
+              </div>
+              <h1 className="text-6xl md:text-8xl lg:text-[90px] font-black text-secondary leading-[0.9] tracking-tighter mb-8 lowercase">
+                Changing lives, <br />
+                <span className="text-white bg-primary px-2 py-2 inline-block -rotate-1 mt-2">
+                  Empowering change
+                  <br />
+                  on every front.
+                </span>
+              </h1>
+              <p className="text-md md:text-2xl text-muted-foreground leading-tight max-w-[800px] font-bold">
+                Fularani Foundation is committed to creating systemic social
+                impact through focused initiatives in healthcare, education,
+                environment.
+              </p>
+            </Motion.div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <StatCard
-              end={500}
-              suffix="+"
-              label="Trees Planted"
-              icon={<Leaf size={24} />}
-            />
-            <StatCard
-              end={1200}
-              suffix="+"
-              label="Child Outreach"
-              icon={<Heart size={24} />}
-            />
-            <StatCard
-              end={10}
-              suffix="+"
-              label="Villages Served"
-              icon={<Globe size={24} />}
-            />
-            <StatCard
-              end={3}
-              suffix=""
-              label="Active Missions"
-              icon={<ShieldCheck size={24} />}
-            />
+            <div className="grid grid-cols-2 gap-4 lg:sticky lg:top-28">
+              <div className="rounded-[32px] border border-secondary/10 bg-white/90 p-4 shadow-xl backdrop-blur-sm">
+                <StatCard
+                  end={500}
+                  suffix="+"
+                  label="Trees Planted"
+                  icon={<Leaf size={20} />}
+                />
+              </div>
+              <div className="rounded-[32px] border border-secondary/10 bg-white/90 p-4 shadow-xl backdrop-blur-sm">
+                <StatCard
+                  end={1200}
+                  suffix="+"
+                  label="Child Outreach"
+                  icon={<Heart size={20} />}
+                />
+              </div>
+              <div className="rounded-[32px] border border-secondary/10 bg-white/90 p-4 shadow-xl backdrop-blur-sm">
+                <StatCard
+                  end={10}
+                  suffix="+"
+                  label="Villages Served"
+                  icon={<Globe size={20} />}
+                />
+              </div>
+              <div className="rounded-[32px] border border-secondary/10 bg-white/90 p-4 shadow-xl backdrop-blur-sm">
+                <StatCard
+                  end={3}
+                  suffix=""
+                  label="Active Missions"
+                  icon={<ShieldCheck size={20} />}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>

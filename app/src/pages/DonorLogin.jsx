@@ -206,12 +206,12 @@ const DonorLogin = () => {
   const isPasswordValid = form.password.length >= 6;
 
   return (
-    <div className="bg-white min-h-screen flex flex-col overflow-hidden relative">
+    <div className="bg-white h-screen flex flex-col overflow-hidden relative">
       <div className="absolute top-0 right-0 w-1/4 h-full bg-primary/5 -skew-x-12 translate-x-1/2 z-0"></div>
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-[100px] -translate-x-1/4"></div>
 
-      <div className="flex-grow flex items-center justify-center p-6 relative z-10 pt-12 pb-12">
-        <div className="w-full max-w-[1100px] grid lg:grid-cols-2 gap-16 items-center">
+      <div className="flex-grow min-h-0 flex items-center justify-center p-6 relative z-10 pt-12 pb-12 overflow-hidden">
+        <div className="w-full max-w-[1100px] grid lg:grid-cols-2 gap-16 items-center h-full min-h-0 overflow-hidden">
           {/* Left Side: Branding */}
           <Motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -252,7 +252,7 @@ const DonorLogin = () => {
           <Motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white p-8 md:p-10 rounded-[48px] shadow-2xl border border-secondary/5 relative overflow-hidden max-w-[500px] mx-auto lg:mr-0 lg:ml-auto"
+            className="bg-white p-8 md:p-10 rounded-[48px] shadow-2xl border border-secondary/5 relative overflow-hidden overflow-y-auto no-scrollbar max-h-[calc(100vh-6rem)] max-w-[500px] mx-auto lg:mr-0 lg:ml-auto"
           >
             {/* Role Switcher */}
             <div className="relative flex items-center bg-muted/20 p-1.5 rounded-2xl mb-8">
@@ -385,6 +385,15 @@ const DonorLogin = () => {
                   </>
                 )}
               </button>
+
+              {role === "donor" && (
+                <Link
+                  to="/anonymous-donate"
+                  className="flex w-full items-center justify-center rounded-2xl border border-primary/15 bg-primary/5 px-6 py-4 text-center text-[11px] font-black uppercase tracking-[0.2em] text-primary transition-colors hover:bg-primary/10"
+                >
+                  Direct Donate Without Login
+                </Link>
+              )}
 
               <div className="mt-8 text-center pt-2">
                 <p className="text-[11px] font-black text-secondary/40 uppercase tracking-[0.2em]">
