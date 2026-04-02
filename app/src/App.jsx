@@ -26,6 +26,7 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import Transparency from "./pages/Transparency";
 import SEO from "./components/SEO";
 import OurTeam from "./pages/OurTeam";
+import FloatingSocials from "./components/FloatingSocials";
 
 const App = () => {
   const location = useLocation();
@@ -56,6 +57,7 @@ const App = () => {
       <SEO />
       <Navbar />
       <ScrollToTop />
+      <FloatingSocials />
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />

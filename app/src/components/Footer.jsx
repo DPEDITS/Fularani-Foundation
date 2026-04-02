@@ -44,13 +44,13 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#0A0A0B] text-white pt-6 md:pt-20 pb-4 md:pb-10 relative overflow-hidden">
+    <footer className="bg-[#0A0A0B] text-white pt-6 md:pt-10 pb-4 md:pb-10 relative overflow-hidden">
       {/* Decorative Gradient Background */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-accent/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
 
       <div className="max-w-[1440px] mx-auto px-6 md:px-10 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mb-6 md:mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mb-2 md:mb-4">
           {/* Brand Section */}
           <div className="lg:col-span-4 space-y-3 lg:space-y-8">
             <Link to="/" className="inline-block bg-white p-3 md:p-4 rounded-3xl group transition-all hover:scale-105">
@@ -81,58 +81,64 @@ const Footer = () => {
             </motion.div>
           </div>
 
-          {/* Links Sections */}
-          <div className="lg:col-span-5 grid grid-cols-1 md:grid-cols-3 gap-1 md:gap-8">
-            <FooterList title="Our Missions" links={footerLinks.missions} />
-            <FooterList title="Company" links={footerLinks.company} />
-            <FooterList title="Transparency" links={footerLinks.legal} />
-          </div>
+          {/* Right Side Sections Wrapper */}
+          <div className="lg:col-span-8 flex flex-col justify-between">
+            <div className="grid grid-cols-1 lg:grid-cols-8 gap-6 lg:gap-8 flex-1">
+              {/* Links Sections */}
+              <div className="lg:col-span-5 grid grid-cols-1 md:grid-cols-3 gap-1 md:gap-8">
+                <FooterList title="Our Missions" links={footerLinks.missions} />
+                <FooterList title="Company" links={footerLinks.company} />
+                <FooterList title="Transparency" links={footerLinks.legal} />
+              </div>
 
-          {/* Newsletter Section */}
-          <div className="lg:col-span-3 space-y-2 md:space-y-6">
-            <h3 className="text-xs md:text-sm font-black text-primary uppercase tracking-[0.2em]">Stay Updated</h3>
-            <p className="hidden md:block text-gray-400 text-sm font-medium">
-              Join our newsletter to receive updates on our impact and missions.
-            </p>
-            <div className="relative group overflow-hidden rounded-2xl">
-              <input 
-                type="email" 
-                placeholder="Email address" 
-                className="w-full bg-white/5 border border-white/10 rounded-xl md:rounded-2xl py-3 md:py-4 px-4 md:px-6 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-gray-600"
+              {/* Newsletter Section */}
+              <div className="lg:col-span-3 space-y-2 md:space-y-6">
+                <h3 className="text-xs md:text-sm font-black text-primary uppercase tracking-[0.2em]">Stay Updated</h3>
+                <p className="hidden md:block text-gray-400 text-sm font-medium">
+                  Join our newsletter to receive updates on our impact and missions.
+                </p>
+                <div className="relative group overflow-hidden rounded-2xl">
+                  <input 
+                    type="email" 
+                    placeholder="Email address" 
+                    className="w-full bg-white/5 border border-white/10 rounded-xl md:rounded-2xl py-3 md:py-4 px-4 md:px-6 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-gray-600"
+                  />
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="absolute right-1.5 top-1.5 bottom-1.5 md:right-2 md:top-2 md:bottom-2 bg-primary hover:bg-primary/90 text-white w-10 md:w-12 rounded-lg md:rounded-xl transition-all group-hover:shadow-lg group-hover:shadow-primary/20 flex items-center justify-center"
+                  >
+                    <Send className="w-4 h-4 md:w-[18px] md:h-[18px]" />
+                  </motion.button>
+                </div>
+              </div>
+            </div>
+
+            {/* Status Badges */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mt-8 md:mt-12 pt-4 md:pt-6 border-t border-white/5">
+              <Badge 
+                icon={<ShieldCheck className="text-primary" size={24} />} 
+                title="Verified NGO" 
+                desc="Registered Section 8" 
               />
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="absolute right-1.5 top-1.5 bottom-1.5 md:right-2 md:top-2 md:bottom-2 bg-primary hover:bg-primary/90 text-white w-10 md:w-12 rounded-lg md:rounded-xl transition-all group-hover:shadow-lg group-hover:shadow-primary/20 flex items-center justify-center"
-              >
-                <Send className="w-4 h-4 md:w-[18px] md:h-[18px]" />
-              </motion.button>
+              <Badge 
+                icon={<Award className="text-primary" size={24} />} 
+                title="Tax Benefits" 
+                desc="80G & 12A Certified" 
+              />
+              <Badge 
+                icon={<MapPin className="text-primary" size={24} />} 
+                title="Local Roots" 
+                desc="Active in 20+ Districts" 
+              />
+              <Badge 
+                icon={<Heart className="text-primary" size={24} />} 
+                title="Grassroots" 
+                desc="100% Community Led" 
+              />
             </div>
           </div>
-        </div>
-
-        {/* Status Badges */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 py-4 md:py-10 border-y border-white/5 mb-4 md:mb-10">
-          <Badge 
-            icon={<ShieldCheck className="text-primary" size={24} />} 
-            title="Verified NGO" 
-            desc="Registered Section 8" 
-          />
-          <Badge 
-            icon={<Award className="text-primary" size={24} />} 
-            title="Tax Benefits" 
-            desc="80G & 12A Certified" 
-          />
-          <Badge 
-            icon={<MapPin className="text-primary" size={24} />} 
-            title="Local Roots" 
-            desc="Active in 20+ Districts" 
-          />
-          <Badge 
-            icon={<Heart className="text-primary" size={24} />} 
-            title="Grassroots" 
-            desc="100% Community Led" 
-          />
+          
         </div>
 
         {/* Bottom Bar */}

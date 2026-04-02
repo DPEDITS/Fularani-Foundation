@@ -160,8 +160,8 @@ const Navbar = () => {
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 border-b ${scrolled
-            ? "bg-white/95 backdrop-blur-md border-secondary/10 shadow-sm py-2"
-            : "bg-white border-transparent py-3"
+            ? "bg-[#EAF4FC]/95 backdrop-blur-md border-secondary/10 shadow-sm py-2"
+            : "bg-[#EAF4FC] border-transparent py-3"
           }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between">
@@ -179,7 +179,9 @@ const Navbar = () => {
 
           {/* Desktop Nav Links */}
           <div className="hidden lg:flex items-center gap-8 ml-10">
-            {navItems.map((item) => (
+            {navItems.map((item) => {
+              const isActive = location.pathname.startsWith(item.link);
+              return (
               <div
                 key={item.name}
                 className="relative group py-2"
@@ -188,9 +190,12 @@ const Navbar = () => {
               >
                 <Link
                   to={item.link}
-                  className="flex items-center gap-1.5 text-[14px] font-bold text-secondary/70 hover:text-secondary group-hover:text-primary transition-colors uppercase tracking-tight"
+                  className={`flex items-center gap-1.5 text-[14px] font-bold uppercase tracking-tight transition-colors relative ${
+                    isActive ? "text-primary" : "text-secondary/70 hover:text-secondary group-hover:text-primary"
+                  }`}
                 >
                   {item.name}
+                  <div className={`absolute -bottom-1.5 left-0 right-0 h-[2px] bg-primary rounded-full transition-transform duration-300 origin-left ${isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`} />
                   {item.dropdown && (
                     <ChevronDown
                       size={14}
@@ -228,7 +233,8 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-            ))}
+              );
+            })}
             {userRole === "admin" &&
               ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"].includes(
                 currentUser?.email?.toLowerCase()
@@ -320,14 +326,21 @@ const Navbar = () => {
               className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-secondary/10 shadow-2xl py-4 px-5 overflow-y-auto max-h-[80vh]"
             >
               <div className="space-y-4">
-                {navItems.map((item) => (
+                {navItems.map((item) => {
+                  const isActive = location.pathname.startsWith(item.link);
+                  return (
                   <div key={item.name} className="space-y-2">
                     <Link
                       to={item.link}
-                      className="text-2xl font-black text-secondary block uppercase tracking-tight"
+                      className={`text-2xl font-black block uppercase tracking-tight transition-colors ${
+                        isActive ? "text-primary" : "text-secondary"
+                      }`}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      {item.name}
+                      <span className="relative inline-block">
+                        {item.name}
+                        <div className={`absolute -bottom-1 left-0 right-0 h-1 bg-primary rounded-full transition-transform origin-left ${isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`} />
+                      </span>
                     </Link>
                     {item.dropdown && (
                       <div className="grid grid-cols-1 gap-3 pl-4 border-l-2 border-primary/20">
@@ -349,7 +362,8 @@ const Navbar = () => {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
 
                 <div className="pt-6 border-t border-secondary/10 space-y-3">
                   {!isLoggedIn && (

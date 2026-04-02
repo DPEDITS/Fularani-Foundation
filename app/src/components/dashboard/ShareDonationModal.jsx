@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { X, Share2, Download, Copy, CheckCheck } from "lucide-react";
-import logoImg from "../../assets/logo.jpg";
+import logoImg from "../../assets/logo.png";
 
 const ShareDonationModal = ({
   show,

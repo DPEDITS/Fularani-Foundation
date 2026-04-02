@@ -1,4 +1,5 @@
 import Hero from "./Hero";
+import TrustStrip from "../components/TrustStrip";
 import BentoGrid from "../components/BentoGrid";
 import Stories from "../components/Stories";
 import CTASection from "../components/CTASection";
@@ -167,6 +168,7 @@ const Home = () => {
 
       <main>
         <Hero />
+        <TrustStrip />
 
         {/* ── OUR PROJECTS SO FAR ── */}
         <section className="py-20 md:py-32 px-6 bg-white border-y border-secondary/5 relative overflow-hidden">
