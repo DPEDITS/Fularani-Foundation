@@ -6,7 +6,7 @@ import gacchaChai1 from "../assets/storyImage/gaccha_chai_1.jpeg";
 import gacchaChai2 from "../assets/storyImage/gaccha_chai_2.jpeg";
 import openGym from "../assets/storyImage/open_gym.jpeg";
 import innovationHealthcare from "../assets/storyImage/innovation_healthcare_2.jpg";
-import bloodBankModernization from "../assets/storyImage/blood_bank.png";
+import bloodBankModernization from "../assets/storyImage/blood_bank.jpg";
 import prashantiSanskarImg from "../assets/storyImage/prashanti_sanskar.png";
 import innovationHealthcare2 from "../assets/storyImage/innovation_healthcare_2.jpg";
 

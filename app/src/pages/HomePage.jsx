@@ -3,6 +3,7 @@ import Hero from "./Hero";
 import TrustStrip from "../components/TrustStrip";
 import BentoGrid from "../components/BentoGrid";
 import Stories from "../components/Stories";
+import HomeGallery from "../components/HomeGallery";
 import CTASection from "../components/CTASection";
 import {
   Facebook,
@@ -322,6 +323,9 @@ const Home = () => {
 
         <div className="home-reveal-panel relative z-20 bg-white">
           <BentoGrid />
+        </div>
+        <div className="home-reveal-panel relative z-25 bg-white">
+          <HomeGallery />
         </div>
         <div className="home-reveal-panel relative z-30 bg-white">
           <Stories />

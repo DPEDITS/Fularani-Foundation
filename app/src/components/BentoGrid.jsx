@@ -10,7 +10,7 @@ import {
 import { motion as Motion } from "motion/react";
 import EducationImage from "../assets/Edu.jpeg";
 import greenImage from "../assets/GreenImage.jpg";
-import healthcareBg from "../assets/AI/healthcare_bg.png";
+// import healthcareBg from "../assets/AI/healthcare_bg.png";
 import thalassemiaBg from "../assets/AI/thalassemia_bg.png";
 
 const BentoGrid = () => {
@@ -140,7 +140,7 @@ const BentoGrid = () => {
           >
             <div
               className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110 opacity-20"
-              style={{ backgroundImage: `url(${healthcareBg})` }}
+              style={{ backgroundImage: `url(https://res.cloudinary.com/dnbgja6dx/image/upload/q_auto/f_auto/v1774408212/tjvyati7mgk5bh7hajbs.jpg)` }}
             ></div>
 
             <div className="absolute inset-0 flex flex-col justify-between p-6 md:p-8 z-20">
@@ -169,7 +169,7 @@ const BentoGrid = () => {
           >
             <div
               className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110 opacity-40 mix-blend-overlay"
-              style={{ backgroundImage: `url(${thalassemiaBg})` }}
+              style={{ backgroundImage: `url(https://res.cloudinary.com/dnbgja6dx/image/upload/q_auto/f_auto/v1774408179/udgchzguldmmitgw9dmu.jpg)` }}
             ></div>
 
             <div className="absolute inset-0 flex flex-col justify-between p-6 md:p-8 z-20">
