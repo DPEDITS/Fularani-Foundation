@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getSecureCloudinaryUrl } from "../utils/imageUtils";
 import { motion as Motion, AnimatePresence } from "motion/react";
 import { galleryItems } from "../data/galleryData";
+import LazyImage from "./LazyImage";
 
 const GalleryCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -29,10 +30,10 @@ const GalleryCarousel = () => {
           transition={{ duration: 0.8 }}
           className="absolute inset-0 w-full h-full"
         >
-          <img
-            src={getSecureCloudinaryUrl(currentItem.src)}
+          <LazyImage
+            src={currentItem.src}
             alt={currentItem.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full"
           />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 pt-24 text-white">
             <Motion.h3

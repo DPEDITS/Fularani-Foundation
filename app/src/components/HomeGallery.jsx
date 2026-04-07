@@ -2,27 +2,28 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Camera } from "lucide-react";
 import { motion as Motion } from "motion/react";
+import LazyImage from "./LazyImage";
 
 const galleryImages = [
   {
     id: 1,
-    src: "https://res.cloudinary.com/dnbgja6dx/image/upload/q_auto/f_auto/v1775551216/IMG_6745_uezv8s.jpg",
+    src: "https://res.cloudinary.com/dnbgja6dx/image/upload/w_600,q_auto,f_auto/v1775551216/IMG_6745_uezv8s.jpg",
   },
   {
     id: 2,
-    src: "https://res.cloudinary.com/dnbgja6dx/image/upload/q_auto/f_auto/v1775550639/IMG_9684_hxin4w.jpg",
+    src: "https://res.cloudinary.com/dnbgja6dx/image/upload/w_600,q_auto,f_auto/v1775550639/IMG_9684_hxin4w.jpg",
   },
   {
     id: 3,
-    src: "https://res.cloudinary.com/dnbgja6dx/image/upload/q_auto/f_auto/v1775550654/IMG_6946_dgq2yi.jpg",
+    src: "https://res.cloudinary.com/dnbgja6dx/image/upload/w_600,q_auto,f_auto/v1775550654/IMG_6946_dgq2yi.jpg",
   },
   {
     id: 4,
-    src: "https://res.cloudinary.com/dnbgja6dx/image/upload/q_auto/f_auto/v1775550511/e6eb7f79-ff70-49bb-ab38-895a382ac2b6_ftuh3y.jpg",
+    src: "https://res.cloudinary.com/dnbgja6dx/image/upload/w_600,q_auto,f_auto/v1775550511/e6eb7f79-ff70-49bb-ab38-895a382ac2b6_ftuh3y.jpg",
   },
   {
     id: 5,
-    src: "https://res.cloudinary.com/dnbgja6dx/image/upload/q_auto/f_auto/v1775550576/IMG_7576_sdv1zo.jpg",
+    src: "https://res.cloudinary.com/dnbgja6dx/image/upload/w_600,q_auto,f_auto/v1775550576/IMG_7576_sdv1zo.jpg",
   },
   // {
   //   id: 6,
@@ -100,17 +101,16 @@ const HomeGallery = () => {
           viewport={{ once: true }}
           className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5"
         >
-          {/* Image 1 - Wide */}
+          {/* Image 1 */}
           <Motion.div
             variants={imageVariants}
-            className="col-span-1 row-span-1 relative rounded-[20px] md:rounded-[28px] overflow-hidden shadow-lg"
+            className="col-span-1 relative rounded-[20px] md:rounded-[28px] overflow-hidden shadow-lg"
           >
             <div className="aspect-[4/3]">
-              <img
+              <LazyImage
                 src={galleryImages[0].src}
-                alt={galleryImages[0].alt}
-                className="w-full h-full object-cover"
-                loading="lazy"
+                alt={galleryImages[0].alt || "Gallery Image 1"}
+                className="w-full h-full"
               />
             </div>
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-4 md:p-5">
@@ -120,17 +120,16 @@ const HomeGallery = () => {
             </div>
           </Motion.div>
 
-          {/* Image 2 - Tall */}
+          {/* Image 2 - Tall on desktop */}
           <Motion.div
             variants={imageVariants}
-            className="col-span-1 row-span-2 relative rounded-[20px] md:rounded-[28px] overflow-hidden shadow-lg"
+            className="col-span-1 md:row-span-2 relative rounded-[20px] md:rounded-[28px] overflow-hidden shadow-lg"
           >
-            <div className="aspect-[3/4] md:h-full">
-              <img
+            <div className="aspect-[4/3] md:aspect-auto md:h-full">
+              <LazyImage
                 src={galleryImages[1].src}
-                alt={galleryImages[1].alt}
-                className="w-full h-full object-cover"
-                loading="lazy"
+                alt={galleryImages[1].alt || "Gallery Image 2"}
+                className="w-full h-full"
               />
             </div>
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-4 md:p-5">
@@ -140,17 +139,16 @@ const HomeGallery = () => {
             </div>
           </Motion.div>
 
-          {/* Image 3 */}
+          {/* Image 3 - Wide on mobile */}
           <Motion.div
             variants={imageVariants}
-            className="col-span-1 row-span-1 relative rounded-[20px] md:rounded-[28px] overflow-hidden shadow-lg"
+            className="col-span-2 md:col-span-1 relative rounded-[20px] md:rounded-[28px] overflow-hidden shadow-lg"
           >
-            <div className="aspect-[4/3]">
-              <img
+            <div className="aspect-[16/9] md:aspect-[4/3]">
+              <LazyImage
                 src={galleryImages[2].src}
-                alt={galleryImages[2].alt}
-                className="w-full h-full object-cover"
-                loading="lazy"
+                alt={galleryImages[2].alt || "Gallery Image 3"}
+                className="w-full h-full"
               />
             </div>
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-4 md:p-5">
@@ -160,17 +158,16 @@ const HomeGallery = () => {
             </div>
           </Motion.div>
 
-          {/* Image 4 - Square */}
+          {/* Image 4 */}
           <Motion.div
             variants={imageVariants}
-            className="col-span-1 row-span-1 relative rounded-[20px] md:rounded-[28px] overflow-hidden shadow-lg"
+            className="col-span-1 relative rounded-[20px] md:rounded-[28px] overflow-hidden shadow-lg"
           >
             <div className="aspect-[4/3]">
-              <img
+              <LazyImage
                 src={galleryImages[3].src}
-                alt={galleryImages[3].alt}
-                className="w-full h-full object-cover"
-                loading="lazy"
+                alt={galleryImages[3].alt || "Gallery Image 4"}
+                className="w-full h-full"
               />
             </div>
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-4 md:p-5">
@@ -183,14 +180,13 @@ const HomeGallery = () => {
           {/* Image 5 */}
           <Motion.div
             variants={imageVariants}
-            className="col-span-1 row-span-1 relative rounded-[20px] md:rounded-[28px] overflow-hidden shadow-lg"
+            className="col-span-1 relative rounded-[20px] md:rounded-[28px] overflow-hidden shadow-lg"
           >
             <div className="aspect-[4/3]">
-              <img
+              <LazyImage
                 src={galleryImages[4].src}
-                alt={galleryImages[4].alt}
-                className="w-full h-full object-cover"
-                loading="lazy"
+                alt={galleryImages[4].alt || "Gallery Image 5"}
+                className="w-full h-full"
               />
             </div>
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-4 md:p-5">
