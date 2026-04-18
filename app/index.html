@@ -95,12 +95,12 @@
       // Offline detection — redirect to cached offline page
       // 1. If already offline when page loads
       if (!navigator.onLine && !window.location.pathname.includes('offline')) {
-        window.location.href = '/offline.html';
+        window.location.href = '/offline.html?returnTo=' + encodeURIComponent(window.location.href);
       }
       // 2. If internet drops while user is browsing
       window.addEventListener('offline', () => {
         if (!window.location.pathname.includes('offline')) {
-          window.location.href = '/offline.html';
+          window.location.href = '/offline.html?returnTo=' + encodeURIComponent(window.location.href);
         }
       });
     </script>

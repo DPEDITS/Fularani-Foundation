@@ -598,7 +598,7 @@
 
 
     <div class="buttons-row">
-      <button class="retry-btn" id="retryBtn" onclick="window.location.reload()">
+      <button class="retry-btn" id="retryBtn" onclick="retryConnection()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="23 4 23 10 17 10"></polyline>
           <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
@@ -612,6 +612,17 @@
   <div class="footer-text">Fularani Foundation &bull; Empowering Communities</div>
 
   <script>
+    // Get the original page URL from the query parameter
+    function getReturnUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('returnTo') || '/';
+    }
+
+    function retryConnection() {
+      const returnUrl = getReturnUrl();
+      window.location.href = returnUrl;
+    }
+
     const leftPupil = document.getElementById('leftPupil');
     const rightPupil = document.getElementById('rightPupil');
     const leftEye = document.getElementById('leftEye');
@@ -831,7 +842,7 @@
       promptText.textContent = "CONNECTED!";
       promptText.setAttribute('fill', '#4caf50');
 
-      setTimeout(() => window.location.reload(), 1200);
+      setTimeout(() => retryConnection(), 1200);
     }
 
     // Tap reactions (on body only)
@@ -865,7 +876,7 @@
     for(let i=0; i<15; i++) setTimeout(createP, i*500);
     setInterval(createP, 2000);
 
-    window.addEventListener('online', () => window.location.reload());
+    window.addEventListener('online', () => retryConnection());
   </script>
 </body>
 </html>
