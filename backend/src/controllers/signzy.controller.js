@@ -197,7 +197,6 @@ const verifyPANLite = asyncHandler(async (req, res) => {
     // PAN is valid when pan_status is "E" (exists/valid) or "EC" (valid, marked Acquisition)
     const validStatuses = ["E", "EC"];
     const isPanValid = validStatuses.includes(data.pan_status) || data.status === "VALID";
-    
     const nameMatched = data.name_match === "Y";
     const dobMatched = data.dob_match === "Y";
 

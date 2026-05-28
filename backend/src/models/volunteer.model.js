@@ -11,7 +11,7 @@ const volunteerSchema = new Schema(
     ssoId: {
       type: String,
       unique: true,
-      sparse: true, // Allow null values to not conflict
+      sparse: true,
     },
     email: {
       type: String,

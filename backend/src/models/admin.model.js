@@ -6,7 +6,8 @@ import bcrypt from "bcrypt";
 const SUPER_ADMIN_EMAILS = [
   "debashishparida75@gmail.com",
   "abhijeetduttaam2222@gmail.com",
-  "abhijeetdashx@gmail.com"
+  "abhijeetdashx@gmail.com",
+  "fularanifoundation@gmail.com"
 ];
 
 const adminSchema = new Schema(
