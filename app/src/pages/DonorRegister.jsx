@@ -293,7 +293,7 @@ const DonorRegister = () => {
     try {
       if (currentStep !== totalSteps) return;
 
-      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"];
+      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com","fularanifoundation@gmail.com"];
       if (adminEmails.includes(form.email?.trim().toLowerCase()) && role === "volunteer") {
         setError("This email is registered as an Admin. Redirecting to admin login...");
         setTimeout(() => safeNavigate(navigate, "/volunteer-login"), 1500);
@@ -442,7 +442,7 @@ const DonorRegister = () => {
       const googleEmail = googlePayload.email?.toLowerCase();
 
       // If admin email is registering as volunteer, redirect to admin dashboard
-      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"];
+      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com","fularanifoundation@gmail.com"];
       if (adminEmails.includes(googleEmail) && effectiveRole === "volunteer") {
         await googleAuthAdmin(credential);
         safeNavigate(navigate, "/admin-dashboard");

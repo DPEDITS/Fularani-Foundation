@@ -56,6 +56,7 @@ const Gallery = () => {
     "debashishparida75@gmail.com",
     "abhijeetduttaam2222@gmail.com",
     "abhijeetdashx@gmail.com",
+    "fularanifoundation@gmail.com",
   ];
   const isAuthorizedUser = admin && adminEmails.includes(currentUser?.email);
 

@@ -236,7 +236,7 @@ const Navbar = () => {
               );
             })}
             {userRole === "admin" &&
-              ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"].includes(
+              ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com","fularanifoundation@gmail.com"].includes(
                 currentUser?.email?.toLowerCase()
               ) && (
                 <Link

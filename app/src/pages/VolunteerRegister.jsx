@@ -79,7 +79,7 @@ const VolunteerRegister = () => {
     setError("");
 
     try {
-      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com"];
+      const adminEmails = ["debashishparida75@gmail.com", "abhijeetduttaam2222@gmail.com", "abhijeetdashx@gmail.com","fularanifoundation@gmail.com"];
       if (adminEmails.includes(form.email?.trim().toLowerCase())) {
         setError("This email is registered as an Admin. Redirecting to admin login...");
         setTimeout(() => safeNavigate(navigate, "/volunteer-login"), 1500);
