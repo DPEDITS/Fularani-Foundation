@@ -47,9 +47,21 @@ self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => {
-        return caches.open(CACHE_NAME).then((cache) => {
-          return cache.match(OFFLINE_URL);
-        });
+        return caches.open(CACHE_NAME)
+          .then((cache) => cache.match(OFFLINE_URL))
+          .then((response) => {
+            if (response) {
+              return response;
+            }
+            // Fallback response if offline.html is not in the cache
+            return new Response(
+              '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offline</title><style>body{font-family:sans-serif;padding:50px;text-align:center;color:#333;}h1{font-size:2em;color:#0066cc;}p{font-size:1.2em;}</style></head><body><h1>Connection Lost</h1><p>You are currently offline. Please check your internet connection and try again.</p></body></html>',
+              {
+                status: 200,
+                headers: { 'Content-Type': 'text/html' }
+              }
+            );
+          });
       })
     );
     return;
@@ -58,13 +70,7 @@ self.addEventListener('fetch', (event) => {
   // Handle cached assets (logo, etc.) — for internal assets only
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request);
-    }).catch(() => {
-      // Return nothing if fetch fails for non-cached assets
-      return; 
+      return cachedResponse || fetch(event.request);
     })
   );
 });
