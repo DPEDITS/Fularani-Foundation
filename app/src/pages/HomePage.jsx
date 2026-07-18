@@ -71,7 +71,7 @@ const projectTiles = [
     icon: Landmark,
   },
   {
-    id: "no-thalassemia",
+    id: "thalassemia",
     title: "No thalassemia 2035",
     subtitle: "An urgent mission to eliminate thalassemia through screening and care.",
     accentColor: "#dc2626",
