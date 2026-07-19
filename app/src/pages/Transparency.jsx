@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   FileText, Download, Eye, ShieldCheck, Plus, X, Loader2, Pencil, Trash2, 
@@ -170,22 +171,6 @@ const DocumentDrawer = ({ mission, isOpen, onClose, isSuperAdmin, onEdit, onDele
             <div className="relative h-48 shrink-0">
               <img src={styles.image} alt="Banner" className="w-full h-full object-cover opacity-40" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
-              
-              {/* Back Button (Mobile Only) */}
-              <button 
-                onClick={onClose}
-                className="md:hidden absolute top-6 left-6 pl-1 pr-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full text-white/90 hover:text-white hover:bg-black/60 transition-all border border-white/10 flex items-center justify-center gap-1"
-              >
-                <ChevronLeft size={18} />
-                <span className="text-sm font-semibold">Back</span>
-              </button>
-
-              <button 
-                onClick={onClose}
-                className="absolute top-6 right-6 p-2 bg-black/40 backdrop-blur-md rounded-full text-white/70 hover:text-white hover:bg-black/60 transition-all border border-white/10"
-              >
-                <X size={20} />
-              </button>
 
               <div className="absolute bottom-6 left-6 right-6">
                 <span className="text-xs font-bold uppercase tracking-wider mb-2 block" style={{ color: styles.hex }}>
@@ -196,16 +181,31 @@ const DocumentDrawer = ({ mission, isOpen, onClose, isSuperAdmin, onEdit, onDele
             </div>
 
             {/* Controls: Search and Filters */}
-            <div className="px-6 py-4 border-b border-white/5 shrink-0 bg-[#0a0a0a]/90 backdrop-blur-lg sticky top-0 z-10">
-              <div className="relative mb-4">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input 
-                  type="text" 
-                  placeholder="Search documents..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-white/20 transition-all"
-                />
+            <div className="px-6 py-4 border-b border-white/5 shrink-0 bg-[#0a0a0a]/90 backdrop-blur-lg sticky top-0 z-20">
+              <div className="flex items-center gap-3 mb-4 w-full">
+                <button 
+                  onClick={onClose}
+                  className="md:hidden p-2.5 -ml-2 bg-white/5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <div className="relative flex-1 min-w-0">
+                  <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input 
+                    type="text" 
+                    placeholder="Search documents..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-white/20 transition-all"
+                  />
+                </div>
+                <button 
+                  onClick={onClose}
+                  className="hidden md:flex p-2.5 bg-white/5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+                  title="Close"
+                >
+                  <X size={20} />
+                </button>
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 {filters.map(filter => (
@@ -242,12 +242,12 @@ const DocumentDrawer = ({ mission, isOpen, onClose, isSuperAdmin, onEdit, onDele
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="group flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-white/[0.02] border border-white/5 hover:border-white/20 rounded-2xl transition-all"
+                      className="group w-full flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-white/[0.02] border border-white/5 hover:border-white/20 rounded-2xl transition-all overflow-hidden"
                     >
                       <div className={`p-3 rounded-xl shrink-0 ${fileInfo.bg} ${fileInfo.color}`}>
                         <Icon size={20} />
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 w-full min-w-0">
                         <h3 className="text-sm font-semibold text-white truncate mb-1">{doc.name}</h3>
                         <div className="flex items-center gap-3 text-xs text-gray-500 font-medium">
                           <span className={`px-2 py-0.5 rounded flex items-center gap-1 ${fileInfo.bg} ${fileInfo.color}`}>
@@ -443,7 +443,7 @@ const Transparency = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white pt-24 pb-20 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#050505] text-white pt-24 pb-20 relative overflow-x-hidden font-sans">
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-500/5 blur-[120px] rounded-full translate-y-1/3 -translate-x-1/3 pointer-events-none" />
 
@@ -455,6 +455,14 @@ const Transparency = () => {
           className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6"
         >
           <div className="max-w-2xl">
+            <Link 
+              to="/" 
+              className="inline-flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors text-sm font-semibold mb-6 group"
+            >
+              <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+              Back to Home
+            </Link>
+            
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300 text-xs font-bold mb-6 tracking-wide uppercase">
               <ShieldCheck size={14} className="text-primary" />
               <span>100% Accountability</span>
